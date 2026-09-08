@@ -1,0 +1,5 @@
+name,chemical_formula,molecular_weight,pharmacological_class,mechanism_summary,source,confidence_score
+Paracétamol,C8H9NO2,151.16,Antalgique non opioïde,Inhibition centrale COX + activation voies sérotoninergiques,DrugBank,99
+Ibuprofène,C13H18O2,206.28,AINS propionique,Inhibition non sélective COX-1/COX-2 anti-inflammatoire,DrugBank,99
+Atorvastatine,C33H35FN2O5,558.64,Statine,Inhibition HMG-CoA réductase → baisse cholestérol,DrugBank,99
+Amoxicilline,C16H19N3O5S,365.40,β-lactamine,Inhibition synthèse peptidoglycane bactérien,DrugBank,99

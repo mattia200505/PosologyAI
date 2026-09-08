@@ -1,0 +1,463 @@
+/* ══════════════════════════════════════════════════════════════════
+   La barre de navigation du site.
+
+   Elle n'a d'abord existé que sur la page d'accueil, dans
+   `accueil_essai.css` : les douze autres pages portaient un bandeau
+   collant tout différent, déclaré dans `styles.css`. Deux barres pour
+   un même site, et le passage de l'accueil à n'importe quelle page
+   changeait de repère.
+
+   Elle est désormais la seule, et cette feuille est sa seule
+   définition. Les pages la chargent, elles ne la redéclarent pas.
+
+   Autonome : les variables `--nv-*` se dérivent de `theme.css`, avec
+   une valeur de repli si la feuille manquait. Aucune page n'a besoin de
+   `styles.css` ni de `accueil_essai.css` pour que la barre tienne.
+   ══════════════════════════════════════════════════════════════════ */
+
+:root {
+  --nv-encre: var(--text-primary, #1d1d1f);
+  --nv-douce: var(--text-secondary, #6e6e73);
+  --nv-filet: rgba(0, 0, 0, 0.08);
+  --nv-accent: var(--primary, #4f46e5);
+  --nv-accent-sombre: var(--primary-dark, #3730a3);
+}
+
+/* ══ Navigation flottante ═══════════════════════════════════════════
+   Pilule en verre posée sur le hero au lieu d'un bandeau opaque qui le
+   couperait. Elle devient blanche dès qu'on quitte le hero, sans quoi
+   le texte clair deviendrait illisible sur le fond gris de la page. */
+.nv {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: min(1180px, calc(100% - 28px));
+  height: 62px;               /* sous le plafond de 80px du skill (§4.7) */
+  padding: 0 10px 0 18px;
+  transform: translateX(-50%);
+  /* Claire dès le départ : la moitié gauche du hero est sur fond blanc,
+     du texte clair y serait illisible. La barre se contente de densifier
+     son ombre une fois qu'on a quitté le hero. */
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid var(--nv-filet);
+  border-radius: 999px;
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.nv-marque {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--nv-encre);
+  text-decoration: none;
+}
+
+.nv-pastille {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  font-size: 0.82rem;
+  color: #fff;
+  background: linear-gradient(140deg, var(--nv-accent), var(--nv-accent-sombre));
+  border-radius: 9px;
+}
+
+.nv-liens { display: flex; gap: 4px; margin-inline-start: auto; }
+
+.nv-liens a {
+  padding: 8px 14px;
+  font-size: 0.88rem;
+  font-weight: 550;
+  color: var(--nv-douce);
+  text-decoration: none;
+  border-radius: 999px;
+  transition: background 0.2s ease, color 0.25s ease;
+}
+
+.nv-liens a:hover { background: rgba(79, 70, 229, 0.09); color: var(--nv-accent); }
+
+.nv-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  font-size: 0.86rem;
+  font-weight: 650;
+  color: #fff;
+  text-decoration: none;
+  background: linear-gradient(140deg, var(--nv-accent), var(--nv-accent-sombre));
+  border-radius: 999px;
+  white-space: nowrap;
+  transition: filter 0.2s ease, transform 0.18s ease;
+}
+
+.nv-action:hover { filter: brightness(1.08); transform: translateY(-1px); }
+
+.nv-burger { display: none; padding: 10px 12px; font-size: 1rem; color: var(--nv-encre); background: none; border: none; cursor: pointer; }
+
+/* Posée : la barre a quitté le hero, son ombre se densifie pour la
+   détacher du contenu qui défile dessous. */
+.nv-pose {
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.1);
+}
+
+
+/* ── Repli mobile ────────────────────────────────────────────────────
+   Sous 980 px les liens se replient derrière le bouton, et se déploient
+   en colonne sous la barre. */
+@media (max-width: 980px) {
+  .nv-liens { display: none; }
+  .nv-burger { display: inline-flex; margin-inline-start: auto; }
+  .nv-action { display: none; }
+  .nv-ouverte .nv-liens {
+    position: absolute;
+    top: calc(100% + 10px);
+    inset-inline: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid var(--nv-filet);
+    border-radius: 18px;
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.14);
+  }
+  .nv-ouverte .nv-liens a { color: var(--nv-encre); text-align: center; }
+}
+
+/* Le mouvement se coupe s'il est refusé. */
+@media (prefers-reduced-motion: reduce) {
+  .nv { transition: none; }
+}
+
+/* Le verre retombe sur un fond plein si la transparence est refusée.
+   Il retombait sur un bleu nuit — `rgba(15, 23, 42, 0.94)` — sous des
+   liens gris et une encre sombre : illisible. La barre est claire, son
+   repli l'est aussi. C'était sans conséquence tant que la règle ne
+   valait que pour l'accueil ; elle vaut maintenant pour tout le site. */
+@media (prefers-reduced-transparency: reduce) {
+  .nv {
+    background: #ffffff;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .nv-pose { background: #ffffff; }
+}
+
+
+/* ══ Ce que la barre de l'accueil ne portait pas ══════════════════════
+   Elle n'avait que cinq liens. Le bandeau qu'elle remplace portait en
+   plus le sous-menu des trois modes de recherche, le sélecteur de
+   langue et le menu utilisateur — profil, favoris, administration,
+   déconnexion. Les reprendre n'est pas un ajout : c'est ce qui rend le
+   remplacement possible sans rien perdre.
+
+   Même vocabulaire visuel que la barre : pilules, mêmes rayons, même
+   accent indigo sur de petites surfaces. */
+
+/* ── La cale ─────────────────────────────────────────────────────────
+   La barre est `position: fixed` : elle ne prend pas de place dans le
+   flux, et le contenu passerait dessous. L'ancien bandeau était
+   `sticky` et occupait sa hauteur, aucune page n'avait donc à s'en
+   soucier.
+
+   La cale la rend. Sauf sur l'accueil, dont le hero est déjà composé
+   pour que la barre flotte par-dessus. */
+.nv-place { height: 90px; }
+body.essai .nv-place { height: 0; }
+
+/* ── Le sous-menu ────────────────────────────────────────────────────
+   Recherche classique, vectorielle et IA. Trois entrées séparées dans
+   la barre l'auraient encombrée ; les fondre en un lien aurait rendu
+   deux écrans introuvables. */
+.nv-groupe { position: relative; }
+
+.nv-groupe > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 550;
+  color: var(--nv-douce);
+  background: none;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.25s ease;
+}
+
+.nv-groupe > button:hover,
+.nv-groupe[data-ouvert="oui"] > button {
+  background: rgba(79, 70, 229, 0.09);
+  color: var(--nv-accent);
+}
+
+.nv-chevron { font-size: 0.62rem; transition: transform 0.2s ease; }
+.nv-groupe[data-ouvert="oui"] .nv-chevron { transform: rotate(180deg); }
+
+.nv-tiroir {
+  position: absolute;
+  top: calc(100% + 12px);
+  inset-inline-start: 0;
+  z-index: 60;
+  display: none;
+  min-width: 264px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.97);
+  border: 1px solid var(--nv-filet);
+  border-radius: 16px;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.14);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+}
+
+.nv-groupe[data-ouvert="oui"] .nv-tiroir { display: block; }
+
+.nv-tiroir a {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 9px 11px;
+  color: var(--nv-encre);
+  text-decoration: none;
+  border-radius: 11px;
+  transition: background 0.18s ease;
+}
+
+.nv-tiroir a:hover { background: rgba(79, 70, 229, 0.08); }
+.nv-tiroir a > i { margin-top: 3px; font-size: 0.82rem; color: var(--nv-accent); }
+.nv-tiroir-titre { font-size: 0.86rem; font-weight: 600; line-height: 1.35; }
+.nv-tiroir-note { font-size: 0.75rem; line-height: 1.45; color: var(--nv-douce); }
+
+/* ── Les outils, à droite ────────────────────────────────────────────
+   Langue et compte. Ils ferment la barre, après les liens et le bouton
+   d'action : ce sont des réglages, pas des destinations. */
+.nv-outils {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-inline-start: 6px;
+}
+
+.nv-avatar {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(140deg, var(--nv-accent), var(--nv-accent-sombre));
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: filter 0.2s ease;
+}
+
+.nv-avatar:hover { filter: brightness(1.1); }
+
+.nv-compte { position: relative; }
+
+.nv-compte-tiroir {
+  position: absolute;
+  top: calc(100% + 12px);
+  inset-inline-end: 0;
+  z-index: 60;
+  display: none;
+  min-width: 190px;
+  padding: 7px;
+  background: rgba(255, 255, 255, 0.97);
+  border: 1px solid var(--nv-filet);
+  border-radius: 15px;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.14);
+}
+
+.nv-compte[data-ouvert="oui"] .nv-compte-tiroir { display: block; }
+
+.nv-compte-tiroir a {
+  display: block;
+  padding: 8px 11px;
+  font-size: 0.85rem;
+  color: var(--nv-encre);
+  text-decoration: none;
+  border-radius: 10px;
+}
+
+.nv-compte-tiroir a:hover { background: rgba(79, 70, 229, 0.08); }
+
+.nv-separateur {
+  height: 1px;
+  margin: 5px 8px;
+  background: var(--nv-filet);
+}
+
+/* Le bouton de connexion prend l'allure du bouton d'action, en plus
+   discret : c'est une entrée, pas l'action principale de la page. */
+.nv-connexion {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 15px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--nv-accent);
+  text-decoration: none;
+  background: rgba(79, 70, 229, 0.1);
+  border-radius: 999px;
+  white-space: nowrap;
+  transition: background 0.2s ease;
+}
+
+.nv-connexion:hover { background: rgba(79, 70, 229, 0.17); }
+
+/* Le sélecteur de langue est injecté par `translations.js`. On ne lui
+   impose que son alignement : sa forme est son affaire. */
+#langSwitcherContainer { display: flex; align-items: center; }
+
+/* Le lien courant se marque, discrètement. Sur douze pages, savoir où
+   l'on est vaut mieux que de le deviner par le titre. */
+.nv-liens a.nv-actif,
+.nv-groupe[data-actif="oui"] > button {
+  color: var(--nv-accent);
+  background: rgba(79, 70, 229, 0.11);
+}
+
+@media (max-width: 980px) {
+  /* Le sous-menu se déplie en place plutôt qu'en surimpression : dans
+     un menu déjà replié, un tiroir flottant sortirait de l'écran. */
+  .nv-ouverte .nv-groupe { width: 100%; }
+  .nv-ouverte .nv-groupe > button { width: 100%; justify-content: center; }
+  .nv-tiroir {
+    position: static;
+    min-width: 0;
+    box-shadow: none;
+    border: none;
+    background: none;
+  }
+  .nv-outils { margin-inline-start: auto; }
+}
+
+
+/* ══ Le sélecteur de langue ═══════════════════════════════════════════
+   Ces règles vivaient dans `styles.css`. La barre déclare
+   `#langSwitcherContainer` et `translations.js` y bâtit ce balisage ;
+   les styles doivent voyager avec elle, pas avec une feuille qu'une
+   page peut ne pas charger.
+
+   Mesuré : la page d'accueil charge `nav.css` mais pas `styles.css`.
+   Le sélecteur s'y construisait donc sans aucun style — un bouton nu au
+   milieu de la barre. Toute page incluant `nav.html` sans passer par
+   `header.html` aurait eu le même trou. */
+.lang-switcher {
+  position: relative;
+}
+
+.lang-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  transition: var(--transition-fast);
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.lang-btn:hover {
+  background: var(--primary-subtle);
+  color: var(--primary);
+}
+
+.lang-flag {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.lang-label {
+  line-height: 1;
+}
+
+.lang-chevron {
+  font-size: 0.625rem;
+  transition: transform 0.2s ease;
+}
+
+.lang-dropdown {
+  position: absolute;
+  inset-inline-end: 0;
+  top: calc(100% + 8px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  min-width: 170px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition: var(--transition-base);
+  padding: 6px;
+  z-index: 200;
+}
+
+.lang-dropdown.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.lang-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-fast);
+  font-family: inherit;
+  text-align: start;
+}
+
+.lang-option:hover {
+  background: var(--surface-secondary);
+  opacity: 1;
+}
+
+.lang-option.active {
+  background: var(--primary-subtle);
+  color: var(--primary);
+}
+
+.lang-option-flag {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.lang-option-label {
+  line-height: 1;
+}

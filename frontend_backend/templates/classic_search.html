@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recherche - PosologyAI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/hero.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/search.css') }}">
+</head>
+<body>
+    {% with active_page='search' %}
+    {% include 'components/header.html' %}
+    {% endwith %}
+    
+    <main>
+    {# La bande de tete partagee avec le tableau de bord, le menu de
+       prescription et la page ordonnance. Le degrade fige a 135 degres
+       et sa tache radiale immobile lui cedent la place. #}
+    <section class="search-banner hero-nuit hero-photo">
+        {% with photo = 'photo-1516549655169-df83a0774514' %}
+        {% include 'components/hero_photo.html' %}
+        {% endwith %}
+        <div class="search-container">
+            <p class="hero-sur"><i class="fas fa-magnifying-glass" aria-hidden="true"></i> <span data-i18n="search">Recherche</span></p>
+            <h1 class="page-title" data-i18n="classic_search_title">Recherche classique</h1>
+            {% with mode_actif='exacte', requete=search %}{% include 'components/modes_recherche.html' %}{% endwith %}
+            {% if not search %}
+            <div class="vector-placeholder">
+                <p data-i18n="try_classic_search">Essayez une recherche classique sur des exemples&nbsp;:</p>
+                <div class="search-tags-row">
+                    <button type="button" class="search-tag-btn translatable-tag" data-query="antibiotique" data-query-en="antibiotic">antibiotique</button>
+                    <button type="button" class="search-tag-btn translatable-tag" data-query="paracétamol" data-query-en="paracetamol">paracétamol</button>
+                    <button type="button" class="search-tag-btn translatable-tag" data-query="gélule" data-query-en="capsule">gélule</button>
+                    <button type="button" class="search-tag-btn translatable-tag" data-query="pédiatrique" data-query-en="pediatric">pédiatrique</button>
+                    <button type="button" class="search-tag-btn translatable-tag" data-query="amoxicilline" data-query-en="amoxicillin">amoxicilline</button>
+                </div>
+                <p class="hint-text" data-i18n="try_keywords">Essayez des mots-clés précis ou des noms de médicaments connus.</p>
+            </div>
+            {% endif %}
+            <form id="search-form" action="/search" method="GET">
+                <div class="search-box">
+                    <input type="text" id="search-input" name="search" class="search-input" data-i18n-placeholder="search_placeholder" placeholder="Nom, substance active, laboratoire..." value="{{ search }}">
+                    <button type="submit" class="search-button" aria-label="Lancer la recherche">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                
+                <!-- Filtres avancés -->
+                <div class="search-filters-row">
+                    <select name="substance" class="control-select control-select-light">
+                        <option value="" data-i18n="all_active_substances" data-i18n-en="All active substances">Toutes les substances actives</option>
+                        {% for substance_opt in available_filters.substances %}
+                        <option value="{{ substance_opt }}" {% if substance_opt == substance %}selected{% endif %}>{{ substance_opt }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="forme" class="control-select control-select-light">
+                        <option value="" data-i18n="all_pharmaceutical_forms" data-i18n-en="All forms">Toutes les formes</option>
+                        {% for forme_opt in available_filters.formes %}
+                        <option value="{{ forme_opt }}" {% if forme_opt == forme %}selected{% endif %}>{{ forme_opt }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="laboratoire" class="control-select control-select-light">
+                        <option value="" data-i18n="all_laboratories" data-i18n-en="All laboratories">Tous les laboratoires</option>
+                        {% for lab in available_filters.laboratoires %}
+                        <option value="{{ lab }}" {% if lab == laboratoire %}selected{% endif %}>{{ lab }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="dosage" class="control-select control-select-light">
+                        <option value="" data-i18n="all_dosages" data-i18n-en="All dosages">Tous les dosages</option>
+                        {% for dosage_opt in available_filters.dosages %}
+                        <option value="{{ dosage_opt }}" {% if dosage_opt|string == dosage|string %}selected{% endif %}>{{ dosage_opt }}</option>
+                        {% endfor %}
+                    </select>
+                    <select id="family-filter" name="family" class="control-select control-select-light">
+                        <option value="" data-i18n="all_therapeutic_families_atc">Toutes les familles (ATC)</option>
+                    </select>
+                    <select id="type-filter" name="type_med" class="control-select control-select-light">
+                        <option value="" data-i18n="all_medicine_types">Tous les types de médicaments</option>
+                    </select>
+                    {#
+                       Trois axes présents en base depuis toujours mais qu'aucun
+                       filtre n'exposait. La voie d'administration couvre 11 940
+                       fiches : c'est le premier tri d'un prescripteur qui cherche
+                       une forme injectable. Le statut de commercialisation évite
+                       de proposer un médicament retiré du marché. La surveillance
+                       renforcée isole 491 spécialités sous triangle noir.
+                    #}
+                    <select name="voie" class="control-select control-select-light">
+                        <option value="" data-i18n="all_routes" data-i18n-en="All routes of administration">Toutes les voies d'administration</option>
+                        {% for voie_opt in available_filters.voies %}
+                        <option value="{{ voie_opt }}" {% if voie_opt == voie %}selected{% endif %}>{{ voie_opt }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="commercialisation" class="control-select control-select-light">
+                        <option value="" data-i18n="all_marketing_status" data-i18n-en="Marketed and withdrawn">Commercialisés et retirés</option>
+                        <option value="Commercialisée" {% if commercialisation == 'Commercialisée' %}selected{% endif %} data-i18n="marketed_only" data-i18n-en="Marketed only">Commercialisés uniquement</option>
+                        <option value="Non commercialisée" {% if commercialisation == 'Non commercialisée' %}selected{% endif %} data-i18n="not_marketed_only" data-i18n-en="Withdrawn only">Retirés uniquement</option>
+                    </select>
+                    <select name="surveillance" class="control-select control-select-light">
+                        <option value="" data-i18n="all_monitoring" data-i18n-en="Any monitoring status">Surveillance : indifférent</option>
+                        <option value="Oui" {% if surveillance == 'Oui' %}selected{% endif %} data-i18n="monitoring_yes" data-i18n-en="Under additional monitoring">Sous surveillance renforcée</option>
+                        <option value="Non" {% if surveillance == 'Non' %}selected{% endif %} data-i18n="monitoring_no" data-i18n-en="Not under additional monitoring">Hors surveillance renforcée</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+    </section>
+    
+    <section class="search-results-container">
+        <div class="container">
+            <div id="search-results" class="search-results" aria-live="polite" aria-atomic="false">
+                <!-- Results will be loaded here via AJAX -->
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+            
+            <div class="pagination" id="pagination">
+                <!-- Pagination will be generated via JS -->
+            </div>
+        </div>
+    </section>
+    
+    </main>
+
+    {% with now=now|default({"year": 2025}) %}
+    {% include 'components/footer.html' %}
+    {% endwith %}
+    
+    <script>
+    // ── L'entrée des fiches ──────────────────────────────────────────
+    //
+    // Le même geste que sur les trois autres écrans. La réserve aussi :
+    // sans observateur, ou en mouvement réduit, les fiches sont visibles
+    // d'emblée — ce qui resterait transparent serait le résultat de la
+    // recherche.
+    function animerFiches(zone) {
+        var fiches = [].slice.call(zone.querySelectorAll('.medicine-card'));
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches
+                || !('IntersectionObserver' in window)) {
+            fiches.forEach(function (f) { f.classList.add('entree', 'vu'); });
+            return;
+        }
+        fiches.forEach(function (f) { f.classList.add('entree'); });
+        var observateur = new IntersectionObserver(function (entrees) {
+            entrees.forEach(function (e) {
+                if (!e.isIntersecting) return;
+                e.target.classList.add('vu');
+                observateur.unobserve(e.target);
+            });
+        }, { threshold: 0.1 });
+        fiches.forEach(function (f) { observateur.observe(f); });
+    }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- CHARGEMENT DES FAMILLES THÉRAPEUTIQUES ET TYPES ---
+            const familySelect = document.getElementById('family-filter');
+            const typeSelect = document.getElementById('type-filter');
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentFamily = urlParams.get('family') || '';
+            const currentType = urlParams.get('type_med') || '';
+            
+            // Charger les familles thérapeutiques depuis l'API
+            fetch('/api/therapeutic-families')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.families) {
+                        data.families.forEach(family => {
+                            const option = document.createElement('option');
+                            option.value = family.name;
+                            option.textContent = `${family.name} (${family.count})`;
+                            if (family.name === currentFamily) {
+                                option.selected = true;
+                            }
+                            familySelect.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur chargement familles:', error);
+                });
+            
+            // Charger les types de médicaments hiérarchiques
+            fetch('/api/medicine-types')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.categories) {
+                        Object.keys(data.categories).forEach(categoryKey => {
+                            const category = data.categories[categoryKey];
+                            const optgroup = document.createElement('optgroup');
+                            optgroup.label = categoryKey;
+                            category.types.forEach(type => {
+                                const option = document.createElement('option');
+                                option.value = type;
+                                option.textContent = type;
+                                if (type === currentType) {
+                                    option.selected = true;
+                                }
+                                optgroup.appendChild(option);
+                            });
+                            typeSelect.appendChild(optgroup);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur chargement types:', error);
+                });
+            
+            // --- TAGS INTERACTIVES POUR LA RECHERCHE CLASSIQUE ---
+            const tagButtons = document.querySelectorAll('.search-tag-btn[data-query]');
+            tagButtons.forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    const value = btn.getAttribute('data-query');
+                    const input = document.getElementById('search-input');
+                    if (input) {
+                        input.value = value;
+                        let form = input.closest('form');
+                        if (form) {
+                            btn.disabled = true;
+                            btn.classList.add('loading');
+                            tagButtons.forEach(b => b.disabled = true);
+                            btn.innerHTML = '<span class="spinner-inline"></span>Recherche...';
+                            form.submit();
+                        }
+                    }
+                });
+            });
+            
+            // Medicine type categories mapping (for emojis)
+            const TYPE_CATEGORIES = {};
+            
+            // Translation dictionaries for search results
+            const therapeuticFamilyTranslations = {
+                "Anti-infectieux généraux à usage systémique": "General anti-infectives for systemic use",
+                "Antinéoplasiques et immunomodulateurs": "Antineoplastic and immunomodulating agents",
+                "Appareil digestif et métabolisme": "Alimentary tract and metabolism",
+                "Divers": "Various",
+                "Médicaments dermatologiques": "Dermatological preparations",
+                "Organes sensoriels": "Sensory organs",
+                "Produits antiparasitaires": "Antiparasitic products",
+                "Préparations systémiques hormonales": "Systemic hormonal preparations",
+                "Sang et organes hématopoïétiques": "Blood and blood forming organs",
+                "Système cardiovasculaire": "Cardiovascular system",
+                "Système génito-urinaire et hormones sexuelles": "Genitourinary system and sex hormones",
+                "Système musculo-squelettique": "Musculoskeletal system",
+                "Système nerveux": "Nervous system",
+                "Système respiratoire": "Respiratory system"
+            };
+            
+            const medicineTypeTranslations = {
+                "Antalgiques/Antipyrétiques": "Analgesics/Antipyretics",
+                "Anti-inflammatoires (AINS)": "Anti-inflammatories (NSAIDs)",
+                "Myorelaxants": "Muscle relaxants",
+                "Antimigraineux": "Anti-migraine drugs",
+                "Antibiotiques": "Antibiotics",
+                "Antiviraux": "Antivirals",
+                "Antifongiques": "Antifungals",
+                "Antiparasitaires": "Antiparasitic drugs",
+                "Vaccins": "Vaccines",
+                "Antiseptiques": "Antiseptics",
+                "Antidépresseurs": "Antidepressants",
+                "Anxiolytiques": "Anxiolytics",
+                "Neuroleptiques/Antipsychotiques": "Neuroleptics/Antipsychotics",
+                "Hypnotiques/Sédatifs": "Hypnotics/Sedatives",
+                "Antiépileptiques": "Antiepileptics",
+                "Antiparkinsoniens": "Antiparkinson drugs",
+                "Psychostimulants": "Psychostimulants",
+                "Antihypertenseurs": "Antihypertensives",
+                "Diurétiques": "Diuretics",
+                "Bêta-bloquants": "Beta-blockers",
+                "Inhibiteurs calciques": "Calcium channel blockers",
+                "Antiarythmiques": "Antiarrhythmics",
+                "Vasodilatateurs": "Vasodilators",
+                "Anticoagulants": "Anticoagulants",
+                "Antiagrégants plaquettaires": "Antiplatelet agents",
+                "Hypolipémiants": "Lipid-lowering drugs",
+                "Bronchodilatateurs": "Bronchodilators",
+                "Corticoïdes inhalés": "Inhaled corticosteroids",
+                "Antitussifs": "Antitussives",
+                "Mucolytiques/Expectorants": "Mucolytics/Expectorants",
+                "Antihistaminiques": "Antihistamines",
+                "Antiasthmatiques": "Antiasthmatics",
+                "Antiacides": "Antacids",
+                "Antiulcéreux (IPP)": "Antiulcer drugs (PPIs)",
+                "Antiémétiques": "Antiemetics",
+                "Laxatifs": "Laxatives",
+                "Antidiarrhéiques": "Antidiarrheals",
+                "Antispasmodiques": "Antispasmodics",
+                "Enzymes digestives": "Digestive enzymes",
+                "Insulines": "Insulins",
+                "Antidiabétiques oraux": "Oral antidiabetics",
+                "Hormones thyroïdiennes": "Thyroid hormones",
+                "Antithyroïdiens": "Antithyroid drugs",
+                "Corticoïdes systémiques": "Systemic corticosteroids",
+                "Contraceptifs": "Contraceptives",
+                "Traitements hormonaux substitutifs": "Hormone replacement therapies",
+                "Antianémiques": "Antianemic drugs",
+                "Facteurs de croissance": "Growth factors",
+                "Immunosuppresseurs": "Immunosuppressants",
+                "Immunostimulants": "Immunostimulants",
+                "Dermocosmétiques": "Dermocosmetics",
+                "Antiacnéiques": "Antiacne drugs",
+                "Antimycosiques topiques": "Topical antifungals",
+                "Émollients": "Emollients",
+                "Antipsoriasiques": "Antipsoriatic drugs",
+                "Chimiothérapies": "Chemotherapies",
+                "Thérapies ciblées": "Targeted therapies",
+                "Hormonothérapies": "Hormone therapies",
+                "Immunothérapies": "Immunotherapies",
+                "Collyres": "Eye drops",
+                "Antiglaucomateux": "Antiglaucoma drugs",
+                "Décongestionnants": "Decongestants",
+                "Gouttes auriculaires": "Ear drops"
+            };
+            
+            const pharmaFormKeywords = {
+                "comprimé": "tablet", "gélule": "capsule", "capsule": "capsule",
+                "sirop": "syrup", "solution": "solution", "suspension": "suspension",
+                "poudre": "powder", "granulé": "granule", "ampoule": "ampoule",
+                "injectable": "injectable", "injection": "injection", "perfusion": "infusion",
+                "crème": "cream", "pommade": "ointment", "gel": "gel",
+                "lotion": "lotion", "spray": "spray", "aérosol": "aerosol",
+                "inhalation": "inhalation", "inhalateur": "inhaler", "nébuliseur": "nebulizer",
+                "suppositoire": "suppository", "ovule": "vaginal suppository",
+                "patch": "patch", "timbre": "patch", "transdermique": "transdermal",
+                "collyre": "eye drops", "gouttes": "drops", "ophtalmique": "ophthalmic",
+                "auriculaire": "ear", "nasal": "nasal", "nasale": "nasal",
+                "buccal": "buccal", "sublingual": "sublingual", "orodispersible": "orodispersible",
+                "effervescent": "effervescent", "gastro-résistant": "gastro-resistant",
+                "libération prolongée": "extended-release", "libération modifiée": "modified-release",
+                "retard": "extended-release", "lp": "extended-release",
+                "pelliculé": "film-coated", "enrobé": "coated", "sécable": "scored",
+                "à croquer": "chewable", "à sucer": "lozenge",
+                "voie orale": "oral", "voie rectale": "rectal", "voie cutanée": "cutaneous",
+                "usage externe": "external use", "usage local": "local use",
+                "stérile": "sterile", "lyophilisé": "lyophilized",
+                "reconstitution": "reconstitution", "dilution": "dilution",
+                "unidose": "single-dose", "multidose": "multi-dose",
+                "flacon": "bottle", "tube": "tube", "sachet": "sachet",
+                "seringue": "syringe", "stylo": "pen", "cartouche": "cartridge"
+            };
+            
+            function translatePharmaForm(frenchText) {
+                if (!frenchText) return frenchText;
+                let result = frenchText.toLowerCase();
+                for (const [fr, en] of Object.entries(pharmaFormKeywords)) {
+                    const regex = new RegExp(fr, 'gi');
+                    result = result.replace(regex, en);
+                }
+                return result.charAt(0).toUpperCase() + result.slice(1);
+            }
+            
+            // Load medicine types with their categories and emojis
+            fetch('/api/medicine-types')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.categories) {
+                        Object.keys(data.categories).forEach(categoryKey => {
+                            const category = data.categories[categoryKey];
+                            category.types.forEach(type => {
+                                TYPE_CATEGORIES[type] = {
+                                    emoji: category.emoji,
+                                    category: category.name
+                                };
+                            });
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur chargement catégories:', error);
+                });
+            
+            // Function to get type display with emoji
+            function getTypeDisplay(type) {
+                if (!type) return null;
+                const categoryInfo = TYPE_CATEGORIES[type];
+                if (categoryInfo) {
+                    return `<span class="type-emoji">${categoryInfo.emoji}</span><span><strong>${type}</strong></span>`;
+                }
+                return `<span class="type-emoji">💊</span><span><strong>${type}</strong></span>`;
+            }
+            
+            // Function to get type data (emoji and type name) for translation purposes
+            function getTypeDisplayData(type) {
+                if (!type) return { emoji: '💊', type: type };
+                const categoryInfo = TYPE_CATEGORIES[type];
+                if (categoryInfo) {
+                    return { emoji: categoryInfo.emoji, type: type };
+                }
+                return { emoji: '💊', type: type };
+            }
+
+            {#
+               Trois lignes orphelines retirees ici.
+
+                   document.getElementById('sort').value = 'date_desc';
+                   document.getElementById('search-form').submit();
+               });
+
+               Elles n'avaient aucun ouvrant : le corps d'un gestionnaire dont
+               la premiere ligne a disparu, present depuis le commit initial.
+               Leur `});` fermait prematurement le callback de
+               `DOMContentLoaded` ouvert plus haut, et le `});` final de la
+               page n'avait alors plus rien a fermer.
+
+               Consequence : **le bloc entier ne se parsait pas**. Rien de ce
+               qu'il contient ne s'executait — ni la lecture de l'URL, ni
+               `loadSearchResults`, ni le rendu des fiches, ni le tri, ni la
+               pagination. Mesure : `new vm.Script` sur le bloc rendu par la
+               page echouait sur « Unexpected token '}' », a l'identique sur
+               la version du depot.
+
+               Rien n'est ajoute a la place : ce que ces lignes faisaient —
+               remettre le tri a `date_desc` et resoumettre le formulaire —
+               n'etait declenche par rien.
+            #}
+
+            // Load search results
+            {# `urlParams` est deja declare en tete de ce meme callback, avec
+               la meme valeur — `new URLSearchParams(window.location.search)`.
+               Le redeclarer ici leve `Identifier 'urlParams' has already been
+               declared`. L'erreur etait masquee par la fermeture prematuree
+               retiree ci-dessus : le parseur n'atteignait jamais cette ligne. #}
+            let currentPage = parseInt(urlParams.get('page')) || 1;
+            const perPage = parseInt(urlParams.get('per_page')) || 10;
+            const searchQuery = urlParams.get('search') || '';
+            const substance = urlParams.get('substance') || '';
+            const forme = urlParams.get('forme') || '';
+            const laboratoire = urlParams.get('laboratoire') || '';
+            const dosage = urlParams.get('dosage') || '';
+            const family = urlParams.get('family') || '';
+            const type_med = urlParams.get('type_med') || '';
+            const sort = urlParams.get('sort') || 'date_desc';
+            // Les trois filtres ajoutes se lisent directement dans l URL plutot
+            // que de passer par la signature de loadSearchResults, deja a dix
+            // parametres positionnels : un de plus et un oubli d ordre devient
+            // invisible. La pagination rechargeant la page, l URL fait foi.
+            const voie = urlParams.get('voie') || '';
+            const commercialisation = urlParams.get('commercialisation') || '';
+            const surveillance = urlParams.get('surveillance') || '';
+
+            // Ne charger les résultats QUE si une recherche a été faite
+            if (searchQuery || substance || forme || laboratoire || dosage || family || type_med
+                || voie || commercialisation || surveillance) {
+                loadSearchResults(searchQuery, currentPage, perPage, substance, forme, laboratoire, dosage, family, type_med, sort);
+            } else {
+                // Masquer le spinner si aucune recherche
+                document.getElementById('search-results').innerHTML = '';
+            }
+            
+            function loadSearchResults(search, page, perPage, substance, forme, laboratoire, dosage, family, type_med, sort) {
+                const resultsContainer = document.getElementById('search-results');
+                resultsContainer.innerHTML = `
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                    </div>
+                `;
+                
+                // Détecter la langue depuis localStorage
+                const currentLang = localStorage.getItem('posologyai_lang') || 'fr';
+                
+                let apiUrl = `/api/search-results?page=${page}&per_page=${perPage}&lang=${currentLang}`;
+                if (search) apiUrl += `&search=${encodeURIComponent(search)}`;
+                if (substance) apiUrl += `&substance=${encodeURIComponent(substance)}`;
+                if (forme) apiUrl += `&forme=${encodeURIComponent(forme)}`;
+                if (laboratoire) apiUrl += `&laboratoire=${encodeURIComponent(laboratoire)}`;
+                if (dosage) apiUrl += `&dosage=${encodeURIComponent(dosage)}`;
+                if (family) apiUrl += `&family=${encodeURIComponent(family)}`;
+                if (type_med) apiUrl += `&type_med=${encodeURIComponent(type_med)}`;
+                if (sort) apiUrl += `&sort=${sort}`;
+                if (voie) apiUrl += `&voie=${encodeURIComponent(voie)}`;
+                if (commercialisation) apiUrl += `&commercialisation=${encodeURIComponent(commercialisation)}`;
+                if (surveillance) apiUrl += `&surveillance=${encodeURIComponent(surveillance)}`;
+                
+                fetch(apiUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.results.length === 0) {
+                            resultsContainer.innerHTML = `
+                                <div class="no-results">
+                                    <i class="fas fa-search"></i>
+                                    <h3>Aucun résultat trouvé</h3>
+                                    <p>Essayez de modifier vos termes de recherche ou vos filtres pour trouver ce que vous cherchez.</p>
+                                </div>
+                            `;
+                            document.getElementById('pagination').innerHTML = '';
+                            return;
+                        }
+                        let resultsHTML = `
+                            <div class="results-info">
+                                <div class="results-count">
+                                    <strong>${data.total_results}</strong> résultat(s) trouvé(s)
+                                </div>
+                                <div class="results-controls">
+                                    <div class="sort-control">
+                                        <span class="control-label">Trier par:</span>
+                                        <select id="sort-select" class="control-select" onchange="changeSortOrder(this.value)">
+                                            <option value="relevance" ${sort === 'relevance' ? 'selected' : ''}>Pertinence</option>
+                                            <option value="date_desc" ${sort === 'date_desc' ? 'selected' : ''}>Date (plus récent)</option>
+                                            <option value="date_asc" ${sort === 'date_asc' ? 'selected' : ''}>Date (plus ancien)</option>
+                                            <option value="name_asc" ${sort === 'name_asc' ? 'selected' : ''}>Nom (A-Z)</option>
+                                            <option value="name_desc" ${sort === 'name_desc' ? 'selected' : ''}>Nom (Z-A)</option>
+                                        </select>
+                                    </div>
+                                    <div class="per-page-control">
+                                        <span class="control-label">Résultats par page:</span>
+                                        <select id="per-page-select" class="control-select" onchange="changeResultsPerPage(this.value)">
+                                            <option value="10" ${perPage === 10 ? 'selected' : ''}>10</option>
+                                            <option value="25" ${perPage === 25 ? 'selected' : ''}>25</option>
+                                            <option value="50" ${perPage === 50 ? 'selected' : ''}>50</option>
+                                            <option value="100" ${perPage === 100 ? 'selected' : ''}>100</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        for (const medicine of data.results) {
+                            resultsHTML += generateMedicineCard(medicine);
+                        }
+                        resultsContainer.innerHTML = resultsHTML;
+                        animerFiches(resultsContainer);
+                        generatePagination(data.total_pages, currentPage);
+                    })
+                    .catch(error => {
+                        console.error('Error loading search results:', error);
+                        resultsContainer.innerHTML = `
+                            <div class="error-message">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <h3>Une erreur est survenue</h3>
+                                <p>Impossible de charger les résultats. Veuillez réessayer plus tard.</p>
+                            </div>
+                        `;
+                    });
+            }
+            function generateMedicineCard(medicine) {
+                const medicineDetails = medicine.medicine_details || {};
+                const substances = medicineDetails.substances_actives || [];
+                const forme = medicineDetails.forme || 'Non spécifié';
+                const laboratoire = medicineDetails.laboratoire || 'Non spécifié';
+                let matchesHTML = '';
+                if (medicine.search_matches && medicine.search_matches.length > 0) {
+                    matchesHTML = `<div class="medicine-matches">`;
+                    for (const match of medicine.search_matches) {
+                        const searchQuery = new URLSearchParams(window.location.search).get('search') || '';
+                        let highlightedText = match.text;
+                        if (searchQuery) {
+                            const terms = searchQuery.split(' ').filter(term => term.length > 2);
+                            terms.forEach(term => {
+                                const regex = new RegExp(`(${term})`, 'gi');
+                                highlightedText = highlightedText.replace(regex, '<span class="highlight-term">$1</span>');
+                            });
+                        }
+                        matchesHTML += `
+                            <div class="match-item">
+                                <span class="match-location">${match.location}:</span>
+                                <span>${highlightedText}</span>
+                            </div>
+                        `;
+                    }
+                    matchesHTML += `</div>`;
+                }
+                
+                // Ajouter le paramètre lang au lien
+                const currentLang = localStorage.getItem('posologyai_lang') || 'fr';
+                const medicineUrl = `/medicine/${medicine.id}?lang=${currentLang}`;
+                
+                // Translate forme if needed
+                const translatedForme = currentLang === 'en' ? translatePharmaForm(forme) : forme;
+                
+                // Translate groupe anatomique if needed
+                const translatedGroupe = currentLang === 'en' && medicine.groupe_anatomique 
+                    ? (therapeuticFamilyTranslations[medicine.groupe_anatomique] || medicine.groupe_anatomique)
+                    : (medicine.groupe_anatomique || '');
+                
+                // Translate type medicament if needed
+                let typeDisplay = '';
+                if (medicine.type_medicament) {
+                    const typeInfo = getTypeDisplayData(medicine.type_medicament);
+                    const translatedType = currentLang === 'en' 
+                        ? (medicineTypeTranslations[typeInfo.type] || typeInfo.type)
+                        : typeInfo.type;
+                    typeDisplay = `<span class="type-emoji">${typeInfo.emoji}</span><span class="translatable-type" data-original-fr="${typeInfo.type}"><strong>${translatedType}</strong></span>`;
+                }
+                
+                return `
+                    <div class="medicine-card">
+                        <a href="${medicineUrl}" class="medicine-title">${medicine.title}</a>
+                        ${medicine.availability ? `
+                        <span class="avail-badge avail-badge-${medicine.availability.level}"
+                              title="${medicine.availability.detail}">
+                            <i class="fas ${medicine.availability.icon}" aria-hidden="true"></i>${medicine.availability.label}
+                        </span>
+                        ` : ''}
+                        <div class="medicine-meta">
+                            <div class="medicine-meta-item">
+                                <i class="fas fa-flask medicine-meta-icon"></i>
+                                <span>${substances.join(', ') || (currentLang === 'en' ? 'Not specified' : 'Non spécifié')}</span>
+                            </div>
+                            <div class="medicine-meta-item">
+                                <i class="fas fa-pills medicine-meta-icon"></i>
+                                <span class="translatable-form" data-original-fr="${forme}">${translatedForme}</span>
+                            </div>
+                            <div class="medicine-meta-item">
+                                <i class="fas fa-industry medicine-meta-icon"></i>
+                                <span>${laboratoire}</span>
+                            </div>
+                            <div class="medicine-meta-item">
+                                <i class="fas fa-calendar-alt medicine-meta-icon"></i>
+                                <span>${medicine.update_date || (currentLang === 'en' ? 'Date not available' : 'Date non disponible')}</span>
+                            </div>
+                            ${medicine.type_medicament ? `
+                            <div class="medicine-meta-item meta-item-type">
+                                ${typeDisplay}
+                            </div>
+                            ` : ''}
+                            ${medicine.groupe_anatomique ? `
+                            <div class="medicine-meta-item meta-item-family">
+                                <i class="fas fa-tag medicine-meta-icon"></i>
+                                <span class="translatable-family" data-original-fr="${medicine.groupe_anatomique}">${translatedGroupe}</span>
+                            </div>
+                            ` : ''}
+                        </div>
+                        ${matchesHTML}
+                    </div>
+                `;
+            }
+            function generatePagination(totalPages, currentPage) {
+                if (totalPages <= 1) {
+                    document.getElementById('pagination').innerHTML = '';
+                    return;
+                }
+                const paginationContainer = document.getElementById('pagination');
+                let paginationHTML = '';
+                paginationHTML += `
+                    <button class="page-btn ${currentPage === 1 ? 'disabled' : ''}" aria-label="Page précédente" 
+                            ${currentPage === 1 ? 'disabled' : `onclick="navigateToPage(${currentPage - 1})"`}>
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                `;
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, startPage + 4);
+                if (endPage - startPage < 4) {
+                    startPage = Math.max(1, endPage - 4);
+                }
+                if (startPage > 1) {
+                    paginationHTML += `<button class="page-btn" onclick="navigateToPage(1)">1</button>`;
+                    if (startPage > 2) {
+                        paginationHTML += `<span class="page-separator">...</span>`;
+                    }
+                }
+                for (let i = startPage; i <= endPage; i++) {
+                    paginationHTML += `
+                        <button class="page-btn ${i === currentPage ? 'active' : ''}" 
+                                onclick="navigateToPage(${i})">
+                            ${i}
+                        </button>
+                    `;
+                }
+                if (endPage < totalPages) {
+                    if (endPage < totalPages - 1) {
+                        paginationHTML += `<span class="page-separator">...</span>`;
+                    }
+                    paginationHTML += `<button class="page-btn" onclick="navigateToPage(${totalPages})">${totalPages}</button>`;
+                }
+                paginationHTML += `
+                    <button aria-label="Page suivante" class="page-btn ${currentPage === totalPages ? 'disabled' : ''}" 
+                            ${currentPage === totalPages ? 'disabled' : `onclick="navigateToPage(${currentPage + 1})"`}>
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                `;
+                paginationContainer.innerHTML = paginationHTML;
+            }
+            window.navigateToPage = function(page) {
+                const urlParams = new URLSearchParams(window.location.search);
+                urlParams.set('page', page);
+                window.location.href = window.location.pathname + '?' + urlParams.toString();
+            };
+            window.changeSortOrder = function(sortValue) {
+                const urlParams = new URLSearchParams(window.location.search);
+                urlParams.set('sort', sortValue);
+                window.location.href = window.location.pathname + '?' + urlParams.toString();
+            };
+            window.changeResultsPerPage = function(perPageValue) {
+                const urlParams = new URLSearchParams(window.location.search);
+                urlParams.set('per_page', perPageValue);
+                urlParams.set('page', 1);
+                window.location.href = window.location.pathname + '?' + urlParams.toString();
+            };
+        });
+    </script>
+</body>
+</html>

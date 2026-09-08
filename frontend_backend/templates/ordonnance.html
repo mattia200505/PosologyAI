@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vérifier une ordonnance - PosologyAI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/hero.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ordonnance.css') }}">
+</head>
+<body>
+    {% with active_page='ordonnance' %}
+    {% include 'components/header.html' %}
+    {% endwith %}
+
+    <main class="ordonnance-page">
+        {# La page ouvrait sur une colonne blanche : rien n'y disait ou l'on
+           venait d'arriver. Elle prend la bande de tete partagee avec le
+           tableau de bord et le menu de prescription, et la carte de saisie
+           monte dessus. Le texte est le meme, au mot pres. #}
+        <section class="ordonnance-tete hero-nuit hero-photo">
+        {% with photo = 'photo-1584515933487-779824d29309' %}
+        {% include 'components/hero_photo.html' %}
+        {% endwith %}
+          <div class="container">
+            <p class="hero-sur"><i class="fas fa-clipboard-check" aria-hidden="true"></i> <span data-i18n="ord_surtitre">Vérification</span></p>
+            <h1 class="page-title" data-i18n="ord_titre">Vérifier une ordonnance</h1>
+            <p class="ordonnance-chapeau" data-i18n="ord_chapeau">
+                Composez la liste des médicaments d'une ordonnance. L'écran croise
+                ce que les données recensent&nbsp;: doublons de substance active,
+                interactions entre les lignes, contre-indications, surveillance
+                renforcée.
+            </p>
+            {#
+               Dit d'emblée ce que l'écran ne fait pas. Un outil qui touche à la
+               prescription doit annoncer sa portée avant ses résultats, non
+               après : le lecteur qui parcourt les alertes doit déjà savoir ce
+               qu'elles valent.
+            #}
+            <p class="ordonnance-portee" data-i18n="ord_portee">
+                <i class="fas fa-info-circle"></i>
+                Aucune intelligence artificielle n'intervient ici, et aucun ordre
+                de gravité n'est affiché&nbsp;: la source des interactions,
+                DrugBank, n'en porte pas. Cet écran rapproche des faits, il ne
+                décide pas. Vérifiez chaque point dans le RCP officiel.
+            </p>
+          </div>
+        </section>
+
+        <div class="container">
+            <!-- ─── Composition de l'ordonnance ───────────────────── -->
+            <section class="ordonnance-saisie" aria-labelledby="titre-saisie">
+                <h2 id="titre-saisie" data-i18n="ord_lignes">Lignes de l'ordonnance</h2>
+                <div class="ordonnance-recherche">
+                    <label class="sr-only" for="champ-medicament" data-i18n="ord_ajouter">Ajouter un médicament</label>
+                    <input type="text" id="champ-medicament" autocomplete="off"
+                           placeholder="Tapez un nom de médicament, puis choisissez dans la liste…" data-i18n-placeholder="ord_placeholder">
+                    <ul id="suggestions" class="ordonnance-suggestions" hidden role="listbox"
+                        aria-label="Médicaments proposés" data-i18n-aria="ord_proposes"></ul>
+                </div>
+
+                <ul id="lignes" class="ordonnance-lignes" aria-live="polite"></ul>
+
+                <p id="ordonnance-vide" class="ordonnance-vide" data-i18n="ord_vide">
+                    Aucune ligne pour l'instant. Ajoutez au moins deux médicaments
+                    pour que le croisement ait un sens.
+                </p>
+
+                <div class="ordonnance-actions">
+                    <button type="button" id="analyser" class="btn-primary" disabled>
+                        <i class="fas fa-stethoscope"></i> <span data-i18n="ord_verifier">Vérifier l'ordonnance</span>
+                    </button>
+                    <button type="button" id="vider" class="btn-secondaire" hidden data-i18n="ord_tout_retirer">Tout retirer</button>
+                </div>
+            </section>
+
+            <!-- ─── Résultats ─────────────────────────────────────── -->
+            <div id="resultats" class="ordonnance-resultats" aria-live="polite"></div>
+        </div>
+    </main>
+
+    {% include 'components/footer.html' %}
+
+    <script>
+    (function () {
+        // ── L'entrée des blocs de résultat ───────────────────────────
+        //
+        // Le même geste que sur le tableau de bord et le menu. La réserve
+        // vaut ici plus qu'ailleurs : ce qui resterait transparent faute
+        // d'observateur serait le résultat même de la vérification.
+        var MOUVEMENT_REDUIT =
+            window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        function poserResultats(zone, html) {
+            zone.innerHTML = html;
+            var blocs = [].slice.call(zone.children);
+            if (MOUVEMENT_REDUIT || !('IntersectionObserver' in window)) {
+                blocs.forEach(function (b) { b.classList.add('entree', 'vu'); });
+                return;
+            }
+            blocs.forEach(function (b) { b.classList.add('entree'); });
+            var observateur = new IntersectionObserver(function (entrees) {
+                entrees.forEach(function (e) {
+                    if (!e.isIntersecting) return;
+                    e.target.classList.add('vu');
+                    observateur.unobserve(e.target);
+                });
+            }, { threshold: 0.12 });
+            blocs.forEach(function (b) { observateur.observe(b); });
+        }
+
+        var lignes = [];                       // {id, titre, forme}
+        var champ = document.getElementById('champ-medicament');
+        var boiteSuggestions = document.getElementById('suggestions');
+        var listeLignes = document.getElementById('lignes');
+        var boutonAnalyser = document.getElementById('analyser');
+        var boutonVider = document.getElementById('vider');
+        var zoneResultats = document.getElementById('resultats');
+        var messageVide = document.getElementById('ordonnance-vide');
+
+        function echapper(texte) {
+            var d = document.createElement('div');
+            d.textContent = texte == null ? '' : texte;
+            return d.innerHTML;
+        }
+
+        // ── Saisie assistée ────────────────────────────────────────
+        var minuterie = null;
+        champ.addEventListener('input', function () {
+            clearTimeout(minuterie);
+            var requete = champ.value.trim();
+            if (requete.length < 3) { boiteSuggestions.hidden = true; return; }
+            // 250 ms : une frappe normale produit une lettre toutes les 150 ms
+            // environ, donc une seule requete part par mot saisi et non une par
+            // caractere.
+            minuterie = setTimeout(function () { chercher(requete); }, 250);
+        });
+
+        function chercher(requete) {
+            fetch('/api/prescription/medications/search?q=' + encodeURIComponent(requete) + '&limit=8')
+                .then(function (r) { return r.json(); })
+                .then(function (d) {
+                    var trouves = (d.medications || []).filter(function (m) {
+                        return !lignes.some(function (l) { return l.id === m.id; });
+                    });
+                    if (!trouves.length) { boiteSuggestions.hidden = true; return; }
+                    boiteSuggestions.innerHTML = trouves.map(function (m) {
+                        return '<li role="option"><button type="button" data-id="' + m.id + '">' +
+                            '<span class="suggestion-titre">' + echapper(m.title) + '</span>' +
+                            (m.laboratoire ? '<span class="suggestion-meta">' + echapper(m.laboratoire) + '</span>' : '') +
+                            '</button></li>';
+                    }).join('');
+                    boiteSuggestions.hidden = false;
+                    boiteSuggestions.querySelectorAll('button').forEach(function (b) {
+                        b.addEventListener('click', function () {
+                            var m = trouves.find(function (x) { return x.id === b.dataset.id; });
+                            ajouter(m);
+                        });
+                    });
+                })
+                .catch(function () { boiteSuggestions.hidden = true; });
+        }
+
+        function ajouter(medicament) {
+            if (!medicament || lignes.some(function (l) { return l.id === medicament.id; })) return;
+            lignes.push({ id: medicament.id, titre: medicament.title, forme: medicament.forme });
+            champ.value = '';
+            boiteSuggestions.hidden = true;
+            dessinerLignes();
+        }
+
+        function retirer(id) {
+            lignes = lignes.filter(function (l) { return l.id !== id; });
+            dessinerLignes();
+        }
+
+        function dessinerLignes() {
+            listeLignes.innerHTML = lignes.map(function (l) {
+                return '<li class="ordonnance-ligne">' +
+                    '<span class="ligne-titre">' + echapper(l.titre) + '</span>' +
+                    '<button type="button" class="ligne-retirer" data-id="' + l.id + '" ' +
+                    'aria-label="Retirer ' + echapper(l.titre) + ' de l\'ordonnance">' +
+                    '<i class="fas fa-times"></i></button></li>';
+            }).join('');
+            listeLignes.querySelectorAll('.ligne-retirer').forEach(function (b) {
+                b.addEventListener('click', function () { retirer(b.dataset.id); });
+            });
+            messageVide.hidden = lignes.length > 0;
+            boutonVider.hidden = lignes.length === 0;
+            // Une seule ligne se verifie deja : contre-indications et
+            // surveillance ne demandent pas de croisement.
+            boutonAnalyser.disabled = lignes.length === 0;
+        }
+
+        boutonVider.addEventListener('click', function () {
+            lignes = [];
+            poserResultats(zoneResultats, '');
+            dessinerLignes();
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!boiteSuggestions.contains(e.target) && e.target !== champ) {
+                boiteSuggestions.hidden = true;
+            }
+        });
+
+        // ── Analyse ────────────────────────────────────────────────
+        boutonAnalyser.addEventListener('click', function () {
+            poserResultats(zoneResultats, '<div class="loading-box"><div class="loading-spinner"></div>' +
+                '<p>Croisement en cours…</p></div>');
+            fetch('/api/ordonnance/analyse', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ medicaments: lignes.map(function (l) { return l.id; }) })
+            })
+                .then(function (r) { return r.json(); })
+                .then(dessinerResultats)
+                .catch(function () {
+                    poserResultats(zoneResultats, '<div class="bloc-alerte bloc-indisponible">' +
+                        '<h3>Vérification impossible</h3><p>La requête n\'a pas abouti. ' +
+                        'Aucune conclusion ne peut être tirée de cet écran.</p></div>');
+                });
+        });
+
+        function dessinerResultats(d) {
+            if (!d.success) {
+                poserResultats(zoneResultats, '<div class="bloc-alerte bloc-indisponible"><h3>Vérification impossible</h3>' +
+                    '<p>' + echapper(d.error || 'erreur inconnue') + '</p></div>');
+                return;
+            }
+            var html = '';
+
+            // 1. Doublons — l erreur la plus silencieuse passe en premier.
+            if (d.doublons.length) {
+                html += '<section class="bloc-alerte bloc-doublon"><h3><i class="fas fa-copy"></i> ' +
+                    d.doublons.length + ' substance(s) présente(s) sur plusieurs lignes</h3>' +
+                    '<p class="bloc-explication">Chaque ligne est correcte prise seule&nbsp;; ' +
+                    'c\'est leur somme qui expose à un surdosage.</p><ul>';
+                d.doublons.forEach(function (x) {
+                    html += '<li><strong>' + echapper(x.substance) + '</strong> — ' +
+                        x.lignes.map(function (l) {
+                            return '<a href="/medicine/' + l.id + '">' + echapper(l.titre) + '</a>';
+                        }).join(' et ') + '</li>';
+                });
+                html += '</ul></section>';
+            }
+
+            // 2. Interactions entre lignes.
+            if (d.etat_interactions !== 'ok') {
+                html += '<section class="bloc-alerte bloc-indisponible"><h3>' +
+                    '<i class="fas fa-exclamation-triangle"></i> Interactions non vérifiées</h3>' +
+                    '<p>Le graphe d\'interactions n\'est pas accessible. Cette absence ' +
+                    'd\'alerte ne vaut pas absence de risque.</p></section>';
+            } else if (d.interactions.length) {
+                html += '<section class="bloc-alerte bloc-interaction"><h3><i class="fas fa-exchange-alt"></i> ' +
+                    d.interactions.length + ' interaction(s) entre les lignes</h3>' +
+                    '<p class="bloc-explication">Sans ordre de gravité&nbsp;: DrugBank n\'en ' +
+                    'fournit aucun. L\'ordre ci-dessous regroupe par paire de médicaments.</p>';
+                d.interactions.forEach(function (i) {
+                    html += '<article class="interaction-croisee">' +
+                        '<div class="croisee-paire">' + echapper(i.titre_a) +
+                        ' <i class="fas fa-arrows-alt-h"></i> ' + echapper(i.titre_b) + '</div>' +
+                        '<div class="croisee-substances">' + echapper(i.substance_a) + ' / ' +
+                        echapper(i.substance_b) + '</div>' +
+                        (i.description_fr
+                            ? '<p class="croisee-enonce">' + echapper(i.description_fr) + '</p>'
+                            : '<p class="croisee-enonce" lang="en">' + echapper(i.description) + '</p>') +
+                        '</article>';
+                });
+                html += '</section>';
+            } else {
+                html += '<section class="bloc-alerte bloc-ras"><h3><i class="fas fa-check-circle"></i> ' +
+                    'Aucune interaction recensée entre ces lignes</h3>' +
+                    '<p>DrugBank ne recense aucune interaction entre les substances de cette ' +
+                    'ordonnance. L\'absence dans cette source ne vaut pas garantie d\'innocuité.</p></section>';
+            }
+
+            // 3. Lignes non appariees — nommees, jamais tues.
+            if (d.non_appariees.length) {
+                html += '<section class="bloc-alerte bloc-indisponible"><h3>' +
+                    '<i class="fas fa-question-circle"></i> ' + d.non_appariees.length +
+                    ' ligne(s) non analysée(s)</h3><p>Ces médicaments n\'ont pas pu être ' +
+                    'appariés à DrugBank&nbsp;: ils n\'ont été croisés avec aucun autre.</p><ul>';
+                d.non_appariees.forEach(function (l) {
+                    html += '<li><a href="/medicine/' + l.id + '">' + echapper(l.titre) + '</a></li>';
+                });
+                html += '</ul></section>';
+            }
+
+            // 4. Surveillance renforcee.
+            var surveilles = d.lignes.filter(function (l) { return l.surveillance_renforcee; });
+            if (surveilles.length) {
+                html += '<section class="bloc-alerte bloc-surveillance"><h3>' +
+                    '<i class="fas fa-eye"></i> ' + surveilles.length +
+                    ' ligne(s) sous surveillance renforcée</h3>' +
+                    '<p class="bloc-explication">Signalement d\'effets indésirables encouragé.</p><ul>' +
+                    surveilles.map(function (l) {
+                        return '<li><a href="/medicine/' + l.id + '">' + echapper(l.titre) + '</a></li>';
+                    }).join('') + '</ul></section>';
+            }
+
+            // 5. Contre-indications, ligne par ligne, repliees.
+            html += '<section class="bloc-contre-indications"><h3>Contre-indications, ligne par ligne</h3>';
+            d.lignes.forEach(function (l) {
+                var n = l.contre_indications.length;
+                html += '<details class="ci-ligne"><summary>' + echapper(l.titre) +
+                    ' <span class="ci-compte">' + (n ? n + ' contre-indication(s)' : 'aucune rubrique 4.3') +
+                    '</span></summary>' +
+                    (n ? '<ul>' + l.contre_indications.map(function (t) {
+                        return '<li>' + echapper(t) + '</li>';
+                    }).join('') + '</ul>'
+                       : '<p>Cette fiche ne porte pas de rubrique 4.3 exploitable. ' +
+                         'Consultez le RCP officiel.</p>') +
+                    '</details>';
+            });
+            html += '</section>';
+
+            if (d.introuvables.length) {
+                html += '<p class="ordonnance-note">' + d.introuvables.length +
+                    ' identifiant(s) introuvable(s) — les autres lignes ont bien été vérifiées.</p>';
+            }
+            if (d.tronquee) {
+                html += '<p class="ordonnance-note">Seules les ' + d.limite +
+                    ' premières lignes ont été analysées.</p>';
+            }
+
+            poserResultats(zoneResultats, html);
+        }
+
+        dessinerLignes();
+    })();
+    </script>
+</body>
+</html>

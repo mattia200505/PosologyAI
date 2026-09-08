@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Database Viewer - Connexion</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f1923;
+            color: #e0e0e0;
+            display: flex; align-items: center; justify-content: center;
+            min-height: 100vh;
+        }
+        .login-card {
+            background: #1a2634;
+            padding: 2.5rem;
+            border-radius: 12px;
+            width: 100%; max-width: 380px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+        h1 { font-size: 1.5rem; margin-bottom: .5rem; }
+        p { color: #999; margin-bottom: 1.5rem; font-size: .9rem; }
+        input[type="password"] {
+            width: 100%; padding: .75rem 1rem;
+            background: #0f1923; border: 1px solid #2a3a4a;
+            color: #e0e0e0; border-radius: 6px; font-size: 1rem;
+            outline: none; transition: border .2s;
+        }
+        input[type="password"]:focus { border-color: #4a9eff; }
+        button {
+            width: 100%; padding: .75rem; margin-top: 1rem;
+            background: #4a9eff; color: #fff; border: none;
+            border-radius: 6px; font-size: 1rem; cursor: pointer;
+            transition: background .2s;
+        }
+        button:hover { background: #3a8eef; }
+        .error { color: #ff6b6b; font-size: .9rem; margin-top: .75rem; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h1>Database Viewer</h1>
+        <p>Accès protégé — entrez le mot de passe</p>
+        <form method="POST">
+            <input type="password" name="password" placeholder="Mot de passe" autofocus>
+            <button type="submit">Se connecter</button>
+        </form>
+        {% if error %}<div class="error">{{ error }}</div>{% endif %}
+    </div>
+</body>
+</html>

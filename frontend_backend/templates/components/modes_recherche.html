@@ -1,0 +1,53 @@
+{#
+   Barre de modes, partagée par les trois pages de recherche.
+
+   L'audit (§1.9) relevait que l'accueil proposait trois portes — /search,
+   /vector-search, /ai-search — sans dire laquelle sert à quoi. Le lecteur
+   devait choisir avant de savoir. L'accueil ne pose plus la question : il
+   ouvre sur un champ unique. Le choix se fait ici, après la saisie, quand la
+   requête est déjà écrite et qu'un autre mode ne coûte qu'un clic.
+
+   Les trois routes restent valides et gardent leurs URL : un lien envoyé par
+   courriel ou mis en favori continue de fonctionner.
+
+   Attend deux variables :
+     mode_actif : 'exacte' | 'similarite' | 'assistant'
+     requete    : la requête en cours, reportée d'un mode à l'autre
+#}
+{#
+   L'intitulé était posé par `libelle()`, donc par le serveur. C'était le
+   seul libellé serveur de ce composant, et il obligeait les trois pages de
+   recherche à se recharger entièrement à chaque bascule de langue pour un
+   texte que personne ne voit — il n'est lu que par les lecteurs d'écran.
+   `data-i18n-aria` le fait traduire dans le navigateur, comme les six
+   intitulés de modes juste en dessous.
+#}
+<nav class="modes-recherche" data-i18n-aria="mode_label" aria-label="Mode de recherche">
+    <a href="{{ url_for('search', search=requete) }}"
+       class="mode-onglet{% if mode_actif == 'exacte' %} mode-actif{% endif %}"
+       {% if mode_actif == 'exacte' %}aria-current="page"{% endif %}>
+        <i class="fas fa-search"></i>
+        <span class="mode-nom" data-i18n="mode_exact">Exacte</span>
+        <span class="mode-aide" data-i18n="mode_exact_hint">nom, substance, laboratoire</span>
+    </a>
+    <a href="{{ url_for('vector_search', query=requete) }}"
+       class="mode-onglet{% if mode_actif == 'similarite' %} mode-actif{% endif %}"
+       {% if mode_actif == 'similarite' %}aria-current="page"{% endif %}>
+        <i class="fas fa-project-diagram"></i>
+        <span class="mode-nom" data-i18n="mode_similar">Similarité</span>
+        <span class="mode-aide" data-i18n="mode_similar_hint">molécules et indications proches</span>
+    </a>
+    {#
+       `nofollow` et non un simple lien : ouvrir cet onglet déclenche une
+       reformulation puis une synthèse par Mistral — environ quatre secondes
+       et deux appels facturés. Un robot d'indexation ou une préconnexion de
+       navigateur les consommerait sans que personne ne lise le résultat.
+    #}
+    <a href="{{ url_for('ai_search', query=requete) }}" rel="nofollow"
+       class="mode-onglet{% if mode_actif == 'assistant' %} mode-actif{% endif %}"
+       {% if mode_actif == 'assistant' %}aria-current="page"{% endif %}>
+        <i class="fas fa-robot"></i>
+        <span class="mode-nom" data-i18n="mode_assistant">Assistant</span>
+        <span class="mode-aide" data-i18n="mode_assistant_hint">une question en français</span>
+    </a>
+</nav>

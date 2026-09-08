@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PosologyAI • Aide à la prescription</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/prescription.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    {% with active_page='prescription' %}
+    {% include 'components/header.html' %}
+    {% endwith %}
+
+    <main>
+        <section class="assistant-section">
+            <div class="container">
+                <div class="page-header">
+                    <a href="/api/prescription/menu"><i class="fas fa-arrow-left"></i> <span data-i18n="menu_prescription" data-i18n-en="Prescription Menu">Menu Prescription</span></a>
+                </div>
+
+                <div class="assistant-grid">
+                    <!-- LEFT: Patient Form -->
+                    <div class="patient-form-card">
+                        <h2><i class="fas fa-user-md"></i> <span data-i18n="patient_info" data-i18n-en="Patient Information">Informations patient</span></h2>
+
+                        <form id="patientForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="nom" data-i18n-label="nom" data-i18n-en="Last Name">Nom</label>
+                                    <input type="text" id="nom" name="nom" required class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="prenom" data-i18n-label="prenom" data-i18n-en="First Name">Prénom</label>
+                                    <input type="text" id="prenom" name="prenom" required class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="form-row-3">
+                                <div class="form-group">
+                                    <label for="age" data-i18n-label="age" data-i18n-en="Age">Âge</label>
+                                    <input type="number" id="age" name="age" min="0" max="150" required class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="taille" data-i18n-label="taille" data-i18n-en="Height (cm)">Taille (cm)</label>
+                                    <input type="number" id="taille" name="taille" min="0" max="250" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="poids" data-i18n-label="poids" data-i18n-en="Weight (kg)">Poids (kg)</label>
+                                    <input type="number" id="poids" name="poids" min="0" max="300" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="genre" data-i18n-label="genre" data-i18n-en="Gender">Genre</label>
+                                <select id="genre" name="genre" required class="form-control">
+                                    <option value="M" data-i18n="homme" data-i18n-en="Male">Masculin</option>
+                                    <option value="F" data-i18n="femme" data-i18n-en="Female">Féminin</option>
+                                    <option value="A" data-i18n="autre" data-i18n-en="Other">Autre</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="symptomes"><i class="fas fa-notes-medical"></i> <span data-i18n-label="symptom_description" data-i18n-en="Symptoms">Symptômes</span></label>
+                                <textarea id="symptomes" name="symptomes" rows="4" required class="form-control" placeholder="Décrivez les symptômes du patient..."></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="antecedents"><i class="fas fa-history"></i> <span data-i18n-label="antecedents" data-i18n-en="Medical History">Antécédents médicaux</span></label>
+                                <textarea id="antecedents" name="antecedents" rows="3" class="form-control" placeholder="Maladies chroniques, allergies, chirurgies..."></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="medicaments_actuels"><i class="fas fa-pills"></i> <span data-i18n-label="current_meds" data-i18n-en="Current Medications">Médicaments actuels</span></label>
+                                <textarea id="medicaments_actuels" name="medicaments_actuels" rows="3" class="form-control" placeholder="Médicaments en cours de prise..."></textarea>
+                            </div>
+
+                            <!-- Résultats biologiques, tous facultatifs.
+                                 Un antécédent est un mot, un résultat est un
+                                 nombre : « maladie rénale chronique » ne dit
+                                 pas si la metformine est déconseillée ou
+                                 interdite, un DFG à 28 le dit. Laissés vides,
+                                 ils ne déclenchent rien — c'est ce qui permet
+                                 de les proposer sans alourdir les cas
+                                 simples. -->
+                            <details class="bloc-biologie">
+                                <summary><i class="fas fa-vial"></i> <span data-i18n="bio_titre">Résultats biologiques</span> <span class="bio-facultatif" data-i18n="bio_facultatif">(facultatif)</span></summary>
+                                <p class="bio-aide" data-i18n="bio_aide">Renseignés, ces résultats deviennent des contraintes : ils écartent les médicaments contre-indiqués et signalent les traitements en cours à reconsidérer.</p>
+                                <div class="form-row bio-grille">
+                                    <div class="form-group">
+                                        <label for="dfg"><span data-i18n="bio_dfg">DFG</span> <span class="bio-unite">mL/min/1,73&nbsp;m²</span></label>
+                                        <input type="number" id="dfg" name="dfg" min="0" max="200" step="1" class="form-control" placeholder="Ex : 28">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="kaliemie"><span data-i18n="bio_kaliemie">Kaliémie</span> <span class="bio-unite">mmol/L</span></label>
+                                        <input type="number" id="kaliemie" name="kaliemie" min="0" max="12" step="0.1" class="form-control" placeholder="Ex : 5,8">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="natremie"><span data-i18n="bio_natremie">Natrémie</span> <span class="bio-unite">mmol/L</span></label>
+                                        <input type="number" id="natremie" name="natremie" min="90" max="180" step="1" class="form-control" placeholder="Ex : 128">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="transaminases"><span data-i18n="bio_transaminases">Transaminases</span> <span class="bio-unite">U/L</span></label>
+                                        <input type="number" id="transaminases" name="transaminases" min="0" max="5000" step="1" class="form-control" placeholder="Ex : 145">
+                                    </div>
+                                </div>
+                                <!-- Les constantes. Ajoutées après un essai où le
+                                     moteur proposait des antihypertenseurs à un
+                                     patient dont la pression était à 96/58, et du
+                                     vérapamil à une fraction d'éjection de 30 %.
+                                     Les deux valeurs avaient bien été saisies —
+                                     dans le texte libre, qu'aucune règle ne lit. -->
+                                <p class="bio-aide bio-sous-titre" data-i18n="bio_constantes">Constantes</p>
+                                <div class="form-row bio-grille">
+                                    <div class="form-group">
+                                        <label for="systolique"><span data-i18n="bio_systolique">PA systolique</span> <span class="bio-unite">mmHg</span></label>
+                                        <input type="number" id="systolique" name="systolique" min="40" max="300" step="1" class="form-control" placeholder="Ex : 96">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="diastolique"><span data-i18n="bio_diastolique">PA diastolique</span> <span class="bio-unite">mmHg</span></label>
+                                        <input type="number" id="diastolique" name="diastolique" min="20" max="200" step="1" class="form-control" placeholder="Ex : 58">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="frequence_cardiaque"><span data-i18n="bio_frequence">Fréquence cardiaque</span> <span class="bio-unite">bpm</span></label>
+                                        <input type="number" id="frequence_cardiaque" name="frequence_cardiaque" min="20" max="250" step="1" class="form-control" placeholder="Ex : 48">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="fevg"><span data-i18n="bio_fevg">FEVG</span> <span class="bio-unite">%</span></label>
+                                        <input type="number" id="fevg" name="fevg" min="5" max="90" step="1" class="form-control" placeholder="Ex : 30">
+                                    </div>
+                                </div>
+                            </details>
+
+                            <div class="form-actions">
+                                <button type="submit" id="analyzeBtn" class="btn-primary">
+                                    <i class="fas fa-search"></i> <span data-i18n="submit_btn" data-i18n-en="Analyze & Suggest">Analyser &amp; suggérer</span>
+                                </button>
+                                <button type="reset" id="resetBtn" class="btn-secondary">
+                                    <i class="fas fa-redo"></i> <span data-i18n="reset_btn" data-i18n-en="Reset">Réinitialiser</span>
+                                </button>
+                            </div>
+                        </form>
+
+                        <div id="loadingIndicator" class="loading-indicator hidden">
+                            <div class="spinner"></div>
+                            <p data-i18n="loading" data-i18n-en="Processing...">Analyse en cours...</p>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT: Results -->
+                    <div class="results-column">
+                        <div id="resultPatient" class="resume-patient hidden"></div>
+                        <div id="diagnosticSection" class="result-section diagnostic-section hidden">
+                            <h3><i class="fas fa-brain"></i> <span data-i18n="ai_diagnosis_title" data-i18n-en="Clinical Hypotheses - Medical Analysis">Hypothèses cliniques — à valider par un professionnel de santé</span></h3>
+                            <div id="diagnosticContent"></div>
+                        </div>
+
+                        <div id="suggestionsSection" class="result-section suggestions-section hidden">
+                            <h3><i class="fas fa-capsules"></i> <span data-i18n="suggested_medications" data-i18n-en="Suggested Medications">Médicaments suggérés</span></h3>
+                            <div id="suggestionsContainer"></div>
+                        </div>
+
+                        <!-- Écartés par une règle d'antécédent. Section à part
+                             des suggestions : ces médicaments ne sont pas
+                             proposés, mais les retirer sans le dire emporterait
+                             la raison de leur retrait. -->
+                        <div id="ecartesSection" class="result-section ecartes-section hidden">
+                            <h3><i class="fas fa-ban"></i> <span data-i18n="ecartes_title" data-i18n-en="Ruled out, and why">Médicaments écartés</span></h3>
+                            <div id="ecartesContainer"></div>
+                        </div>
+
+                        <div id="alertsSection" class="result-section alerts-section hidden">
+                            <h3><i class="fas fa-exclamation-triangle"></i> <span data-i18n="interactions_title" data-i18n-en="Interaction check">Contrôle des interactions</span></h3>
+                            <div id="alertsContainer"></div>
+                        </div>
+
+                        <div id="generatePrescriptionSection" class="generate-btn-container action-detachee hidden">
+                            <button id="generatePrescriptionBtn" class="btn-generate">
+                                <i class="fas fa-file-prescription"></i> <span data-i18n="generate_pdf" data-i18n-en="Generate PDF Prescription">Générer l'ordonnance PDF</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    {% with now=now|default({"year": 2025}) %}
+    {% include 'components/footer.html' %}
+    {% endwith %}
+
+    <!-- L'affichage des resultats est commun aux deux ecrans de prescription :
+         meme reponse, meme rendu. Charge avant le script de la page, qui
+         l'appelle. -->
+    <script src="{{ url_for('static', filename='js/prescription_resultats.js') }}"></script>
+    <script>
+        const API_BASE_URL = window.location.origin;
+        // Les resultats biologiques, tous facultatifs. Un champ vide n'est pas
+        // transmis : ne rien savoir n'est pas un resultat, et le serveur ne
+        // doit pas prendre une chaine vide pour une mesure.
+        function mesuresBiologiques() {
+            var mesures = {};
+            ['dfg', 'kaliemie', 'natremie', 'transaminases',
+             'systolique', 'diastolique', 'frequence_cardiaque',
+             'fevg'].forEach(function (cle) {
+                var champ = document.getElementById(cle);
+                if (champ && champ.value !== '') mesures[cle] = champ.value;
+            });
+            return mesures;
+        }
+
+        function getCurrentLanguage() { return localStorage.getItem(window.CLE_LANGUE || 'posologyai_lang') || 'fr'; }
+
+        const patientForm = document.getElementById('patientForm');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const alertsSection = document.getElementById('alertsSection');
+        const suggestionsSection = document.getElementById('suggestionsSection');
+        const diagnosticSection = document.getElementById('diagnosticSection');
+        const generatePrescriptionSection = document.getElementById('generatePrescriptionSection');
+
+        patientForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideAllSections();
+            showLoading();
+
+            const formData = {
+                nom: document.getElementById('nom').value,
+                prenom: document.getElementById('prenom').value,
+                age: parseInt(document.getElementById('age').value),
+                taille: parseInt(document.getElementById('taille').value) || null,
+                poids: parseInt(document.getElementById('poids').value) || null,
+                genre: document.getElementById('genre').value,
+                symptomes: document.getElementById('symptomes').value,
+                antecedents: document.getElementById('antecedents').value || '',
+                medicaments_actuels: document.getElementById('medicaments_actuels').value || '',
+                language: localStorage.getItem(window.CLE_LANGUE || 'posologyai_lang') || 'fr'
+            };
+            Object.assign(formData, mesuresBiologiques());
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/prescription/analyze`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                if (!response.ok) throw new Error('Erreur serveur');
+                const result = await response.json();
+                displayResults(result);
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Une erreur est survenue lors de l\'analyse. Vérifiez que le serveur est démarré.');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        function displayResults(data) {
+            const formData = {
+                nom: document.getElementById('nom').value,
+                prenom: document.getElementById('prenom').value,
+                age: parseInt(document.getElementById('age').value),
+                symptomes: document.getElementById('symptomes').value,
+                antecedents: document.getElementById('antecedents').value || '',
+                medicaments_actuels: document.getElementById('medicaments_actuels').value || ''
+            };
+
+            currentAnalysisData = {
+                patient: {
+                    name: formData.prenom + ' ' + formData.nom,
+                    age: formData.age,
+                    symptoms: formData.symptomes,
+                    medical_history: formData.antecedents,
+                    current_medications: formData.medicaments_actuels
+                },
+                diagnostic: { diagnostic_principal: '', diagnostic_differentiel: '', recommandations: '' },
+                medications: [],
+                language: localStorage.getItem(window.CLE_LANGUE || 'posologyai_lang') || 'fr'
+            };
+
+            // Chacun a son propre filet : une erreur dans le bandeau ne doit
+            // pas empecher le repli du formulaire, ni le repli empecher les
+            // resultats. C est ainsi que la classe de mise en page a pu
+            // manquer, laissant du texte blanc sur une carte blanche.
+            try { afficherResumePatient(formData); }
+            catch (err) { console.error('bandeau patient :', err); }
+            try { replierFormulaire(formData); }
+            catch (err) { console.error('repli du formulaire :', err); }
+            displayAlerts(data);
+            try { displayEcartes(data); }
+            catch (err) { console.error('medicaments ecartes :', err); }
+
+            if (data.medications && data.medications.length > 0) {
+                displaySuggestions(data.medications, data.interactions, data);
+                currentAnalysisData.medications = data.medications.map(function(med) {
+                    return {
+                        title: med.title || med.name || 'Médicament',
+                        posologie: med.posologie || med.posology || 'À déterminer par le médecin',
+                        duration: med.duration || med.duree || '5 jours'
+                    };
+                });
+            }
+
+            if (data.diagnostic) {
+                displayDiagnostic(data.diagnostic);
+                currentAnalysisData.diagnostic.diagnostic_principal = data.diagnostic.diagnostic_principal || data.diagnostic;
+                currentAnalysisData.diagnostic.diagnostic_differentiel = data.diagnostic.diagnostic_differentiel || '';
+                currentAnalysisData.diagnostic.recommandations = data.diagnostic.recommandations || '';
+            }
+
+            if (data.recommendations && data.recommendations.length > 0) {
+                if (currentAnalysisData.diagnostic.recommandations) {
+                    currentAnalysisData.diagnostic.recommandations += '\n\n' + data.recommendations.join('\n');
+                } else {
+                    currentAnalysisData.diagnostic.recommandations = data.recommendations.join('\n');
+                }
+            }
+
+            generatePrescriptionSection.classList.remove('hidden');
+
+            var lang = getCurrentLanguage();
+            setTimeout(function() {
+                applyTranslations(lang);
+                translateDynamicContent(lang);
+            }, 100);
+        }
+
+        // echapper, displayAlerts, interactionsDe, displaySuggestions et
+        // displayEcartes vivent desormais dans
+        // static/js/prescription_resultats.js : la prescription par diagnostic
+        // affiche la meme reponse et lit le meme code. Les recopier dans le
+        // second gabarit aurait garanti qu ils redivergent — c est ainsi qu ils
+        // en etaient arrives a n avoir plus rien en commun.
+
+        function mdToHtml(text) {
+            function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+            text = escapeHtml(text);
+            text = text.replace(/---+/g, '<hr class="section-divider">');
+            text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+            text = text.replace(/^(\d+)\.\s+(.+)$/gm, function(m, n, content) {
+                return '</li><li>' + content;
+            });
+            if (text.indexOf('<li>') !== -1) {
+                text = text.replace(/<\/li><li>/, '<ol><li>');
+                text = text + '</li></ol>';
+                text = text.replace('<li><ol>', '<ol><li>');
+            }
+            text = text.replace(/\n{2,}/g, '</p><p>');
+            text = text.replace(/\n/g, '<br>');
+            text = '<p>' + text + '</p>';
+            text = text.replace(/<p><\/p>/g, '');
+            text = text.replace(/<br><\/p>/g, '</p>');
+            return text;
+        }
+
+        // Le degre de confiance et les probabilites etaient noyes dans la
+        // prose. Ils en sortent : ce sont les elements les plus rapides a lire
+        // d un compte rendu, et ils etaient les plus enfouis.
+        var RE_DIFFERENTIEL = /\[([^\]]+)\]/g;
+
+        function extraireDifferentiels(texte) {
+            // Deux formes observees sur le meme cas, a deux executions :
+            // entre crochets sur une ligne, ou bien un titre suivi de son
+            // detail a la ligne. Les deux sont acceptees ; si aucune ne
+            // s applique, l appelant retombe sur l affichage en prose.
+            var liste = [], m;
+
+            RE_DIFFERENTIEL.lastIndex = 0;
+            while ((m = RE_DIFFERENTIEL.exec(texte)) !== null) {
+                liste.push(decouperDifferentiel(m[1]));
+            }
+            if (liste.length) return liste;
+
+            var courant = null;
+            texte.split(/\n+/).forEach(function (ligne) {
+                ligne = ligne.trim();
+                if (!ligne) return;
+                var entete = ligne.match(
+                    /^(.+?)\s*[\u2014\u2013-]\s*(?:probabilit\u00e9|probabilite|probability)\s*:?\s*(\d{1,3})\s*%(.*)$/i);
+                if (entete) {
+                    courant = {
+                        nom: entete[1].trim(),
+                        probabilite: parseInt(entete[2], 10),
+                        detail: entete[3].replace(/^\s*[\u2014\u2013-]\s*/, '').trim()
+                    };
+                    liste.push(courant);
+                } else if (courant) {
+                    courant.detail = (courant.detail ? courant.detail + ' ' : '') + ligne;
+                }
+            });
+            return liste;
+        }
+
+        function decouperDifferentiel(brut) {
+            var parts = brut.split(/\s+[\u2014\u2013-]\s+/);
+            var proba = null;
+            for (var i = 0; i < parts.length; i++) {
+                var p = parts[i].match(/(\d{1,3})\s*%/);
+                if (p) { proba = parseInt(p[1], 10); break; }
+            }
+            var reste = parts.slice(1).filter(function (t) {
+                return !/(\d{1,3})\s*%/.test(t);
+            }).join(' \u2014 ').trim();
+            return {
+                nom: (parts[0] || brut).trim(),
+                probabilite: proba,
+                detail: reste
+            };
+        }
+
+        // La frappe. Elle avait ete retiree, a tort : voir le raisonnement
+        // s ecrire dit que l analyse est en train de se faire. Refaite avec
+        // une duree fixe quelle que soit la longueur du texte, pour qu un
+        // compte rendu long ne fasse pas attendre plus qu un court.
+        // L affichage est immediat. Une frappe progressive occupait cette
+        // place : elle bloquait en cours de route, laissant l hypothese
+        // coupee en plein mot, et comme les sections se remplissaient l une
+        // apres l autre, la conclusion ne se remplissait jamais. Un seul
+        // defaut pour les deux symptomes. Le texte est desormais pose d un
+        // coup, ce qui supprime toute une famille de pannes.
+        function displayDiagnostic(diagnostic) {
+            var container = document.getElementById('diagnosticContent');
+            container.innerHTML = '';
+
+            var sections = parseDiagnostic(diagnostic);
+
+            // La comparaison se fait ici et non dans createDiagnosticSection :
+            // elle porte sur deux sections a la fois, et cette fonction est la
+            // seule a les voir toutes.
+            var confiance = null;
+            var differentiels = [];
+            sections.forEach(function (section) {
+                var titre = (section.title || '').toLowerCase();
+                if (titre.indexOf('diagnostic principal') !== -1
+                        || titre.indexOf('probable') !== -1) {
+                    confiance = decouperPrincipal(section.content).confiance;
+                } else if (titre.indexOf('différentiel') !== -1
+                        || titre.indexOf('differentiel') !== -1) {
+                    differentiels = extraireDifferentiels(section.content || '');
+                }
+            });
+
+            sections.forEach(function (section) {
+                var bloc = createDiagnosticSection(section);
+                container.appendChild(bloc);
+                var zone = bloc.querySelector('.typing-content');
+                if (zone && zone.frappe) {
+                    zone.innerHTML = zone.frappe.html;
+                }
+            });
+
+            // Le compte rendu se contredit : un differentiel est annonce aussi
+            // probable, ou plus, que l hypothese retenue. On le dit, sans
+            // couleur et sans corriger les chiffres — ce sont ceux du modele,
+            // et les redresser reviendrait a maquiller l ecart.
+            if (differentielDominant(confiance, differentiels)) {
+                var note = document.createElement('p');
+                note.className = 'ds-incoherence';
+                note.textContent = 'Un diagnostic différentiel est annoncé '
+                    + 'au niveau de l’hypothèse principale ou au-dessus. '
+                    + 'Les probabilités de ce compte rendu ne se hiérarchisent pas.';
+                container.appendChild(note);
+            }
+
+            diagnosticSection.classList.remove('hidden');
+        }
+
+        function parseDiagnostic(texte) {
+            // Les en-tetes sont reperes par leur forme, « **Titre:** », et non
+            // par comparaison litterale. La version precedente cherchait
+            // « conclusion et conduite » alors que le modele ecrit
+            // « Conclusion et conduite a tenir » : la section n etait pas
+            // reconnue et son texte tombait dans la precedente.
+            var CLASSES = [
+                { mots: ['principal', 'probable', 'primary'], icon: 'fa-bullseye', role: 'principal' },
+                { mots: ['differentiel', 'diff\u00e9rentiel', 'differential'], icon: 'fa-list', role: 'differentiel' },
+                { mots: ['conclusion', 'conduite', 'management'], icon: 'fa-file-medical-alt', role: 'conclusion' }
+            ];
+
+            // Un en-tete doit remplir deux conditions, et les deux sont
+            // necessaires.
+            //
+            // Commencer une ligne : le modele emploie le gras au milieu de
+            // ses phrases, \u00ab **Pertinence** : hospitalisation si... \u00bb. Sans
+            // cette condition, chacun de ces mots ouvrait une section, et la
+            // conclusion se retrouvait eclatee en quatre blocs dont trois
+            // n avaient qu un intertitre pour tout contenu. C est ce que
+            // l ecran montrait.
+            //
+            // Etre reconnu : il n existe que trois sections dans ce compte
+            // rendu. Un gras en debut de ligne qui ne correspond a aucune
+            // d elles est de l emphase, pas un en-tete.
+            function classer(titre) {
+                var bas = titre.toLowerCase();
+                for (var ci = 0; ci < CLASSES.length; ci++) {
+                    for (var ki = 0; ki < CLASSES[ci].mots.length; ki++) {
+                        if (bas.indexOf(CLASSES[ci].mots[ki]) !== -1) return CLASSES[ci];
+                    }
+                }
+                return null;
+            }
+
+            var motif = /(?:^|\n)[ \t]*\*\*\s*([^*\n]+?)\s*:?\s*\*\*/g;
+            var reperes = [], m;
+            while ((m = motif.exec(texte)) !== null) {
+                var titre = m[1].trim();
+                var classe = classer(titre);
+                if (!classe) continue;
+                reperes.push({ titre: titre, classe: classe,
+                               debut: m.index, fin: motif.lastIndex });
+            }
+            if (!reperes.length) {
+                // Aucune section reconnue : le texte entier est rendu tel
+                // quel plutot que decoupe au hasard. Rien n est perdu.
+                return [{ title: 'Analyse m\u00e9dicale', content: texte,
+                          icon: 'fa-stethoscope', role: 'principal' }];
+            }
+
+            var sections = [];
+            for (var i = 0; i < reperes.length; i++) {
+                var r = reperes[i];
+                var suivant = (i + 1 < reperes.length) ? reperes[i + 1].debut : texte.length;
+                sections.push({
+                    title: r.titre,
+                    content: texte.substring(r.fin, suivant).trim(),
+                    icon: r.classe.icon,
+                    role: r.classe.role
+                });
+            }
+            return sections;
+        }
+
+        // Le modele ecrit sa premiere ligne sous la forme
+        // « Pneumonie communautaire - Confiance : 75% ». Le nom du diagnostic
+        // etait donc noye dans un paragraphe, alors que c est la conclusion.
+        function decouperPrincipal(contenu) {
+            // Les marqueurs de gras qui trainent en tete de contenu etaient
+            // promus en titre : l ecran affichait « ** » en gros corps.
+            var propre = String(contenu || '').replace(/^[\s*_#>-]+/, '');
+            var lignes = propre.split(/\n+/).filter(function (l) { return l.trim(); });
+            if (!lignes.length) return { nom: '', confiance: null, prose: propre };
+            var premiere = lignes[0].trim().replace(/[*_`]/g, '').trim();
+
+            // La confiance etait jetee ici, avec le reste de la ligne. Elle est
+            // desormais lue : les differentiels affichent leur probabilite, et
+            // sans elle ces pourcentages n avaient aucun point de comparaison.
+            // Un differentiel a 25 % ne veut rien dire tant qu on ignore ou se
+            // situe l hypothese principale.
+            var mesure = premiere.match(
+                /(?:confiance|confidence)\s*:?\s*(\d{1,3})\s*%/i);
+            var confiance = mesure ? parseInt(mesure[1], 10) : null;
+
+            var nom = premiere
+                .replace(/\s*[\u2014\u2013-]\s*(?:confiance|confidence)[\s\S]*$/i, '')
+                .replace(/\s*[:,.]\s*$/, '')
+                .trim();
+            // Si la premiere ligne est deja de la prose, on ne la promeut pas :
+            // mieux vaut pas de titre qu un faux titre en gros corps.
+            if (!nom || nom.length > 90 || nom.split(/\s+/).length > 10) {
+                return { nom: '', confiance: confiance, prose: propre };
+            }
+            return {
+                nom: nom,
+                confiance: confiance,
+                prose: lignes.slice(1).join('\n\n')
+            };
+        }
+
+        // Le garde-fou du \u00a7 5 du rapport. Un cas observe annoncait une
+        // hypothese principale a 11 % sous des differentiels a 25 % et 15 % :
+        // si un differentiel est plus probable que l hypothese retenue, ce
+        // n en est plus un.
+        //
+        // La mesure sur six cas cliniques n en avait trouve aucun : c est un
+        // ecart du modele, pas son comportement habituel. Raison de plus pour
+        // le dire quand il se produit, au lieu de le laisser passer inapercu.
+        //
+        // L egalite compte : deux hypotheses aussi probables l une que l autre
+        // ne se hierarchisent pas davantage.
+        function differentielDominant(confiance, differentiels) {
+            if (typeof confiance !== 'number') return false;
+            return (differentiels || []).some(function (d) {
+                return typeof d.probabilite === 'number'
+                    && d.probabilite >= confiance;
+            });
+        }
+
+        // Aucun tiret cadratin dans ce que l ecran affiche : le modele en
+        // produit, ils deviennent des traits d union, seul tiret autorise.
+        function sansCadratin(texte) {
+            return String(texte || '').replace(/[\u2014\u2013]/g, '-');
+        }
+
+        function createDiagnosticSection(section) {
+            var div = document.createElement('div');
+            var titre = section.title.toLowerCase();
+            var estPrincipal = titre.indexOf('diagnostic principal') !== -1
+                || titre.indexOf('probable') !== -1;
+            var estDifferentiel = titre.indexOf('diff\u00e9rentiel') !== -1
+                || titre.indexOf('differentiel') !== -1;
+
+            if (estPrincipal) {
+                var decoupe = decouperPrincipal(section.content);
+                div.className = 'ds-tete';
+                // La confiance revient a l ecran, dans le meme vocabulaire que
+                // les probabilites des differentiels. Elle avait ete retiree
+                // comme auto-evaluation du modele : elle l est toujours, mais
+                // les differentiels affichent la leur, et une echelle amputee
+                // de son sommet ne se lit plus.
+                var confiance = (typeof decoupe.confiance === 'number')
+                    ? '<span class="ds-confiance" title="Confiance annonc\u00e9e par le mod\u00e8le">'
+                      + decoupe.confiance + '\u00a0%</span>' : '';
+                div.innerHTML =
+                    '<div class="ds-tete-gauche">'
+                    + '<p class="ds-sur">Hypoth\u00e8se principale</p>'
+                    + (decoupe.nom
+                        ? '<h4 class="ds-nom">' + echapper(sansCadratin(decoupe.nom))
+                          + confiance + '</h4>' : '')
+                    + '<div class="typing-content ds-prose"></div>'
+                    + '</div>';
+                return poserFrappe(div, decoupe.prose);
+            }
+
+            // Un seul accent : les filets bleu, ambre et vert se lisaient
+            // comme une echelle de gravite, ce que le projet s interdit.
+            div.className = 'diagnostic-card-item'
+                + (estDifferentiel ? ' ds-differential' : ' ds-conclusion');
+
+            var entete = '<div class="ds-header">' + echapper(section.title) + '</div>';
+            var corps = '';
+
+            if (estDifferentiel) {
+                var differentiels = extraireDifferentiels(section.content || '');
+                if (differentiels.length) {
+                    corps = '<ul class="ds-differentiels">' + differentiels.map(function (d) {
+                        return '<li>'
+                            + '<span class="ds-diff-nom">' + echapper(sansCadratin(d.nom)) + '</span>'
+                            + (d.probabilite !== null
+                                ? '<span class="ds-diff-part">' + d.probabilite + '\u00a0%</span>' : '')
+                            + (d.detail
+                                ? '<p class="ds-diff-detail">' + echapper(sansCadratin(d.detail)) + '</p>' : '')
+                            + '</li>';
+                    }).join('') + '</ul>';
+                }
+            }
+
+            if (!corps) {
+                corps = '<div class="typing-content"></div>';
+            }
+
+            div.innerHTML = entete + corps;
+            return poserFrappe(div, section.content);
+        }
+
+        // Le texte est attache a l element comme propriete JavaScript. Il
+        // passait auparavant par un attribut HTML, ou le premier guillemet
+        // droit du compte rendu le coupait net.
+        function poserFrappe(bloc, texte) {
+            var zone = bloc.querySelector('.typing-content');
+            if (!zone) return bloc;
+            var propre = sansCadratin(texte || '');
+            zone.frappe = { texte: propre, html: mdToHtml(propre) };
+            return bloc;
+        }
+
+        // Le chiffre monte jusqu a sa valeur. Motive : il signale que
+        // l analyse vient d aboutir, et attire l oeil sur la conclusion
+        // plutot que sur les panneaux qui la suivent. Il s affiche d emblee
+        // pour qui demande un mouvement reduit.
+        // L anneau se dessine et le chiffre monte, ensemble. Motive : le
+        // geste signale que l analyse vient d aboutir, et porte l oeil sur la
+        // conclusion plutot que sur les panneaux qui la suivent. Les deux
+        // s affichent d emblee sous prefers-reduced-motion.
+
+        // Les resultats apparaissaient sans rappeler de qui il s agit : sur un
+        // ecran partage, rien ne rattachait le compte rendu a un patient.
+        function afficherResumePatient(f) {
+            var bandeau = document.getElementById('resultPatient');
+            var traits = [];
+            if (f.age) traits.push(f.age + ' ans');
+            var genre = document.getElementById('genre');
+            if (genre && genre.value) traits.push(genre.options[genre.selectedIndex].text);
+            var taille = document.getElementById('taille');
+            var poids = document.getElementById('poids');
+            if (taille && taille.value) traits.push(taille.value + ' cm');
+            if (poids && poids.value) traits.push(poids.value + ' kg');
+            var traitements = (f.medicaments_actuels || '').split(',')
+                .map(function (t) { return t.trim(); }).filter(Boolean);
+
+            // Un seul bandeau. Le resume du formulaire replie disait la
+            // meme chose sur une seconde ligne pleine largeur : deux rangees
+            // pour une identite, alors que l ecran manque de hauteur.
+            var motifs = (f.symptomes || '').replace(/\s+/g, ' ').trim();
+            bandeau.innerHTML =
+                '<div class="rp-identite">'
+                + '<span class="rp-nom">' + echapper((f.prenom + ' ' + f.nom).trim() || 'Patient') + '</span>'
+                + (traits.length ? '<span class="rp-traits">' + echapper(traits.join(' \u00b7 ')) + '</span>' : '')
+                + '</div>'
+                + (motifs ? '<p class="rp-motif">' + echapper(
+                    motifs.length > 130 ? motifs.slice(0, 130) + '\u2026' : motifs) + '</p>' : '')
+                + '<div class="rp-pied">'
+                + '<span class="rp-mesures">'
+                + '<strong>' + traitements.length + '</strong> traitement(s) en cours'
+                + '<span class="rp-sep" aria-hidden="true">\u00b7</span>'
+                + 'analyse de ' + new Date().toLocaleTimeString('fr-FR',
+                    { hour: '2-digit', minute: '2-digit' })
+                + '</span>'
+                + '<button type="button" id="formRouvrir" class="btn-secondaire-mince">'
+                + '<i class="fas fa-pen" aria-hidden="true"></i> Modifier</button>'
+                + '</div>';
+            bandeau.classList.remove('hidden');
+
+            // Le bouton est reconstruit a chaque analyse : l ecouteur se pose
+            // ici, et non une fois pour toutes au chargement.
+            var rouvrir = bandeau.querySelector('#formRouvrir');
+            if (rouvrir) {
+                rouvrir.addEventListener('click', function () {
+                    document.querySelector('.patient-form-card').classList.remove('repliee');
+                    document.querySelector('.assistant-grid').classList.remove('analyse-faite');
+                    bandeau.classList.add('hidden');
+                });
+            }
+        }
+
+        // Le formulaire occupait la moitie de l ecran alors qu il a fini son
+        // office : il se replie en resume, et les resultats prennent la place.
+        // Le formulaire disparait entierement : son resume est desormais
+        // dans le bandeau patient, avec le bouton pour le rouvrir.
+        function replierFormulaire(f) {
+            var carte = document.querySelector('.patient-form-card');
+            var grille = document.querySelector('.assistant-grid');
+            if (grille) grille.classList.add('analyse-faite');
+            if (carte) carte.classList.add('repliee');
+        }
+
+        function showLoading() { loadingIndicator.classList.remove('hidden'); }
+        function hideLoading() { loadingIndicator.classList.add('hidden'); }
+
+        function hideAllSections() {
+            alertsSection.classList.add('hidden');
+            suggestionsSection.classList.add('hidden');
+            diagnosticSection.classList.add('hidden');
+            generatePrescriptionSection.classList.add('hidden');
+            document.getElementById('ecartesSection').classList.add('hidden');
+        }
+
+        document.getElementById('resetBtn').addEventListener('click', function() { hideAllSections(); });
+
+        var currentAnalysisData = null;
+
+        document.getElementById('generatePrescriptionBtn').addEventListener('click', async function() {
+            if (!currentAnalysisData) {
+                alert('Aucune analyse disponible. Veuillez d\'abord analyser un patient.');
+                return;
+            }
+            try {
+                var generateBtn = document.getElementById('generatePrescriptionBtn');
+                generateBtn.disabled = true;
+                generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> G\u00e9n\u00e9ration en cours...';
+                var response = await fetch('/api/generate-ordonnance', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(currentAnalysisData)
+                });
+                if (!response.ok) {
+                    var errorData = await response.json();
+                    throw new Error(errorData.error || 'Erreur lors de la génération');
+                }
+                var blob = await response.blob();
+                var url = window.URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = 'Ordonnance_' + currentAnalysisData.patient.name.replace(/\s+/g, '_') + '_' + new Date().toISOString().split('T')[0] + '.pdf';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '<i class="fas fa-file-prescription"></i> G\u00e9n\u00e9rer l\'ordonnance PDF';
+                var toast = document.createElement('div');
+                toast.className = 'toast-notification';
+                toast.innerHTML = '<i class="fas fa-check-circle"></i> Ordonnance g\u00e9n\u00e9r\u00e9e avec succ\u00e8s !';
+                document.body.appendChild(toast);
+                setTimeout(function() { toast.remove(); }, 3000);
+            } catch (error) {
+                console.error('Erreur génération PDF:', error);
+                alert('Erreur lors de la génération de l\'ordonnance: ' + error.message);
+                var generateBtn = document.getElementById('generatePrescriptionBtn');
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '<i class="fas fa-file-prescription"></i> G\u00e9n\u00e9rer l\'ordonnance PDF';
+            }
+        });
+    </script>
+
+    <script>
+    {#
+       La table de traduction locale a ete retiree : trente cles en
+       francais et en anglais, aucune en arabe, en concurrence avec les
+       tables centrales sur les memes attributs `data-i18n`.
+
+       Elle etait rappelee cent millisecondes apres chaque analyse et
+       pouvait donc **ecraser** en francais ce que le moteur central
+       venait de traduire en arabe. Les memes cles existent dans
+       `static/js/translations.js`, dans les trois langues : verifie, les
+       191 cles que les gabarits demandent y sont toutes.
+    #}
+    /* Deleguent au moteur central, qui lit `data-i18n`, `data-i18n-label`,
+     * les placeholders, les infobulles et les `aria-label`, dans les trois
+     * langues. Les deux noms sont gardes : deux appels existent plus haut
+     * dans ce fichier, et les renommer n'apporterait rien. */
+    function applyTranslations() {
+        if (window.retraduire) window.retraduire();
+    }
+
+    function translateDynamicContent() {
+        if (window.retraduire) window.retraduire();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var lang = getCurrentLanguage();
+        applyTranslations(lang);
+    });
+    </script>
+
+    {# Le conteneur du widget de traduction tiers est retire : plus aucun
+       script ne le remplissait depuis que les trois autres pages ont
+       abandonne ce chemin. Un noeud cache que rien n'alimente. #}
+</body>
+</html>

@@ -1,0 +1,372 @@
+/* ─── Vérification d'ordonnance ────────────────────────────────────────
+   Action 3.1 de l'audit UX. Les couleurs classent par nature de constat,
+   jamais par gravité : DrugBank n'en fournit aucune, et une échelle de
+   teintes en inventerait une. L'ambre signale « à regarder », le gris
+   « donnée absente », le vert « rien de recensé » — pas « sans risque ».
+
+   La forme, elle, s'aligne sur le reste de l'application : la bande de
+   tête de `hero.css`, partagée avec le tableau de bord et le menu de
+   prescription, puis des panneaux de verre sur un fond à voiles indigo.
+   La page était une colonne blanche sur fond blanc, sans entrée en
+   matière — rien n'y disait où l'on venait d'arriver.
+
+   Ce qui n'a pas bougé : les teintes des blocs de résultat, et l'ordre
+   dans lequel la page dit les choses. */
+
+.ordonnance-page {
+  position: relative;
+  isolation: isolate;
+  padding: 0 0 64px;
+}
+
+/* Le même fond que l'écran de prescription et le tableau de bord : sans
+   lui, le verre n'a rien à filtrer et se lit comme un aplat gris. */
+.ordonnance-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 52% 42% at 12% 4%, rgba(79, 70, 229, 0.13), transparent 62%),
+    radial-gradient(ellipse 44% 38% at 88% 22%, rgba(129, 140, 248, 0.12), transparent 64%),
+    radial-gradient(ellipse 60% 40% at 50% 96%, rgba(55, 48, 163, 0.08), transparent 66%);
+}
+
+/* ── La bande de tête ───────────────────────────────────────────────── */
+.ordonnance-tete { padding-bottom: 118px; }
+
+.ordonnance-tete .container {
+  position: relative;
+  z-index: 1;
+}
+
+.ordonnance-page .page-title {
+  max-width: 20ch;
+  margin: 0;
+  font-size: clamp(2.1rem, 4.6vw, 3.2rem);
+  font-weight: 800;
+  letter-spacing: -0.032em;
+  line-height: 1.08;
+  color: #fff;
+}
+
+.ordonnance-chapeau {
+  max-width: 62ch;
+  margin: 18px 0 0;
+  font-size: 1.02rem;
+  line-height: 1.62;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+/* La portée de l'écran, dite avant ses résultats. Elle était un encadré
+   gris pâle qu'on saute ; sur le sombre, en verre, elle se lit. Le
+   contenu est le même, au mot près. */
+.ordonnance-portee {
+  max-width: 68ch;
+  margin: 22px 0 0;
+  padding: 14px 18px;
+  font-size: 0.89rem;
+  line-height: 1.62;
+  color: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-inline-start: 3px solid rgba(199, 210, 254, 0.7);
+  border-radius: 0 14px 14px 0;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.ordonnance-portee i { margin-inline-end: 7px; color: #c7d2fe; }
+
+/* ── Saisie ─────────────────────────────────────────────────────────── */
+.ordonnance-saisie {
+  position: relative;
+  z-index: 2;
+  /* Elle chevauche la bande sombre : c'est ce recouvrement qui fait la
+     composition, ici comme sur les deux autres écrans. Opaque, parce
+     qu'elle est à cheval sur le sombre et le clair — une surface
+     translucide y prendrait deux teintes. */
+  margin-top: -76px;
+  padding: 26px 28px;
+  background: rgba(255, 255, 255, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 22px;
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.18), 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+
+/* En petites capitales espacées, comme les intertitres de l'écran de
+   prescription et du tableau de bord. */
+.ordonnance-saisie h2 {
+  margin: 0 0 16px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-secondary, #6e6e73);
+}
+
+.ordonnance-recherche { position: relative; }
+
+#champ-medicament {
+  width: 100%;
+  padding: 13px 20px;
+  font-size: 0.98rem;
+  color: #111827;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 999px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* L'accent de l'application, et non un bleu qui n'appartient à rien. */
+#champ-medicament:focus {
+  outline: none;
+  border-color: var(--primary, #4f46e5);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.16);
+}
+
+.ordonnance-suggestions {
+  position: absolute;
+  z-index: 20;
+  inset-inline: 0;
+  top: calc(100% + 4px);
+  max-height: 300px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.16);
+}
+
+.ordonnance-suggestions button {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  font: inherit;
+  text-align: start;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.ordonnance-suggestions button:hover { background: rgba(79, 70, 229, 0.07); }
+
+.suggestion-titre { display: block; font-size: 0.92rem; color: #111827; }
+
+.suggestion-meta { display: block; font-size: 0.78rem; color: #6b7280; }
+
+.ordonnance-lignes { margin: 16px 0 0; padding: 0; list-style: none; }
+
+.ordonnance-ligne {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  background: rgba(79, 70, 229, 0.05);
+  border: 1px solid rgba(79, 70, 229, 0.12);
+  border-radius: 14px;
+}
+
+.ligne-titre { flex: 1; font-size: 0.92rem; color: #111827; }
+
+.ligne-retirer {
+  padding: 5px 9px;
+  color: #6b7280;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.ligne-retirer:hover { color: #b91c1c; background: #fee2e2; }
+
+.ordonnance-vide { margin: 14px 0 0; font-size: 0.88rem; color: #6b7280; }
+
+.ordonnance-actions { display: flex; gap: 10px; margin-top: 18px; }
+
+.btn-secondaire {
+  padding: 11px 20px;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary, #4f46e5);
+  background: rgba(79, 70, 229, 0.1);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-secondaire:hover { background: rgba(79, 70, 229, 0.17); }
+
+/* Le bouton principal de la page suit la même règle. Il tenait sa forme
+   de `styles.css`, écrite pour un autre contexte. */
+.ordonnance-actions .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 22px;
+  font-size: 0.9rem;
+  font-weight: 650;
+  color: #fff;
+  background: linear-gradient(140deg, var(--primary, #4f46e5), var(--primary-dark, #3730a3));
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: filter 0.2s ease, transform 0.18s ease, opacity 0.2s ease;
+}
+
+.ordonnance-actions .btn-primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.ordonnance-actions .btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Résultats ──────────────────────────────────────────────────────── */
+.ordonnance-resultats { margin-top: 26px; }
+
+/* Panneaux de verre, comme partout ailleurs. Le filet de gauche et sa
+   teinte restent : c'est lui qui dit la nature du constat, et le
+   repeindre pour l'harmonie effacerait ce qu'il dit. */
+.bloc-alerte,
+.bloc-contre-indications {
+  padding: 20px 24px;
+  margin-bottom: 14px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-inline-start-width: 4px;
+  border-radius: 0 22px 22px 0;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    0 18px 46px rgba(30, 27, 75, 0.09);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+}
+
+.bloc-alerte h3,
+.bloc-contre-indications h3 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--text-secondary, #6e6e73);
+}
+
+.bloc-alerte ul { margin: 8px 0 0; padding-inline-start: 20px; }
+
+.bloc-alerte li { margin-bottom: 5px; font-size: 0.91rem; color: #374151; }
+
+.bloc-explication { margin: 0 0 10px; font-size: 0.86rem; color: #6b7280; }
+
+.bloc-doublon { border-inline-start-color: #b45309; }
+.bloc-doublon h3 i { color: #b45309; }
+
+.bloc-interaction { border-inline-start-color: #b45309; }
+.bloc-interaction h3 i { color: #b45309; }
+
+.bloc-surveillance { border-inline-start-color: #6b7280; }
+.bloc-surveillance h3 i { color: #6b7280; }
+
+/* Gris et non rouge : une donnée absente n'est pas une alerte, c'est un
+   trou. Le rouge ferait lire « danger » là où il faut lire « je ne sais
+   pas ». */
+.bloc-indisponible {
+  border-inline-start-color: #94a3b8;
+  background: rgba(148, 163, 184, 0.1);
+}
+.bloc-indisponible h3 i { color: #6b7280; }
+
+.bloc-ras { border-inline-start-color: #059669; }
+.bloc-ras h3 i { color: #059669; }
+
+.bloc-ras p { margin: 0; font-size: 0.89rem; color: #4b5563; }
+
+.interaction-croisee {
+  padding: 13px 16px;
+  margin-top: 10px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 14px;
+}
+
+.croisee-paire { font-size: 0.92rem; font-weight: 600; color: #111827; }
+
+.croisee-paire i { margin: 0 5px; color: #b45309; }
+
+.croisee-substances { margin-top: 2px; font-size: 0.79rem; color: #6b7280; }
+
+.croisee-enonce { margin: 7px 0 0; font-size: 0.89rem; color: #374151; line-height: 1.55; }
+
+.bloc-contre-indications { border-inline-start-color: #cbd5e1; }
+
+.ci-ligne { margin-top: 8px; border-top: 1px solid #f1f5f9; }
+
+.ci-ligne summary {
+  padding: 9px 2px;
+  font-size: 0.92rem;
+  color: #111827;
+  cursor: pointer;
+}
+
+.ci-compte { font-size: 0.79rem; color: #6b7280; }
+
+.ci-ligne ul { margin: 4px 0 12px; padding-inline-start: 22px; }
+
+.ci-ligne li { margin-bottom: 5px; font-size: 0.88rem; color: #374151; line-height: 1.5; }
+
+.ordonnance-note { font-size: 0.85rem; color: #6b7280; }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 640px) {
+  .ordonnance-actions { flex-direction: column; }
+  .ordonnance-actions button { width: 100%; justify-content: center; }
+}
+
+
+/* ── L'entrée ────────────────────────────────────────────────────────
+   Les blocs de résultat montent d'un cran en arrivant, comme les
+   panneaux du tableau de bord. `entree` et `vu` viennent de `hero.css`,
+   avec leur réserve : sans script, ou en mouvement réduit, tout est
+   visible d'emblée — et ici, ce qui serait perdu est le résultat même
+   de la vérification. */
+.ordonnance-resultats > .entree:nth-child(2) { transition-delay: 0.07s; }
+.ordonnance-resultats > .entree:nth-child(3) { transition-delay: 0.14s; }
+.ordonnance-resultats > .entree:nth-child(4) { transition-delay: 0.21s; }
+.ordonnance-resultats > .entree:nth-child(5) { transition-delay: 0.28s; }
+
+/* Le verre retombe sur un fond plein si la transparence est refusée. */
+@media (prefers-reduced-transparency: reduce) {
+  .bloc-alerte,
+  .bloc-contre-indications,
+  .ordonnance-portee {
+    background: #ffffff;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .ordonnance-portee { color: #374151; }
+  .ordonnance-page::before { display: none; }
+}

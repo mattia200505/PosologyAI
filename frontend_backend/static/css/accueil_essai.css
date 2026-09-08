@@ -1,0 +1,801 @@
+/* ─── Essai visuel, palette du site ────────────────────────────────────
+   Servi sur /accueil-essai ; l'accueil réel n'est pas modifié.
+
+   Les couleurs sont celles du site, reprises de theme.css et non
+   recopiées en dur : indigo #4f46e5, fond #f5f5f7, surfaces blanches,
+   hero bleu nuit. VARIANCE 8, MOTION 7, DENSITY 6 : plus dense que les
+   essais précédents, l'objectif étant qu'aucune zone ne sonne creux.
+
+   Ce que le skill classe en interdit dur tient : contraste AA, mouvement
+   effondré sous prefers-reduced-motion, un seul accent, un seul rayon,
+   zéro em-dash, aucune couleur codant une gravité. */
+
+.essai {
+  --e-fond: var(--bg, #f5f5f7);
+  --e-surface: var(--surface, #ffffff);
+  --e-encre: var(--text-primary, #1d1d1f);
+  --e-douce: var(--text-secondary, #6e6e73);
+  --e-filet: rgba(0, 0, 0, 0.08);
+  --e-accent: var(--primary, #4f46e5);
+  --e-accent-clair: var(--primary-light, #818cf8);
+  --e-accent-sombre: var(--primary-dark, #3730a3);
+  /* Dégradé de la section « Intelligence artificielle » de l'accueil,
+     repris tel quel : #1e1b4b, #312e81, #3730a3. Il est déjà en service
+     sur le site, il n'y a pas de raison d'en inventer un autre. Blanc à
+     9,9:1 au point le plus clair, 15,9:1 au plus sombre. */
+  --e-nuit: #1e1b4b;
+  --e-nuit-2: #312e81;
+  --e-nuit-3: #3730a3;
+  /* L'indigo du site devient un accent, employé sur de petites surfaces
+     seulement : boutons, liens, chiffres. Éclairci sur fond sombre, où
+     #4f46e5 tomberait à 2,4:1. */
+  --e-accent-sur-sombre: #a5b4fc;
+  --e-rayon: 16px;
+
+  margin: 0;
+  background: var(--e-fond);
+  color: var(--e-encre);
+  overflow-x: hidden;
+}
+
+.wrap { position: relative; z-index: 1; max-width: 1220px; margin: 0 auto; padding: 0 24px; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+
+/* ══ 1. Hero en deux moitiés ════════════════════════════════════════
+   L'aplat indigo couvrait toute la largeur : trop de bleu d'un coup, et
+   rien à regarder. Le texte passe sur fond clair, la photographie prend
+   l'autre moitié. L'indigo ne subsiste que sur le voile de l'image et
+   les boutons — un accent, plus un décor. */
+
+.hr {
+  display: grid;
+  grid-template-columns: 1.02fr 1fr;
+  min-height: 100dvh;            /* jamais 100vh (§3.E) */
+}
+
+/* Un blanc pur sur une demi-page fatigue l'œil, et il ne se distingue
+   plus des cartes blanches qui suivent. Le fond descend vers un gris très
+   légèrement bleuté, avec une lueur d'accent dans l'angle : la surface
+   cesse d'être plate sans devenir bruyante. */
+.hr-gauche {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 132px 56px 132px clamp(24px, 6vw, 88px);
+  background:
+    radial-gradient(ellipse 70% 60% at 8% 12%, rgba(79, 70, 229, 0.07), transparent 66%),
+    linear-gradient(168deg, #fbfbfd 0%, #f2f3f8 62%, #eceef5 100%);
+}
+
+/* Filet de séparation avec la photographie, côté clair. */
+.hr-gauche::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.07) 30%, rgba(0, 0, 0, 0.07) 70%, transparent);
+}
+
+.hr-contenu { position: relative; z-index: 1; }
+
+.hr-contenu { max-width: 34rem; }
+
+.hr-sur {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 20px;
+  padding: 7px 15px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--e-accent);
+  background: rgba(79, 70, 229, 0.09);
+  border-radius: 999px;
+}
+
+.hr-titre {
+  margin: 0 0 20px;
+  font-size: clamp(2.4rem, 5vw, 3.9rem);
+  font-weight: 800;
+  line-height: 1.04;
+  letter-spacing: -0.042em;
+  color: var(--e-encre);
+}
+
+/* Emphase par l'italique de la même fonte, jamais par un dégradé de
+   couleur (§4.1 et §9.A). La réserve sous la ligne empêche le jambage
+   du « é » et la virgule d'être rognés. */
+.hr-titre em {
+  display: inline-block;
+  padding-bottom: 5px;
+  line-height: 1.12;
+  font-style: italic;
+  color: var(--e-accent);
+}
+
+.hr-chapeau {
+  max-width: 44ch;
+  margin: 0 0 32px;
+  font-size: 1.06rem;
+  line-height: 1.72;
+  color: var(--e-douce);
+}
+
+.hr-recherche {
+  display: flex;
+  gap: 8px;
+  max-width: 540px;
+  padding: 7px;
+  background: var(--e-surface);
+  border: 1px solid var(--e-filet);
+  border-radius: calc(var(--e-rayon) + 7px);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.hr-recherche input {
+  flex: 1;
+  min-width: 0;
+  padding: 14px 16px;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--e-encre);
+  background: transparent;
+  border: none;
+}
+
+/* 4,7:1 sur le fond du champ : le seuil AA vaut aussi pour les
+   indications de saisie (§4.5). */
+.hr-recherche input::placeholder { color: var(--e-douce); }
+.hr-recherche input:focus { outline: none; }
+.hr-recherche:focus-within { border-color: var(--e-accent); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.18); }
+
+.hr-recherche button {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 14px 26px;
+  font: inherit;
+  font-weight: 650;
+  color: #fff;
+  white-space: nowrap;
+  background: linear-gradient(140deg, var(--e-accent), var(--e-accent-sombre));
+  border: none;
+  border-radius: var(--e-rayon);
+  cursor: pointer;
+  transition: filter 0.2s ease, transform 0.18s ease;
+}
+
+.hr-recherche button:hover { filter: brightness(1.09); transform: translateY(-1px); }
+.hr-recherche button:active { transform: scale(0.985); }
+.hr-recherche button i { transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1); }
+.hr-recherche button:hover i { transform: translateX(4px); }
+
+.hr-aide { margin: 16px 0 0; font-size: 0.88rem; color: var(--e-douce); }
+
+/* ── Moitié droite : la photographie ──────────────────────────────── */
+.hr-droite { position: relative; overflow: hidden; }
+
+.hr-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Un lent rapproché pendant huit secondes, puis plus rien : le
+     mouvement accompagne l'arrivée, il ne tourne pas en boucle. */
+  animation: hr-approche 8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes hr-approche {
+  from { transform: scale(1.1); }
+  to   { transform: scale(1); }
+}
+
+/* Le voile porte le dégradé de la section « Intelligence artificielle »
+   du site, en transparence : c'est là que l'indigo subsiste. */
+.hr-teinte {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgba(30, 27, 75, 0.78) 0%, rgba(49, 46, 129, 0.64) 50%, rgba(55, 48, 163, 0.72) 100%),
+    radial-gradient(ellipse 62% 190% at 88% 50%, rgba(129, 140, 248, 0.15), transparent 70%);
+}
+
+/* Sur les grands écrans, la photographie déborde légèrement sur le texte
+   par une diagonale : la composition cesse d'être coupée au couteau. */
+@media (min-width: 1180px) {
+  .hr-droite { clip-path: polygon(6% 0, 100% 0, 100% 100%, 0 100%); margin-inline-start: -3%; }
+}
+
+.hr-panneau {
+  position: absolute;
+  inset-inline-end: clamp(24px, 4vw, 54px);
+  bottom: clamp(64px, 9vh, 104px);
+  width: min(320px, calc(100% - 48px));
+  padding: 24px;
+  background: rgba(12, 14, 30, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: calc(var(--e-rayon) + 6px);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 26px 60px rgba(0, 0, 0, 0.36);
+  color: #fff;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hr-panneau.vu { opacity: 1; transform: none; }
+
+.hr-panneau-titre { margin: 0 0 14px; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255, 255, 255, 0.88); }
+
+.hr-classement { margin: 0 0 16px; padding: 0; list-style: none; }
+.hr-classement li { display: flex; align-items: baseline; gap: 11px; padding: 8px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.12); }
+.hr-classement li:last-child { border-bottom: none; }
+
+.hr-rang { font-size: 0.72rem; font-variant-numeric: tabular-nums; color: #c7d2fe; }
+.hr-classement a { font-size: 0.93rem; font-weight: 550; color: #fff; text-decoration: none; }
+.hr-classement a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+.hr-panneau-lien { display: inline-flex; align-items: center; gap: 8px; font-size: 0.84rem; font-weight: 600; color: #c7d2fe; text-decoration: none; }
+.hr-panneau-lien:hover { color: #fff; }
+
+/* ══ 2. Compteurs, à cheval sur le hero ═════════════════════════════ */
+.ct { margin-top: -58px; position: relative; z-index: 2; }
+
+.ct-grille {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  background: var(--e-filet);
+  border-radius: calc(var(--e-rayon) + 4px);
+  /* Ombre franche : c'est elle qui décolle le bandeau du hero, et non un
+     trait de séparation. */
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.14), 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+
+.ct-item {
+  padding: 26px 22px;
+  background: var(--e-surface);
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ct-item.vu { opacity: 1; transform: none; }
+
+.ct-val {
+  display: block;
+  font-size: clamp(1.5rem, 2.8vw, 2.05rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  color: var(--e-accent);
+}
+
+.ct-lib { display: block; margin-top: 5px; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--e-douce); }
+
+/* Le bloc du bento a été retiré avec la section : plus aucune règle
+   `.bt-*` n'était appliquée, et du CSS mort survit longtemps parce que
+   rien ne le signale. */
+
+/* ══ 4. Bandeau défilant ════════════════════════════════════════════ */
+.mq {
+  padding: 18px 0;
+  overflow: hidden;
+  background: var(--e-surface);
+  border-block: 1px solid var(--e-filet);
+  mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+}
+
+.mq-piste { display: flex; width: max-content; animation: e-defile 62s linear infinite; }
+.mq-piste span { padding: 0 22px; font-size: clamp(1rem, 2vw, 1.42rem); font-weight: 600; letter-spacing: -0.02em; color: var(--e-douce); white-space: nowrap; }
+.mq-piste i { align-self: center; font-size: 0.5rem; font-style: normal; color: var(--e-accent); }
+
+/* La piste contient deux tours identiques : translater de moitié revient
+   exactement sur elle-même, sans saut visible. */
+@keyframes e-defile { from { transform: translate3d(0,0,0); } to { transform: translate3d(-50%,0,0); } }
+.mq:hover .mq-piste { animation-play-state: paused; }
+
+/* ══ 5. Molécule ════════════════════════════════════════════════════ */
+.ml { padding: 92px 0; }
+
+.ml-grille { display: grid; grid-template-columns: 1fr 1.3fr; gap: 56px; align-items: center; }
+.ml-grille > * { opacity: 0; transform: translateY(18px); transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
+.ml-grille > *.vu { opacity: 1; transform: none; }
+
+.ml-visuel { margin: 0; padding: 26px; background: var(--e-surface); border: 1px solid var(--e-filet); border-radius: calc(var(--e-rayon) + 6px); box-shadow: 0 18px 50px rgba(0, 0, 0, 0.07); }
+.ml-visuel img { display: block; width: 100%; height: auto; }
+.ml-visuel figcaption { margin-top: 14px; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--e-douce); text-align: center; }
+
+.ml-texte h2 { margin: 0 0 16px; font-size: clamp(1.6rem, 3.4vw, 2.35rem); font-weight: 750; line-height: 1.16; letter-spacing: -0.03em; }
+.ml-texte h2 em { font-style: italic; color: var(--e-accent); }
+.ml-texte > p { margin: 0 0 24px; font-size: 1.02rem; line-height: 1.74; color: var(--e-douce); }
+
+.ml-points { margin: 0 0 26px; padding: 0; list-style: none; }
+.ml-points li { padding: 14px 0 14px 18px; border-top: 1px solid var(--e-filet); box-shadow: inset 2px 0 0 var(--e-accent); font-size: 0.94rem; line-height: 1.62; color: var(--e-douce); }
+.ml-points li:last-child { border-bottom: 1px solid var(--e-filet); }
+.ml-points strong { color: var(--e-encre); font-weight: 650; }
+
+.ml-lien { display: inline-flex; align-items: center; gap: 9px; font-weight: 650; color: var(--e-accent); text-decoration: none; border-bottom: 1px solid rgba(79, 70, 229, 0.35); transition: border-color 0.2s ease; }
+.ml-lien:hover { border-bottom-color: var(--e-accent); }
+
+/* ══ 6. Clôture : bandeau photographique ════════════════════════════
+   C'était un aplat indigo avec un titre et un champ au milieu. L'image
+   occupe désormais toute la largeur, le voile la calme, la recherche s'y
+   détache en grand.
+
+   La page s'ouvre et se ferme sur une photographie, mais dans deux
+   dispositions différentes : moitié d'écran à l'ouverture, pleine
+   largeur centrée à la fermeture. Le skill interdit la répétition d'une
+   famille de mise en page, pas le rappel d'un matériau. */
+
+.cl { position: relative; padding: 116px 0 124px; overflow: hidden; color: #fff; text-align: center; }
+
+.cl-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.35);
+}
+
+/* Le voile reprend le dégradé de la section « Intelligence artificielle »
+   du site. Il est assez dense pour que le calcul se fasse sans la photo :
+   même sur un pixel blanc, au point où la lueur radiale éclaircit le plus,
+   le titre tient 10,3:1 et le texte le plus pâle 5,0:1. Le contraste ne
+   dépend donc pas de l'image, qui peut changer sans rien casser. */
+.cl-voile {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgba(30, 27, 75, 0.93) 0%, rgba(49, 46, 129, 0.88) 50%, rgba(55, 48, 163, 0.92) 100%),
+    radial-gradient(ellipse 62% 190% at 84% 50%, rgba(129, 140, 248, 0.16), transparent 70%);
+}
+
+.cl-inner { position: relative; z-index: 1; }
+
+.cl-sur {
+  margin: 0 0 16px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* Couleur declaree et non heritee : theme.css applique
+   `color: var(--text-primary)` a h1..h6, et une regle directe l emporte
+   toujours sur l heritage. Le `color: #fff` pose sur la section ne
+   descendait donc pas jusqu au titre, qui restait en encre presque noire
+   sur fond sombre. */
+.cl h2 {
+  max-width: 22ch;
+  margin: 0 auto 34px;
+  font-size: clamp(1.8rem, 4.2vw, 2.9rem);
+  font-weight: 780;
+  line-height: 1.1;
+  letter-spacing: -0.034em;
+  color: #fff;
+}
+
+/* Réserve sous la ligne : le jambage du « q » de « sait » et l'apostrophe
+   se font rogner par un interlignage aussi serré. */
+.cl h2 em { display: inline-block; padding-bottom: 5px; line-height: 1.16; font-style: italic; color: #c7d2fe; }
+
+/* Le champ est plus grand qu'ailleurs : c'est le dernier geste proposé
+   par la page, il doit se voir de loin. */
+.cl-recherche {
+  display: flex;
+  gap: 9px;
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 8px;
+  text-align: start;
+  background: rgba(255, 255, 255, 0.13);
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: calc(var(--e-rayon) + 8px);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 26px 60px rgba(0, 0, 0, 0.32);
+}
+
+.cl-recherche input {
+  flex: 1;
+  min-width: 0;
+  padding: 16px 18px;
+  font: inherit;
+  font-size: 1.04rem;
+  color: #fff;
+  background: transparent;
+  border: none;
+}
+
+.cl-recherche input::placeholder { color: rgba(255, 255, 255, 0.78); }
+.cl-recherche input:focus { outline: none; }
+.cl-recherche:focus-within { border-color: rgba(199, 210, 254, 0.85); box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 0 0 4px rgba(129, 140, 248, 0.3); }
+
+.cl-recherche button {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 16px 30px;
+  font: inherit;
+  font-weight: 650;
+  color: #1e1b4b;
+  white-space: nowrap;
+  background: #fff;
+  border: none;
+  border-radius: var(--e-rayon);
+  cursor: pointer;
+  transition: transform 0.18s ease, background 0.2s ease;
+}
+
+.cl-recherche button:hover { background: #eef0ff; transform: translateY(-1px); }
+.cl-recherche button:active { transform: scale(0.985); }
+.cl-recherche button i { transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1); }
+.cl-recherche button:hover i { transform: translateX(4px); }
+
+/* Le champ ne mène qu'à la recherche par nom : les trois autres entrées
+   de la base méritent leur raccourci ici plutôt que d'être oubliées au
+   moment où le lecteur décide. */
+.cl-raccourcis { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 26px; }
+
+.cl-raccourcis a {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 999px;
+  transition: background 0.22s ease, border-color 0.22s ease, transform 0.18s ease;
+}
+
+.cl-raccourcis a:hover { background: rgba(255, 255, 255, 0.19); border-color: rgba(255, 255, 255, 0.45); transform: translateY(-1px); }
+.cl-raccourcis i { font-size: 0.85rem; color: #c7d2fe; }
+
+.cl-note { max-width: 62ch; margin: 30px auto 0; font-size: 0.86rem; line-height: 1.6; color: rgba(255, 255, 255, 0.8); }
+
+/* ══ Repli mobile, déclaré section par section (§4.7) ═══════════════ */
+@media (max-width: 980px) {
+
+  .hr { min-height: auto; padding: 108px 0 96px; }
+  .hr { grid-template-columns: 1fr; min-height: auto; }
+  .hr-gauche { padding: 112px 24px 64px; }
+  .hr-droite { min-height: 420px; clip-path: none; margin-inline-start: 0; }
+  .hr-panneau { position: static; width: auto; margin: 0 24px 28px; }
+  .ct { margin-top: -48px; }
+  .ml-grille { grid-template-columns: 1fr; gap: 34px; }
+  .hr-recherche, .cl-recherche { flex-direction: column; }
+  .hr-recherche button, .cl-recherche button { justify-content: center; }
+  .cl-raccourcis a { flex: 1 1 auto; justify-content: center; }
+}
+
+/* ══ Mouvement réduit : tout s'arrête, rien ne disparaît ═══════════ */
+@media (prefers-reduced-motion: reduce) {
+  .hr-photo { animation: none; }
+  .mq-piste { animation: none; }
+  .hr-panneau, .ct-item, .ml-grille > * { opacity: 1; transform: none; transition: none; }
+}
+
+/* Le verre retombe sur un fond plein si la transparence est refusée. */
+@media (prefers-reduced-transparency: reduce) {
+  .hr-recherche, .hr-panneau { background: rgba(15, 23, 42, 0.72); backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+
+/* ══ Sections reprises de l'accueil réel ════════════════════════════
+   Le contenu est celui de la page en service ; seule la mise en page
+   change. Chaque section emploie une famille distincte, le skill
+   interdisant qu'une même disposition serve deux fois (§4.7). */
+
+.es-eyebrow {
+  margin: 0 0 12px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--e-accent);
+}
+
+/* ── Fonctionnement : trois étapes numérotées, sur une ligne ─────── */
+.pr { padding: 92px 0 84px; }
+
+.pr-tete { max-width: 62ch; margin-bottom: 40px; }
+.pr-tete h2 { margin: 0 0 10px; font-size: clamp(1.7rem, 3.6vw, 2.5rem); font-weight: 750; line-height: 1.14; letter-spacing: -0.032em; }
+.pr-intro { margin: 0; color: var(--e-douce); line-height: 1.68; }
+
+.pr-etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin: 0; padding: 0; list-style: none; }
+
+.pr-etapes li {
+  padding: 0 28px;
+  border-inline-start: 1px solid var(--e-filet);
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pr-etapes li:first-child { padding-inline-start: 0; border-inline-start: none; }
+.pr-etapes li.vu { opacity: 1; transform: none; }
+
+.pr-num {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 14px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--e-accent);
+  background: rgba(79, 70, 229, 0.1);
+  border-radius: 50%;
+}
+
+.pr-etapes h3 { margin: 0 0 8px; font-size: 1.08rem; font-weight: 700; letter-spacing: -0.018em; }
+.pr-etapes p { margin: 0; font-size: 0.92rem; line-height: 1.66; color: var(--e-douce); }
+
+/* ── Résultats : texte à gauche, molécule à droite ──────────────── */
+.rs { padding: 88px 0; background: var(--e-surface); border-block: 1px solid var(--e-filet); }
+
+.rs-grille { display: grid; grid-template-columns: 1.25fr 1fr; gap: 56px; align-items: center; }
+.rs-grille > * { opacity: 0; transform: translateY(18px); transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
+.rs-grille > *.vu { opacity: 1; transform: none; }
+
+.rs-texte h2 { margin: 0 0 12px; font-size: clamp(1.7rem, 3.4vw, 2.4rem); font-weight: 750; line-height: 1.14; letter-spacing: -0.032em; }
+.rs-texte h2 em { font-style: italic; color: var(--e-accent); }
+.rs-texte > p { margin: 0 0 26px; color: var(--e-douce); line-height: 1.7; }
+
+.rs-liste { margin: 0; }
+.rs-liste > div { display: grid; grid-template-columns: minmax(150px, 0.6fr) 1fr; gap: 18px; padding: 15px 0; border-top: 1px solid var(--e-filet); }
+.rs-liste > div:last-child { border-bottom: 1px solid var(--e-filet); }
+.rs-liste dt { font-size: 0.92rem; font-weight: 650; color: var(--e-encre); }
+.rs-liste dd { margin: 0; font-size: 0.9rem; line-height: 1.6; color: var(--e-douce); }
+
+.rs-visuel { margin: 0; padding: 26px; background: var(--e-fond); border: 1px solid var(--e-filet); border-radius: calc(var(--e-rayon) + 6px); }
+.rs-visuel img { display: block; width: 100%; height: auto; }
+.rs-visuel figcaption { margin-top: 14px; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--e-douce); text-align: center; }
+
+/* ── Confiance : quatre engagements, filets verticaux ───────────── */
+.tr { padding: 84px 0; }
+
+.tr-grille { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
+
+.tr-item {
+  padding: 0 26px;
+  border-inline-start: 1px solid var(--e-filet);
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.tr-item:first-child { padding-inline-start: 0; border-inline-start: none; }
+.tr-item.vu { opacity: 1; transform: none; }
+.tr-item i { display: block; margin-bottom: 12px; font-size: 1.1rem; color: var(--e-accent); }
+.tr-item h3 { margin: 0 0 7px; font-size: 1rem; font-weight: 700; letter-spacing: -0.015em; }
+.tr-item p { margin: 0; font-size: 0.9rem; line-height: 1.62; color: var(--e-douce); }
+
+/* ── Clôture : le texte « à propos » de la page réelle ──────────── */
+
+/* Le chiffre fixe « 24/7 » n'a pas de compteur : rien à animer. */
+.ct-fixe .ct-val { color: var(--e-encre); }
+
+@media (max-width: 980px) {
+  .pr-etapes, .tr-grille { grid-template-columns: 1fr; }
+  .pr-etapes li, .tr-item { padding: 22px 0 0; border-inline-start: none; border-top: 1px solid var(--e-filet); }
+  .pr-etapes li:first-child, .tr-item:first-child { padding-top: 0; border-top: none; }
+  .rs-grille { grid-template-columns: 1fr; gap: 34px; }
+  .rs-liste > div { grid-template-columns: 1fr; gap: 4px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pr-etapes li, .rs-grille > *, .tr-item { opacity: 1; transform: none; transition: none; }
+  .cl-raccourcis a, .cl-recherche button { transition: none; }
+}
+
+/* ══ Onglets des fonctionnalités ════════════════════════════════════
+   Troisième forme pour cette section : l'interaction change, pas
+   seulement la disposition. Cinq onglets, un panneau à la fois.
+
+   Les règles de l'index précédent ont été retirées avec lui plutôt que
+   laissées en place : du CSS mort survit longtemps parce que rien ne le
+   signale. */
+
+.on { padding: 92px 0 96px; }
+
+.on-tete { max-width: 62ch; margin-bottom: 30px; }
+.on-tete h2 { margin: 0 0 10px; font-size: clamp(1.7rem, 3.6vw, 2.5rem); font-weight: 750; line-height: 1.14; letter-spacing: -0.032em; }
+.on-tete h2 em { font-style: italic; color: var(--e-accent); }
+.on-tete p { margin: 0; color: var(--e-douce); line-height: 1.68; }
+
+.on-barre {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--e-filet);
+}
+
+.on-barre button {
+  padding: 11px 20px;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--e-douce);
+  background: var(--e-fond);
+  border: 1px solid var(--e-filet);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 0.22s ease, background 0.22s ease, border-color 0.22s ease;
+}
+
+.on-barre button:hover { color: var(--e-accent); border-color: rgba(79, 70, 229, 0.4); }
+
+/* L'onglet actif porte l'accent en aplat : le blanc dessus tient 6,3:1. */
+.on-barre button[aria-selected="true"] {
+  color: #fff;
+  background: var(--e-accent);
+  border-color: var(--e-accent);
+}
+
+.on-barre button:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.35); }
+
+.on-panneau {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.on-panneau.vu { opacity: 1; transform: none; }
+.on-panneau[hidden] { display: none; }
+
+/* Sans script, les cinq panneaux s'affichent à la suite : il leur faut
+   alors une séparation, que l'affichage par onglets ne demande pas. */
+.on-panneau + .on-panneau { margin-top: 44px; padding-top: 44px; border-top: 1px solid var(--e-filet); }
+
+.on-texte h3 { margin: 0 0 14px; font-size: clamp(1.3rem, 2.6vw, 1.75rem); font-weight: 750; line-height: 1.2; letter-spacing: -0.026em; }
+.on-texte p { margin: 0 0 24px; font-size: 1rem; line-height: 1.74; color: var(--e-douce); }
+
+.on-lien {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 24px;
+  font-weight: 650;
+  color: #fff;
+  text-decoration: none;
+  background: linear-gradient(140deg, var(--e-accent), var(--e-accent-sombre));
+  border-radius: var(--e-rayon);
+  transition: filter 0.2s ease, transform 0.18s ease;
+}
+
+.on-lien:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.on-lien i { transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1); }
+.on-lien:hover i { transform: translateX(4px); }
+
+.on-visuel { margin: 0; overflow: hidden; border-radius: calc(var(--e-rayon) + 6px); border: 1px solid var(--e-filet); }
+.on-visuel img { display: block; width: 100%; height: 340px; object-fit: cover; }
+
+/* Le tracé de RDKit est noir et ne se recadre pas : il lui faut sa marge
+   et un fond clair. */
+.on-visuel-molecule { padding: 26px; background: var(--e-fond); }
+.on-visuel-molecule img { height: auto; object-fit: contain; }
+
+@media (max-width: 980px) {
+  .on-panneau { grid-template-columns: 1fr; gap: 26px; }
+  .on-visuel img { height: 240px; }
+  .on-barre button { flex: 1 1 auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .on-panneau { opacity: 1; transform: none; transition: none; }
+  .on-lien, .on-lien i, .on-barre button { transition: none; }
+}
+
+/* ══ Rythme des sections ════════════════════════════════════════════
+   Les sections claires se ressemblaient toutes : rien ne disait où l'une
+   finissait. Elles alternent désormais entre le fond de page et le blanc
+   des surfaces, chaque changement étant marqué par un filet. Le procédé
+   reste sobre — le skill interdit qu'un thème bascule d'une section à
+   l'autre (§4.11), il n'interdit pas de nuancer un même thème. */
+
+.pr { background: var(--e-surface); border-block: 1px solid var(--e-filet); }
+.rs { background: var(--e-fond); }
+.tr { background: var(--e-fond); }
+.on { background: var(--e-surface); border-block: 1px solid var(--e-filet); }
+
+/* La section des chiffres chevauche le hero : son fond reste
+   transparent, ses cartes portent le blanc. */
+.ct { background: transparent; }
+
+/* ══ Pistes de recherche et sources, dans le hero ═══════════════════
+   Le bas de la colonne gauche sonnait creux sous le champ. Il porte
+   maintenant six suggestions tirées du catalogue et un rappel des
+   sources : deux informations réelles, pas du remplissage. */
+
+.hr-pistes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.hr-pistes-titre {
+  margin-inline-end: 2px;
+  font-size: 0.82rem;
+  color: var(--e-douce);
+}
+
+.hr-pistes a {
+  padding: 7px 14px;
+  font-size: 0.85rem;
+  font-weight: 550;
+  color: var(--e-encre);
+  text-decoration: none;
+  background: var(--e-surface);
+  border: 1px solid var(--e-filet);
+  border-radius: 999px;
+  transition: color 0.2s ease, border-color 0.2s ease, transform 0.18s ease;
+}
+
+.hr-pistes a:hover {
+  color: var(--e-accent);
+  border-color: rgba(79, 70, 229, 0.45);
+  transform: translateY(-1px);
+}
+
+.hr-sources {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.hr-sources > span {
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--e-douce);
+}
+
+.hr-sources a {
+  font-size: 0.88rem;
+  font-weight: 650;
+  color: var(--e-douce);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.hr-sources a:hover { color: var(--e-accent); }
+
+@media (max-width: 900px) {
+  .hr-pistes a:nth-child(n+6) { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hr-pistes a { transition: none; }
+}

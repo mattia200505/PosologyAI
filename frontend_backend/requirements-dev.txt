@@ -1,0 +1,28 @@
+# Dépendances des scripts hors-ligne, qui ne tournent jamais dans le
+# processus web. Un déploiement du serveur n'a pas à les installer :
+# `requirements.txt` suffit à le faire tourner.
+#
+# Installation :   pip install -r requirements-dev.txt
+#
+# Ce fichier répond à une objection du §12 du plan P9 — « une dépendance
+# supplémentaire, à déclarer dans les requirements ; trois bibliothèques
+# nécessaires manquaient déjà à l'appel avant P8 ». Séparer les deux
+# permet d'ajouter un outil lourd sans alourdir le serveur.
+
+# ── Dessin des formules topologiques ──────────────────────────────────
+# scripts/render_structures.py — pré-calcule 1 247 SVG à partir des SMILES,
+# une fois pour toutes. Le navigateur reçoit du SVG inline, jamais RDKit :
+# ni bibliothèque JavaScript, ni WebAssembly, ni appel à un CDN.
+# Installation lourde (~100 Mo avec numpy et Pillow), d'où sa place ici.
+rdkit>=2024.3.1
+
+# ── Import du dump DrugBank ───────────────────────────────────────────
+# scripts/import_drugbank_xml.py — barre de progression sur un balayage de
+# 1,8 Go, qui dure assez longtemps pour qu'un retour visuel serve.
+tqdm>=4.66.0
+
+# ── Déjà couvertes par requirements.txt ───────────────────────────────
+# Les scripts s'appuient aussi sur openpyxl (import_ema.py), rapidfuzz
+# (matching_drugbank.py), neo4j, pymongo et python-dotenv. Elles y figurent
+# déjà — rapidfuzz n'est pourtant utilisée que par les scripts, mais la
+# déplacer ici casserait une installation existante pour un gain nul.

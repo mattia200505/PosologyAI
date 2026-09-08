@@ -1,0 +1,37 @@
+{#
+   La photographie et son voile, pour une bande `hero-nuit hero-photo`.
+
+   Cinq pages la portent. Recopier les deux éléments dans chacune aurait
+   donné cinq versions qui divergent à la première retouche : c'est ce
+   qui était arrivé aux barres de navigation.
+
+   Emploi, dans une section qui porte déjà `hero-nuit hero-photo` :
+
+       {% with photo = 'photo-1532187863486-abf9dbad1b69' %}
+       {% include 'components/hero_photo.html' %}
+       {% endwith %}
+
+   Une variable, obligatoire :
+
+       photo   l'identifiant Unsplash, sans l'URL ni les paramètres
+
+   Le voile fait le contraste, pas l'image : au point le plus clair de la
+   bande, sur un pixel blanc pur, le titre tient 7,1:1 et le texte le
+   plus pâle 5,0:1. Le calcul complet est dans `static/css/hero.css`.
+   L'image peut donc changer, ou ne pas se charger du tout, sans que rien
+   ne devienne illisible.
+
+   `alt` vide et `aria-hidden` : elle ne porte aucune information, elle
+   est un fond. La lui faire annoncer par un lecteur d'écran serait du
+   bruit.
+
+   `eager` et `fetchpriority="high"` : c'est le plus grand élément de la
+   première vue, il décide du LCP. Le laisser en chargement paresseux le
+   ferait arriver après le reste, et la bande resterait unie le temps
+   qu'il vienne.
+#}
+<img class="hero-photo-image"
+     src="https://images.unsplash.com/{{ photo }}?auto=format&fit=crop&w=2000&q=80"
+     alt="" aria-hidden="true"
+     loading="eager" decoding="async" fetchpriority="high">
+<div class="hero-photo-voile" aria-hidden="true"></div>

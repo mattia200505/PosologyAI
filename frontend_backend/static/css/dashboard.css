@@ -1,0 +1,431 @@
+/* ══════════════════════════════════════════════════════════════════
+   Le tableau de bord.
+
+   Ce qui a changé
+   ---------------
+   Rien dans ce qu'il montre : mêmes six compteurs, mêmes quatre
+   graphiques, même graphe Neo4j, même palmarès. Seule la forme change.
+
+   Elle ne ressemblait à aucune autre page. Un bandeau bleu nuit en
+   pleine largeur — `#1a237e → #3949ab` — que rien d'autre ne porte ;
+   un fond `#f4f6fa` propre à cette page ; des cartes blanches à
+   14 px de rayon quand tout le reste en fait 22 ; et une palette
+   Material — vert, bleu, violet, orange, rouge, jaune, cyan, magenta —
+   là où l'application n'emploie qu'un indigo.
+
+   Ce qu'elle emprunte maintenant
+   ------------------------------
+   Le vocabulaire de l'écran de prescription, qui est le plus récent :
+   des panneaux de verre sur un fond à voiles indigo, un seul rayon de
+   coin, la pilule pour ce qui est interactif, et des intertitres en
+   petites capitales espacées plutôt qu'en gras coloré.
+
+   Les couleurs qui portent une information ne bougent pas : la légende
+   du graphe Neo4j — médicament, substance, laboratoire, sévérité — dit
+   quelque chose, et la repeindre pour l'harmonie effacerait ce qu'elle
+   dit.
+   ══════════════════════════════════════════════════════════════════ */
+
+.tb {
+  --verre: rgba(255, 255, 255, 0.72);
+  --verre-bord: rgba(255, 255, 255, 0.9);
+  --rayon-app: 22px;
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  padding-bottom: 56px;
+}
+
+/* Sans ce fond, le verre n'a rien à filtrer et se lit comme un aplat
+   gris. Les mêmes trois voiles que l'écran de prescription : la page
+   doit se reconnaître d'un écran à l'autre. */
+.tb::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 52% 42% at 12% 4%, rgba(79, 70, 229, 0.13), transparent 62%),
+    radial-gradient(ellipse 44% 38% at 88% 22%, rgba(129, 140, 248, 0.12), transparent 64%),
+    radial-gradient(ellipse 60% 40% at 50% 96%, rgba(55, 48, 163, 0.08), transparent 66%);
+}
+
+.dash-header {
+  position: relative;
+  z-index: 1;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 24px;
+  text-align: start;
+  background: none;
+}
+
+.dash-header h1 {
+  max-width: 18ch;
+  margin: 0;
+  font-size: clamp(2.1rem, 5vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.06;
+  color: #fff;
+}
+
+.dash-header h1 em {
+  font-style: normal;
+  color: #c7d2fe;
+}
+
+.dash-header p {
+  max-width: 56ch;
+  margin: 18px 0 0;
+  font-size: 1.02rem;
+  line-height: 1.62;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.dash-container {
+  position: relative;
+  z-index: 2;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 24px 40px;
+}
+
+/* Le chargement occupe la place que les compteurs prendront, pour que
+   la page ne saute pas quand ils arrivent. */
+.dash-container > .loading { margin-top: -66px; }
+
+/* ── Les panneaux ────────────────────────────────────────────────────
+   Une seule surface pour tout ce qui contient quelque chose : les
+   compteurs, les graphiques, le graphe, le palmarès. */
+.stat-card,
+.chart-card,
+.neo4j-section {
+  background: var(--verre);
+  border: 1px solid var(--verre-bord);
+  border-radius: var(--rayon-app);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    0 18px 46px rgba(30, 27, 75, 0.09);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+}
+
+/* ── Les compteurs ───────────────────────────────────────────────────
+   Le nombre d'abord, en grand ; l'intitulé sous lui, en petit. Une
+   pastille de couleur porte l'icône — la même forme que la pastille de
+   la barre de navigation. */
+.stats-grid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+  /* Elle chevauche la bande sombre, comme le bandeau de chiffres de
+     l'accueil chevauche le hero. C'est ce recouvrement qui fait la
+     composition : sans lui, deux blocs se suivent sans se répondre. */
+  margin-top: -66px;
+  margin-bottom: 26px;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 22px 24px;
+  /* Opaque, et non de verre : ces cartes sont à cheval sur le sombre et
+     sur le clair, et une surface translucide y prendrait deux teintes.
+     L'ombre est franche — c'est elle qui les décolle de la bande. */
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.16), 0 2px 8px rgba(15, 23, 42, 0.06);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease,
+              opacity 0.6s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 16px 34px rgba(30, 27, 75, 0.13);
+}
+
+.stat-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  font-size: 1.1rem;
+  border-radius: 13px;
+}
+
+.stat-info .num {
+  font-size: 1.72rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-info .lbl {
+  margin-top: 3px;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+/* ── Les graphiques ──────────────────────────────────────────────────
+   Les intertitres étaient en gras, chacun d'une couleur différente
+   posée en attribut `style`. Ils passent en petites capitales
+   espacées, comme les intertitres de l'écran de prescription ;
+   l'icône seule garde l'accent. */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 26px;
+}
+
+.chart-card { padding: 24px 26px; }
+.neo4j-section { padding: 24px 26px; margin-bottom: 16px; }
+
+/* Les intertitres étaient en gras, chacun d'une couleur différente
+   posée en attribut `style`. Ils passent en petites capitales
+   espacées, comme les intertitres de l'écran de prescription ;
+   l'icône seule garde l'accent. */
+.chart-card h3,
+.neo4j-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 16px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.chart-card h3 i,
+.neo4j-section h3 i {
+  font-size: 0.85rem;
+  color: var(--primary);
+}
+
+.chart-card .chart-wrap { position: relative; height: 240px; }
+.chart-card .chart-wrap-sm { position: relative; height: 180px; }
+.full-width { grid-column: 1 / -1; }
+
+/* ── Le graphe ───────────────────────────────────────────────────────
+   Le cadre du graphe reprend le rayon de la page, en un cran plus
+   petit : il est dans un panneau, il ne peut pas avoir le même. */
+.graph-container {
+  width: 100%;
+  height: 400px;
+  margin-top: 10px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--verre-bord);
+  border-radius: 16px;
+}
+
+/* La légende dit ce que chaque couleur désigne. Ses pastilles gardent
+   leurs teintes : elles portent l'information, elles ne la décorent
+   pas. */
+.graph-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding: 2px 0 12px;
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+}
+
+.graph-legend .dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-inline-end: 5px;
+  border-radius: 50%;
+}
+
+.graph-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+/* La pilule, pour ce qui est interactif — la règle de l'application. */
+.graph-controls input {
+  flex: 1;
+  min-width: 170px;
+  padding: 10px 18px;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid var(--border-hover, rgba(0, 0, 0, 0.12));
+  border-radius: 999px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.graph-controls input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.16);
+}
+
+.graph-controls button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 0.85rem;
+  font-weight: 650;
+  color: #fff;
+  background: linear-gradient(140deg, var(--primary), var(--primary-dark));
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: filter 0.2s ease, transform 0.18s ease;
+}
+
+.graph-controls button:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.graph-controls button:active { transform: none; }
+
+/* Le second bouton est une variante, pas une action de même poids :
+   il s'allège. */
+.graph-controls button#fullGraphBtn {
+  color: var(--primary);
+  background: rgba(79, 70, 229, 0.1);
+}
+
+.graph-controls button#fullGraphBtn:hover {
+  background: rgba(79, 70, 229, 0.17);
+  filter: none;
+}
+
+/* ── Le palmarès ─────────────────────────────────────────────────────
+   Un filet de deux pixels sous l'en-tête et un fond bleuté par ligne
+   faisaient plus de traits que de données. */
+.recent-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.recent-table th {
+  padding: 9px 14px;
+  text-align: start;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  background: none;
+  border-bottom: 1px solid var(--border-hover, rgba(0, 0, 0, 0.12));
+}
+
+.recent-table td {
+  padding: 10px 14px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border, rgba(0, 0, 0, 0.06));
+}
+
+.recent-table tr:hover td { background: rgba(79, 70, 229, 0.05); }
+.recent-table a { color: var(--primary); text-decoration: none; font-weight: 550; }
+.recent-table a:hover { text-decoration: underline; }
+
+/* ── États ───────────────────────────────────────────────────────────
+   Attendre et échouer ne se ressemblent pas ; ils ne se ressemblaient
+   déjà pas, la forme suit. */
+.loading {
+  padding: 72px 24px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.loading i { margin-bottom: 10px; font-size: 1.8rem; color: var(--primary); }
+
+.error-msg {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 14px 18px;
+  font-size: 0.88rem;
+  color: #b91c1c;
+  background: rgba(185, 28, 28, 0.07);
+  border: 1px solid rgba(185, 28, 28, 0.16);
+  border-radius: 14px;
+}
+
+.severity-bar {
+  display: flex;
+  height: 28px;
+  margin: 10px 0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.severity-bar .seg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* ── Étroit ──────────────────────────────────────────────────────────
+   Deux graphiques côte à côte ne tiennent plus sous 900 px : chacun
+   prend la largeur. */
+@media (max-width: 900px) {
+  .charts-grid { grid-template-columns: 1fr; }
+  .dash-header { padding: 28px 20px 20px; }
+  .dash-container { padding: 0 20px 32px; }
+  .chart-card, .neo4j-section { padding: 20px; }
+}
+
+/* Le mouvement se coupe s'il est refusé. */
+@media (prefers-reduced-motion: reduce) {
+  .stat-card, .graph-controls button { transition: none; }
+  .stat-card:hover, .graph-controls button:hover { transform: none; }
+  .tb-hero::before, .tb-hero::after { animation: none; }
+  .tb-entree { opacity: 1; transform: none; transition: none; }
+}
+
+/* Le verre retombe sur un fond plein si la transparence est refusée. */
+@media (prefers-reduced-transparency: reduce) {
+  .stat-card, .chart-card, .neo4j-section {
+    background: #ffffff;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .tb::before { display: none; }
+}
+
+/* ── Ce que les compteurs ajoutent à l'entrée partagée ────────────────
+   Le décalage se lit comme une vague plutôt que comme un bloc. */
+.stats-grid .stat-card:nth-child(2) { transition-delay: 0.06s; }
+.stats-grid .stat-card:nth-child(3) { transition-delay: 0.12s; }
+.stats-grid .stat-card:nth-child(4) { transition-delay: 0.18s; }
+.stats-grid .stat-card:nth-child(5) { transition-delay: 0.24s; }
+.stats-grid .stat-card:nth-child(6) { transition-delay: 0.30s; }
+.charts-grid .chart-card:nth-child(2) { transition-delay: 0.07s; }
+.charts-grid .chart-card:nth-child(3) { transition-delay: 0.14s; }
+.charts-grid .chart-card:nth-child(4) { transition-delay: 0.21s; }
+
+/* Déclarée à part, sans quoi la transition d'entrée — à spécificité
+   égale et déclarée dans `hero.css` — écraserait celle de l'ombre. */
+.stat-card.entree {
+  transition: opacity 0.62s ease,
+              transform 0.62s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.28s ease;
+}
+
+.stat-card.entree.vu {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.28s ease;
+}

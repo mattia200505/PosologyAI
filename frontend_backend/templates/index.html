@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PosologyAI • Base de données médicamenteuse</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chatbot.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    {% with active_page='home' %}
+    {% include 'components/header.html' %}
+    {% endwith %}
+
+    <main>
+        <!-- ========== HERO ========== -->
+        <section class="hero">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    <span data-i18n="trusted_medical_db">Base de données médicale de confiance</span>
+                </div>
+                {# Le titre d'accroche est le titre de la page : un <h2> sans <h1>
+                   laisse un lecteur d'écran sans point d'entrée, et la navigation
+                   par titres démarre au mauvais niveau. #}
+                <h1 class="hero-title">
+                    <span data-i18n="hero_title_line1">Votre santé,</span><br>
+                    <span class="highlight" data-i18n="hero_title_line2">éclairée par la donnée</span>
+                </h1>
+                <p data-i18n="hero_subtitle">Accédez à des milliers de fiches médicamenteuses, analysez les interactions et obtenez des synthèses intelligentes en un clic.</p>
+                {#
+                   Un champ, pas trois portes. L'accueil proposait « Explorer
+                   les médicaments » et « Recherche intelligente », et la barre
+                   de navigation en offrait une troisième — sans dire laquelle
+                   sert à quoi. Le visiteur devait choisir avant de savoir.
+
+                   Il tape désormais sa requête ; le choix du mode se présente
+                   sur la page de résultats, quand la requête est déjà écrite
+                   et qu'en changer ne coûte qu'un clic. Les trois routes
+                   gardent leurs URL : aucun lien existant ne casse.
+                #}
+                <form class="hero-recherche" action="/search" method="GET" role="search">
+                    <label class="sr-only" for="hero-recherche-champ" data-i18n="search_placeholder">Nom, substance active, laboratoire...</label>
+                    <input type="text" id="hero-recherche-champ" name="search" class="hero-recherche-champ"
+                           data-i18n-placeholder="search_placeholder"
+                           placeholder="Nom, substance active, laboratoire..."
+                           autocomplete="off" autofocus>
+                    <button type="submit" class="hero-recherche-bouton" aria-label="Lancer la recherche">
+                        <i class="fas fa-search"></i>
+                        <span data-i18n="start_exploring">Rechercher</span>
+                    </button>
+                </form>
+                <p class="hero-recherche-aide">
+                    <span data-i18n="hero_modes_hint">Recherche exacte par défaut&nbsp;; la similarité et l'assistant se choisissent sur la page de résultats.</span>
+                </p>
+            </div>
+        </section>
+
+        <!-- ========== STATISTICS ========== -->
+        <section class="statistics">
+            <div class="container">
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-pills stat-icon"></i>
+                        <span class="stat-number">{{ total_medicines|default('2K+') }}</span>
+                        <span class="stat-label" data-i18n="stat_medicines">MÉDICAMENTS</span>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-flask stat-icon"></i>
+                        <span class="stat-number">{{ substance_count|default('20+') }}</span>
+                        <span class="stat-label" data-i18n="stat_substances">SUBSTANCES ACTIVES</span>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-industry stat-icon"></i>
+                        <span class="stat-number">{{ lab_count|default('100+') }}</span>
+                        <span class="stat-label" data-i18n="laboratoires">LABORATOIRES</span>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-sync-alt stat-icon"></i>
+                        <span class="stat-number">24/7</span>
+                        <span class="stat-label" data-i18n="stat_availability">ACCESSIBILITÉ</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== PROCESS / PATIENT INFO ========== -->
+        <section class="process-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-subtitle" data-i18n="how_it_works">FONCTIONNEMENT</span>
+                    <h2 data-i18n="process_title">De l'information au diagnostic</h2>
+                    <p data-i18n="process_subtitle">Une approche structurée en trois étapes pour une utilisation médicale rigoureuse et fiable.</p>
+                </div>
+                <div class="process-grid">
+                    <div class="process-card">
+                        <div class="process-step">1</div>
+                        <i class="fas fa-notes-medical process-icon"></i>
+                        <h3 data-i18n="step1_title">Saisie des informations</h3>
+                        <p data-i18n="step1_desc">Entrez le nom d'un médicament, une substance active ou un laboratoire. Notre moteur de recherche intelligent trouve instantanément les résultats les plus pertinents parmi des milliers de fiches.</p>
+                    </div>
+                    <div class="process-card">
+                        <div class="process-step">2</div>
+                        <i class="fas fa-brain process-icon"></i>
+                        <h3 data-i18n="step2_title">Analyse par intelligence artificielle</h3>
+                        <p data-i18n="step2_desc">Notre IA génère automatiquement des résumés clairs et structurés : indications, posologie, effets secondaires, interactions médicamenteuses et précautions d'emploi.</p>
+                    </div>
+                    <div class="process-card">
+                        <div class="process-step">3</div>
+                        <i class="fas fa-chart-bar process-icon"></i>
+                        <h3 data-i18n="step3_title">Visualisation des résultats</h3>
+                        <p data-i18n="step3_desc">Consultez des fiches détaillées avec une hiérarchie claire, des données chiffrées, les interactions recensées et les sources d'origine.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== AI FEATURE ========== -->
+        <section class="ai-feature">
+            <div class="container">
+                <div class="ai-content">
+                    <div class="ai-text">
+                        <h2 data-i18n="ai_feature_title">Génération de rapports médicaux par IA</h2>
+                        <p data-i18n="ai_feature_text1">Notre moteur d'IA synthétise des données médicales complexes en rapports clairs et exploitables. Obtenez une analyse complète de tout médicament en quelques secondes.</p>
+                        <p data-i18n="ai_feature_text2">Reformulation des requêtes et détection des interactions. Aucune hiérarchie de gravité n'est affichée : la source ne la fournit pas, et l'inventer orienterait une décision de prescription.</p>
+                        <a href="/ai-search" class="ai-btn"><i class="fas fa-robot"></i> <span data-i18n="try_ai_now">Essayer l'IA maintenant</span></a>
+                    </div>
+                    <div class="ai-visual">
+                        <div class="ai-visual-inner">
+                            <i class="fas fa-robot"></i>
+                            <div class="ai-visual-bar"><div class="ai-visual-bar-fill ai-visual-fill-85"></div></div>
+                            <div class="ai-visual-bar"><div class="ai-visual-bar-fill ai-visual-fill-62"></div></div>
+                            <div class="ai-visual-bar"><div class="ai-visual-bar-fill ai-visual-fill-78"></div></div>
+                            <div class="ai-visual-label" data-i18n="ai_processing">Analyse en cours, synthèse en préparation</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== RESULTS VISUALIZATION ========== -->
+        <section class="results-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 data-i18n="results_title">Des résultats clairs et structurés</h2>
+                    <p data-i18n="results_subtitle">Chaque fiche médicament présente les informations essentielles de manière organisée pour une lecture rapide et fiable.</p>
+                </div>
+                <div class="results-showcase">
+                    <div class="result-card">
+                        <div class="result-card-header">
+                            <i class="fas fa-info-circle"></i>
+                            <h3 data-i18n="card_general_info">Informations générales</h3>
+                        </div>
+                        <div class="result-card-body">
+                            <div class="result-stat">
+                                <span class="result-stat-label" data-i18n="label_trade_name">Nom commercial</span>
+                                <span class="result-stat-value">DOLIPRANE 500mg</span>
+                            </div>
+                            <div class="result-stat">
+                                <span class="result-stat-label" data-i18n="label_active_substance">Substance active</span>
+                                <span class="result-stat-value">Paracétamol</span>
+                            </div>
+                            <div class="result-stat">
+                                <span class="result-stat-label" data-i18n="label_pharmaceutical_form">Forme pharmaceutique</span>
+                                <span class="result-stat-value">Gélule</span>
+                            </div>
+                            <div class="result-stat">
+                                <span class="result-stat-label" data-i18n="label_laboratory">Laboratoire</span>
+                                <span class="result-stat-value">SANOFI</span>
+                            </div>
+                            <div class="result-divider"></div>
+                            <div>
+                                <span class="result-tag blue" data-i18n="tag_analgesic">Antalgique</span>
+                                <span class="result-tag green" data-i18n="tag_antipyretic">Antipyrétique</span>
+                                <span class="result-tag orange" data-i18n="tag_who_level1">Niveau 1 OMS</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-card-header">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <h3 data-i18n="card_interactions_title">Interactions détectées</h3>
+                        </div>
+                        <div class="result-card-body">
+                            {#
+                               Cette carte annonçait « 2 graves, 4 modérées,
+                               12 mineures ». Trois nombres inventés, et surtout
+                               une échelle de gravité : celle-là même que le
+                               rapport P9-1 a retirée du graphe, DrugBank n'en
+                               publiant aucune. La page vendait donc en vitrine
+                               ce que la fiche refuse d'afficher.
+                            #}
+                            <div class="result-stat">
+                                <span class="result-stat-label" data-i18n="label_interactions_recensees">Interactions recensées</span>
+                                <span class="result-stat-value">18</span>
+                            </div>
+                            <div class="result-stat">
+                                <span class="result-stat-label" data-i18n="label_substances_concernees">Substances concernées</span>
+                                <span class="result-stat-value">7</span>
+                            </div>
+                            <div class="result-stat">
+                                <span class="result-stat-label" data-i18n="label_classement_gravite">Classement par gravité</span>
+                                <span class="result-stat-value" data-i18n="valeur_aucun">aucun</span>
+                            </div>
+                            <div class="result-divider"></div>
+                            <div>
+                                <span class="result-tag purple" data-i18n="tag_ai_analysis">Analyse IA</span>
+                                <span class="result-tag green" data-i18n="tag_database">Base de données</span>
+                                <span class="result-tag blue" data-i18n="tag_neo4j_relations">Relations Neo4j</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== TRUST BADGES ========== -->
+        <section class="trust-section">
+            <div class="container">
+                <div class="trust-grid">
+                    <div class="trust-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <h4 data-i18n="trust_data">Données fiables</h4>
+                        <p data-i18n="trust_data_desc">Sources officielles et mises à jour régulières</p>
+                    </div>
+                    <div class="trust-item">
+                        <i class="fas fa-lock"></i>
+                        <h4 data-i18n="trust_privacy">Confidentialité</h4>
+                        <p data-i18n="trust_privacy_desc">Vos données sont protégées et jamais partagées</p>
+                    </div>
+                    <div class="trust-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <h4 data-i18n="trust_academic">Cadre académique</h4>
+                        <p data-i18n="trust_academic_desc">Projet universitaire sous supervision pédagogique</p>
+                    </div>
+                    <div class="trust-item">
+                        <i class="fas fa-database"></i>
+                        <h4 data-i18n="trust_comprehensive">Base exhaustive</h4>
+                        <p data-i18n="trust_comprehensive_desc">13 594 médicaments, 3 473 substances actives, 269 271 interactions recensées</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== FEATURES ========== -->
+        <section class="features-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-subtitle" data-i18n="features">FONCTIONNALITÉS</span>
+                    <h2 data-i18n="features_title">Tout ce dont vous avez besoin</h2>
+                    <p data-i18n="features_subtitle">Des outils puissants pour explorer, comprendre et analyser les données médicamenteuses.</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon purple"><i class="fas fa-search"></i></div>
+                        <h3 data-i18n="feature_search">Recherche multicritères</h3>
+                        <p data-i18n="feature_search_desc">Filtrez par substance, forme, laboratoire, dosage et famille thérapeutique pour des résultats précis.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon green"><i class="fas fa-project-diagram"></i></div>
+                        <h3 data-i18n="feature_vector">Recherche sémantique</h3>
+                        <p data-i18n="feature_vector_desc">Notre moteur vectoriel comprend le sens de votre requête pour des résultats pertinents même avec des termes imprécis.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon blue"><i class="fas fa-brain"></i></div>
+                        <h3 data-i18n="feature_ai">Résumés intelligents</h3>
+                        <p data-i18n="feature_ai_desc">L'IA génère des synthèses à partir du RCP. Les interactions sont listées sans hiérarchie de gravité : la source, DrugBank, n'en fournit aucune.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== ABOUT ========== -->
+        <section class="about">
+            <div class="container">
+                <div class="about-content">
+                    <div class="about__text">
+                        <h2 data-i18n="about_title">PosologyAI, projet académique</h2>
+                        <p data-i18n="about_text1">PosologyAI est une initiative académique développée dans le cadre de la SAE5.01 pour fournir un accès facile et fiable aux informations médicamenteuses.</p>
+                        <p data-i18n="about_text2">Notre objectif est de centraliser et de rendre accessibles les données sur les médicaments, en combinant recherche classique, vectorielle et intelligence artificielle.</p>
+                        <a href="/a-propos" class="btn-primary"><span data-i18n="about_more">Comment cette base est construite</span></a>
+                    </div>
+                    <div class="about__image">
+                        <img src="https://images.unsplash.com/photo-1573883430697-4c3479aae6b9?auto=format&fit=crop&w=800&q=80" alt="Recherche médicale">
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    {% with now=now|default({"year": 2025}) %}
+    {% include 'components/footer.html' %}
+    {% endwith %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Smooth scrolling pour les ancres
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    if (this.getAttribute('href').startsWith('#')) {
+                        e.preventDefault();
+                        document.querySelector(this.getAttribute('href')).scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+
+    {# L'assistant, son bouton et son script : composant partage avec
+       l'accueil. Ses styles sont dans `css/chatbot.css`, charge plus haut. #}
+    {% with cb_fiches = total_medicines, cb_interactions = total_interactions %}
+    {% include 'components/chatbot.html' %}
+    {% endwith %}
+</body>
+</html>

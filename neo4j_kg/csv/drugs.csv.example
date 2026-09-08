@@ -1,0 +1,5 @@
+id,title,generic_name,brand_name,atc_code,therapeutic_class,laboratory,form,dosage,route,marketing_status,source,confidence_score
+EX001,DOLIPRANE 500 mg,Paracétamol,Doliprane,N02BE01,Antalgique,Sanofi,Comprimé,500 mg,Orale,Autorisé,ANSM,99
+EX002,ADVIL 400 mg,Ibuprofène,Advil,M01AE01,AINS,Pfizer,Comprimé,400 mg,Orale,Autorisé,ANSM,99
+EX003,TAHOR 20 mg,Atorvastatine,Tahor,C10AA05,Hypolipémiant,Pfizer,Comprimé,20 mg,Orale,Autorisé,ANSM,99
+EX004,AMOXICILLINE 500 mg,Amoxicilline,Amoxicilline Biogaran,J01CA04,Antibiotique,Biogaran,Gélule,500 mg,Orale,Autorisé,ANSM,99

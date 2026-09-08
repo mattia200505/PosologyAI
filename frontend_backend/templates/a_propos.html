@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="{{ lang or 'fr' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ libelle("Architecture", "Architecture", lang) }} • PosologyAI</title>
+    <meta name="description" content="{{ libelle('How PosologyAI is built: three time regimes, four data stores, an interaction graph, and a French-to-English matching process that leaves gaps we own up to.', 'Comment PosologyAI est construit : trois régimes de temps, quatre magasins de données, un graphe d\'interactions et un appariement français vers anglais qui laisse des trous assumés.', lang) }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/a_propos.css') }}">
+</head>
+<body class="page-apropos" data-langue-serveur="1">
+    {% with active_page='apropos' %}
+    {% include 'components/header.html' %}
+    {% endwith %}
+
+    {#
+       Un nombre absent se dit, il ne s'arrondit pas à zéro. Chaque magasin
+       interrogé par la route peut être hors service ; le relevé laisse alors
+       sa clé vide, et cette macro écrit « donnée absente » plutôt qu'un « 0 »
+       qui se lirait comme une mesure. C'est la règle du projet, appliquée à la
+       page qui la raconte.
+    #}
+    {%- macro nb(v) -%}
+      {%- if v is none -%}{{ libelle("data unavailable", "donnée absente", lang) }}{%- else -%}{{ '{:,}'.format(v).replace(',', ' ') }}{%- endif -%}
+    {%- endmacro -%}
+
+    {%- set intitules_regles = {
+        'dci_exact': libelle('Identical INN', 'DCI identique', lang),
+        'dci_sel_reduit': libelle('INN once the salt is stripped', 'DCI une fois le sel retiré', lang),
+        'dci_translated': libelle('INN translated into English', 'DCI traduite vers l’anglais', lang),
+        'dci_fuzzy_high': libelle('Near INN, high score', 'DCI approchante, score élevé', lang),
+        'dci_fuzzy_medium': libelle('Near INN, medium score', 'DCI approchante, score moyen', lang),
+        'synonym_exact': libelle('Identical synonym', 'Synonyme identique', lang),
+        'synonym_fuzzy': libelle('Near synonym', 'Synonyme approchant', lang),
+        'preparation_homeopathique': libelle('Homeopathic preparation', 'Préparation homéopathique', lang),
+        'no_match': libelle('No match', 'Aucune correspondance', lang)
+    } -%}
+
+    <main>
+        {#
+           Dix sections, dix familles de mise en page (§4.7 du skill) : bandeau
+           photographique, schéma large avec note latérale, registre comparatif,
+           schéma pleine largeur sur fond nuit, graphique à barres, frise
+           numérotée, boucle sur fond nuit, grille sur photographie, index de
+           liens, appel scindé.
+
+           Trois sur-titres pour dix sections, sous le plafond d'un pour trois.
+           Zéro tiret cadratin (§9.G). Un seul accent, l'indigo du site. Aucune
+           couleur ne code un niveau de gravité.
+
+           La densité monte à 6 : la page est devenue de la documentation
+           technique, et une documentation aérée à l'excès oblige à faire
+           défiler pour comparer deux chiffres qui devraient tenir côte à côte.
+        #}
+
+        <!-- 1. Bandeau d'ouverture ───────────────────────────────── -->
+        <section class="ap-hero">
+            <img class="ap-hero-photo"
+                 src="https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&w=2000&q=80"
+                 alt="" aria-hidden="true" loading="eager" decoding="async">
+            <div class="ap-hero-voile" aria-hidden="true"></div>
+
+            <div class="ap-large ap-hero-inner">
+                <p class="ap-sur">{{ libelle("Project architecture", "Architecture du projet", lang) }}</p>
+                <h1 class="ap-hero-titre">
+                    {{ libelle("What sits", "Ce qu'il y a", lang) }}<br>
+                    <em>{{ libelle("beneath the record.", "sous la fiche.", lang) }}</em>
+                </h1>
+                <p class="ap-hero-chapeau">
+                    {{ libelle("PosologyAI is not one database. It is four stores that cannot do each other's job, fed by jobs that run offline for hours, so that opening a record does nothing but read. This page describes that arrangement, including where it wobbles.", "PosologyAI n'est pas une base, c'est quatre magasins qui ne savent pas faire la même chose, alimentés par des traitements qui tournent hors ligne pendant des heures, pour qu'une fiche s'ouvre en lisant et rien d'autre. Cette page décrit ce montage, y compris là où il est bancal.", lang) }}
+                </p>
+
+                <dl class="ap-hero-chiffres">
+                    <div>
+                        <dt>{{ libelle("Medicine records", "Fiches de médicament", lang) }}</dt>
+                        <dd>{{ nb(fiches) }}</dd>
+                    </div>
+                    <div>
+                        <dt>{{ libelle("Lines of code", "Lignes de code", lang) }}</dt>
+                        <dd>{{ nb(lignes) }}</dd>
+                    </div>
+                    <div>
+                        <dt>{{ libelle("Routes served", "Routes servies", lang) }}</dt>
+                        <dd>{{ nb(routes) }}</dd>
+                    </div>
+                    <div>
+                        <dt>{{ libelle("Mongo collections", "Collections Mongo", lang) }}</dt>
+                        <dd>{{ nb(collections) }}</dd>
+                    </div>
+                </dl>
+            </div>
+        </section>
+
+        <!-- 2. Trois régimes de temps ────────────────────────────── -->
+        <section class="ap-regimes">
+            <div class="ap-large">
+                <div class="ap-regimes-tete">
+                    <h2>{{ libelle("Three time regimes", "Trois régimes de temps", lang) }}</h2>
+                    <p>
+                        {{ libelle("The one architectural rule this project truly follows fits in a sentence:", "La seule règle d'architecture que ce projet suit vraiment tient en une phrase :", lang) }} <em>{{ libelle("nothing expensive during the request", "rien de cher pendant la requête", lang) }}</em>. {{ libelle("Anything costly is computed beforehand, written somewhere, and read back at display time. The three bands below are not three software layers; they are three scales of duration.", "Tout ce qui coûte est calculé avant, écrit quelque part, et relu au moment de l'affichage. Les trois bandes ci-dessous ne sont pas trois couches logicielles, ce sont trois échelles de durée.", lang) }}
+                    </p>
+                </div>
+
+                {#
+                   Schéma dessiné à la main en SVG, sans bibliothèque : la page est
+                   servie par Flask et doit rester autonome. Le tracé est décrit une
+                   fois, les couleurs viennent de la feuille de style, donc le schéma
+                   suit la palette au lieu de la figer.
+                #}
+                <figure class="ap-schema">
+                    <svg viewBox="0 0 960 486" role="img" aria-labelledby="sc-regimes-t sc-regimes-d" preserveAspectRatio="xMidYMid meet">
+                        <title id="sc-regimes-t">{{ libelle("The project's three time regimes", "Les trois régimes de temps du projet", lang) }}</title>
+                        <desc id="sc-regimes-d">{{ libelle("Six offline jobs feed four data stores. At server start-up, the indexes, the connections and the vector model are loaded. During a request, the application does nothing but read those stores.", "Six traitements hors ligne alimentent quatre magasins de données. Au démarrage du serveur, les index, les connexions et le modèle vectoriel sont chargés. Pendant une requête, l'application ne fait plus que lire ces magasins.", lang) }}</desc>
+
+                        <defs>
+                            <marker id="fl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 0 L 10 5 L 0 10 z" class="sc-pointe"/>
+                            </marker>
+                        </defs>
+
+                        <!-- Bande 1 : hors ligne -->
+                        <text x="0" y="20" class="sc-bande">{{ libelle("OFFLINE", "HORS LIGNE", lang) }}</text>
+                        <text x="0" y="38" class="sc-duree">{{ libelle("hours to days", "heures à jours", lang) }}</text>
+                        <text x="0" y="58" class="sc-duree">{{ libelle("restarted by hand", "relancé à la main", lang) }}</text>
+
+                        <g class="sc-chip">
+                            <rect x="170" y="8" width="122" height="58" rx="10"/>
+                            <text x="231" y="33">{{ libelle("Collection", "Collecte", lang) }}</text><text x="231" y="50">ANSM</text>
+                        </g>
+                        <g class="sc-chip">
+                            <rect x="302" y="8" width="122" height="58" rx="10"/>
+                            <text x="363" y="33">DrugBank</text><text x="363" y="50">XML</text>
+                        </g>
+                        <g class="sc-chip">
+                            <rect x="434" y="8" width="122" height="58" rx="10"/>
+                            <text x="495" y="33">{{ libelle("EMA SmPC", "RCP EMA", lang) }}</text><text x="495" y="50">{{ libelle("as PDF", "en PDF", lang) }}</text>
+                        </g>
+                        <g class="sc-chip">
+                            <rect x="566" y="8" width="122" height="58" rx="10"/>
+                            <text x="627" y="33">{{ libelle("Matching", "Appariement", lang) }}</text><text x="627" y="50">{{ libelle("FR to EN", "FR vers EN", lang) }}</text>
+                        </g>
+                        <g class="sc-chip">
+                            <rect x="698" y="8" width="122" height="58" rx="10"/>
+                            <text x="759" y="33">{{ libelle("Formulae", "Formules", lang) }}</text><text x="759" y="50">RDKit</text>
+                        </g>
+                        <g class="sc-chip">
+                            <rect x="830" y="8" width="122" height="58" rx="10"/>
+                            <text x="891" y="33">{{ libelle("Translations", "Traductions", lang) }}</text><text x="891" y="50">{{ libelle("offline", "hors ligne", lang) }}</text>
+                        </g>
+
+                        <g class="sc-lien">
+                            <line x1="231" y1="66" x2="231" y2="146" marker-end="url(#fl)"/>
+                            <line x1="363" y1="66" x2="363" y2="146" marker-end="url(#fl)"/>
+                            <line x1="495" y1="66" x2="495" y2="146" marker-end="url(#fl)"/>
+                            <line x1="627" y1="66" x2="627" y2="146" marker-end="url(#fl)"/>
+                            <line x1="759" y1="66" x2="759" y2="146" marker-end="url(#fl)"/>
+                            <line x1="891" y1="66" x2="891" y2="146" marker-end="url(#fl)"/>
+                        </g>
+
+                        <!-- Bande 2 : les magasins -->
+                        <text x="0" y="196" class="sc-bande">{{ libelle("STORES", "MAGASINS", lang) }}</text>
+                        <text x="0" y="214" class="sc-duree">{{ libelle("the state of the project", "l'état du projet", lang) }}</text>
+
+                        <g class="sc-magasin">
+                            <rect x="170" y="152" width="188" height="86" rx="12"/>
+                            <text x="264" y="182" class="sc-nom">MongoDB</text>
+                            <text x="264" y="203">{{ nb(fiches) }} {{ libelle("records", "fiches", lang) }}</text>
+                            <text x="264" y="221">{{ nb(collections) }} collections</text>
+                        </g>
+                        <g class="sc-magasin">
+                            <rect x="368" y="152" width="188" height="86" rx="12"/>
+                            <text x="462" y="182" class="sc-nom">Neo4j</text>
+                            <text x="462" y="203">{{ nb(interactions) }} interactions</text>
+                            <text x="462" y="221">{{ nb(etiquettes) }} {{ libelle("labels", "étiquettes", lang) }}</text>
+                        </g>
+                        <g class="sc-magasin">
+                            <rect x="566" y="152" width="188" height="86" rx="12"/>
+                            <text x="660" y="182" class="sc-nom">Qdrant</text>
+                            <text x="660" y="203">{{ nb(vecteurs) }} {{ libelle("vectors", "vecteurs", lang) }}</text>
+                            <text x="660" y="221">{{ nb(dimension) }} dimensions</text>
+                        </g>
+                        <g class="sc-magasin">
+                            <rect x="764" y="152" width="188" height="86" rx="12"/>
+                            <text x="858" y="182" class="sc-nom">{{ libelle("Files", "Fichiers", lang) }}</text>
+                            <text x="858" y="203">{{ nb(structures) }} {{ libelle("formulae", "formules", lang) }}</text>
+                            <text x="858" y="221">{{ libelle("served as-is", "servies telles quelles", lang) }}</text>
+                        </g>
+
+                        <g class="sc-lien">
+                            <line x1="264" y1="238" x2="264" y2="292" marker-end="url(#fl)"/>
+                            <line x1="462" y1="238" x2="462" y2="292" marker-end="url(#fl)"/>
+                            <line x1="660" y1="238" x2="660" y2="292" marker-end="url(#fl)"/>
+                            <line x1="858" y1="238" x2="858" y2="292" marker-end="url(#fl)"/>
+                        </g>
+
+                        <!-- Bande 3 : au démarrage -->
+                        <text x="0" y="330" class="sc-bande">{{ libelle("AT START-UP", "AU DÉMARRAGE", lang) }}</text>
+                        <text x="0" y="348" class="sc-duree">{{ libelle("a few seconds", "quelques secondes", lang) }}</text>
+
+                        <g class="sc-chip">
+                            <rect x="170" y="298" width="250" height="52" rx="10"/>
+                            <text x="295" y="329">{{ libelle("Search indexes opened", "Index de recherche ouverts", lang) }}</text>
+                        </g>
+                        <g class="sc-chip">
+                            <rect x="430" y="298" width="250" height="52" rx="10"/>
+                            <text x="555" y="329">{{ libelle("Connections established", "Connexions établies", lang) }}</text>
+                        </g>
+                        <g class="sc-chip">
+                            <rect x="690" y="298" width="262" height="52" rx="10"/>
+                            <text x="821" y="329">{{ libelle("Vector model loaded", "Modèle vectoriel chargé", lang) }}</text>
+                        </g>
+
+                        <g class="sc-lien">
+                            <line x1="295" y1="350" x2="295" y2="404" marker-end="url(#fl)"/>
+                            <line x1="555" y1="350" x2="555" y2="404" marker-end="url(#fl)"/>
+                            <line x1="821" y1="350" x2="821" y2="404" marker-end="url(#fl)"/>
+                        </g>
+
+                        <!-- Bande 4 : la requête -->
+                        <text x="0" y="446" class="sc-bande sc-bande-vive">{{ libelle("DURING THE REQUEST", "DANS LA REQUÊTE", lang) }}</text>
+                        <text x="0" y="464" class="sc-duree">{{ libelle("milliseconds", "millisecondes", lang) }}</text>
+
+                        <g class="sc-requete">
+                            <rect x="170" y="410" width="782" height="66" rx="12"/>
+                            <text x="561" y="440" class="sc-nom">{{ libelle("Reads only", "Lectures seulement", lang) }}</text>
+                            <text x="561" y="461">{{ libelle("no computation, no writes, no outbound calls", "aucun calcul, aucune écriture, aucun appel vers l'extérieur", lang) }}</text>
+                        </g>
+                    </svg>
+                    <figcaption>
+                        {{ libelle("The six jobs at the top never run while a reader waits. They write into the stores; the request reads back.", "Les six traitements du haut ne tournent jamais pendant qu'un lecteur attend. Ils écrivent dans les magasins ; la requête relit.", lang) }}
+                    </figcaption>
+                </figure>
+
+                <aside class="ap-note">
+                    <h3>{{ libelle("The time the rule was broken", "La fois où la règle a été enfreinte", lang) }}</h3>
+                    <p>
+                        {{ libelle("The home page displayed a count of active substances that was wrong. Once fixed, the count became correct: it walked all", "La page d'accueil affichait un nombre de substances actives qui était faux. Corrigé, le compte est devenu juste : il parcourait les", lang) }}
+                        {{ nb(fiches) }} {{ libelle("records on every visit. MongoDB ran out of memory and stopped. An exact figure paid for on every display is still a defect, and it was a fix that caused the outage.", "fiches à chaque visite. MongoDB s'est arrêté faute de mémoire. Un chiffre exact payé à chaque affichage reste un défaut, et c'est une correction qui a créé la panne.", lang) }}
+                    </p>
+                </aside>
+            </div>
+        </section>
+
+        <!-- 3. Les quatre magasins ───────────────────────────────── -->
+        <section class="ap-magasins">
+            <div class="ap-large">
+                <h2 class="ap-titre-section">{{ libelle("Why four stores", "Pourquoi quatre magasins", lang) }}</h2>
+                <p class="ap-intro-section">
+                    {{ libelle("None of the four can do the work of the other three. That is the only reason they coexist.", "Aucun des quatre ne sait faire le travail des trois autres. C'est la seule raison pour laquelle ils coexistent.", lang) }}
+                </p>
+
+                <ol class="ap-registre">
+                    <li>
+                        <span class="ap-registre-rang" aria-hidden="true">01</span>
+                        <div class="ap-registre-titre">
+                            <h3>MongoDB</h3>
+                            <p class="ap-registre-mesure">{{ nb(fiches) }} {{ libelle("records", "fiches", lang) }}, {{ nb(collections) }} collections</p>
+                        </div>
+                        <div class="ap-registre-texte">
+                            <p>
+                                {{ libelle("A medicine record is an irregular document: the regulatory sections vary from one product to the next, and some run to several hundred kilobytes. A column schema would have required one table per record shape. Alongside the catalogue live the derived collections: the matching, the translations, the history, the cache.", "Une fiche de médicament est un document irrégulier : les rubriques réglementaires varient d'une spécialité à l'autre, et certaines pèsent plusieurs centaines de kilo-octets. Un schéma en colonnes aurait demandé une table par forme de fiche. À côté du catalogue vivent les collections dérivées : l'appariement, les traductions, l'historique, le cache.", lang) }}
+                            </p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="ap-registre-rang" aria-hidden="true">02</span>
+                        <div class="ap-registre-titre">
+                            <h3>Neo4j</h3>
+                            <p class="ap-registre-mesure">{{ nb(interactions) }} interactions, {{ nb(aretes) }} {{ libelle("link types", "types de lien", lang) }}</p>
+                        </div>
+                        <div class="ap-registre-texte">
+                            <p>
+                                {{ libelle("The question “what does this medicine touch” is one of neighbourhood, not of filtering. In documents it meant joining three collections by hand for every record displayed. In a graph it is an edge traversal, and depth costs almost nothing.", "La question « qu'est-ce que ce médicament touche » est une question de voisinage, pas de filtre. En documents, elle demandait de rapprocher trois collections à la main pour chaque fiche affichée. En graphe, c'est un parcours d'arêtes, et la profondeur ne coûte presque rien.", lang) }}
+                            </p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="ap-registre-rang" aria-hidden="true">03</span>
+                        <div class="ap-registre-titre">
+                            <h3>Qdrant</h3>
+                            <p class="ap-registre-mesure">{{ nb(vecteurs) }} {{ libelle("vectors", "vecteurs", lang) }}, {{ nb(dimension) }} dimensions</p>
+                        </div>
+                        <div class="ap-registre-texte">
+                            <p>
+                                {{ libelle("Exact search fails the moment the reader does not know the name. Records and interaction statements are therefore also indexed as vectors, which finds a text by what it says rather than by the words it uses. It is a fallback, never the default mode.", "La recherche exacte échoue dès que le lecteur ne connaît pas le nom. Les fiches et les énoncés d'interaction sont donc aussi indexés sous forme de vecteurs, ce qui permet de retrouver un texte par ce qu'il dit plutôt que par les mots qu'il emploie. C'est un secours, jamais le mode par défaut.", lang) }}
+                            </p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="ap-registre-rang" aria-hidden="true">04</span>
+                        <div class="ap-registre-titre">
+                            <h3>{{ libelle("The file system", "Le système de fichiers", lang) }}</h3>
+                            <p class="ap-registre-mesure">{{ nb(structures) }} {{ libelle("formulae as SVG", "formules en SVG", lang) }}</p>
+                        </div>
+                        <div class="ap-registre-texte">
+                            <p>
+                                {{ libelle("Skeletal formulae are drawn from the DrugBank SMILES, once, offline. The server merely serves a file, and since a molecule's identifying key never changes, the browser keeps it indefinitely. The figure alongside is one of them, served as-is.", "Les formules topologiques sont dessinées à partir du SMILES DrugBank, une fois, hors ligne. Le serveur ne fait que servir un fichier, et comme la clé d'identification d'une molécule ne change jamais, le navigateur le garde définitivement. La figure ci-contre en est une, servie telle quelle.", lang) }}
+                            </p>
+                            <figure class="ap-molecule-figure">
+                                <img src="{{ url_for('structure_svg', cle=molecule_cle) }}"
+                                     alt="{{ libelle('Skeletal formula of', 'Formule topologique de', lang) }} {{ molecule_nom }}, {{ libelle('computed from its DrugBank structure', 'calculée à partir de sa structure DrugBank', lang) }}"
+                                     loading="lazy" decoding="async">
+                                <figcaption>{{ molecule_nom }}</figcaption>
+                            </figure>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- 4. Le graphe ─────────────────────────────────────────── -->
+        <section class="ap-graphe">
+            <div class="ap-large">
+                <div class="ap-graphe-tete">
+                    <h2>{{ libelle("What the graph holds", "Ce que contient le graphe", lang) }}</h2>
+                    <p>
+                        {{ nb(etiquettes) }} {{ libelle("labels", "étiquettes", lang) }}, {{ nb(aretes) }} {{ libelle("relationship types. The schema fits in one drawing, which is a fairly good sign.", "types de relation. Le schéma tient sur un dessin, ce qui est plutôt bon signe.", lang) }}
+                    </p>
+                </div>
+
+                <figure class="ap-schema ap-schema-sombre">
+                    <svg viewBox="0 0 960 400" role="img" aria-labelledby="sc-graphe-t sc-graphe-d" preserveAspectRatio="xMidYMid meet">
+                        <title id="sc-graphe-t">{{ libelle("Diagram of the interaction graph", "Schéma du graphe des interactions", lang) }}</title>
+                        <desc id="sc-graphe-d">{{ libelle("A Medicine node links a Laboratory through MANUFACTURED_BY, an Active ingredient through CONTAINS, a Substance through CONTAINS_SUBSTANCE, and a DrugBank substance through HAS_DRUGBANK_SUBSTANCE. DrugBank substances are linked to one another through INTERACTS_WITH.", "Un nœud Médicament relie un Laboratoire par MANUFACTURED_BY, un Principe actif par CONTAINS, une Substance par CONTAINS_SUBSTANCE, et une Substance DrugBank par HAS_DRUGBANK_SUBSTANCE. Les substances DrugBank sont reliées entre elles par INTERACTS_WITH.", lang) }}</desc>
+
+                        <defs>
+                            <marker id="fl2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 0 L 10 5 L 0 10 z" class="sc-pointe"/>
+                            </marker>
+                        </defs>
+
+                        <g class="sc-lien">
+                            <line x1="330" y1="180" x2="192" y2="76" marker-end="url(#fl2)"/>
+                            <line x1="330" y1="212" x2="192" y2="320" marker-end="url(#fl2)"/>
+                            <line x1="360" y1="230" x2="360" y2="330" marker-end="url(#fl2)"/>
+                            <line x1="470" y1="200" x2="702" y2="200" marker-end="url(#fl2)"/>
+                            <path d="M 760 164 C 748 84, 872 84, 860 164" marker-end="url(#fl2)" fill="none"/>
+                        </g>
+
+                        <g class="sc-arete-nom">
+                            <text x="248" y="112">MANUFACTURED_BY</text>
+                            <text x="248" y="128" class="sc-arete-n">{{ nb(liens.get('MANUFACTURED_BY')) }}</text>
+                            <text x="240" y="278">CONTAINS</text>
+                            <text x="240" y="294" class="sc-arete-n">{{ nb(liens.get('CONTAINS')) }}</text>
+                            <text x="376" y="296">CONTAINS_SUBSTANCE</text>
+                            <text x="376" y="312" class="sc-arete-n">{{ nb(liens.get('CONTAINS_SUBSTANCE')) }}</text>
+                            <text x="586" y="188" text-anchor="middle">HAS_DRUGBANK_SUBSTANCE</text>
+                            <text x="586" y="204" text-anchor="middle" class="sc-arete-n">{{ nb(liens.get('HAS_DRUGBANK_SUBSTANCE')) }}</text>
+                            <text x="810" y="56" text-anchor="middle">INTERACTS_WITH</text>
+                            <text x="810" y="72" text-anchor="middle" class="sc-arete-n">{{ nb(interactions) }}</text>
+                        </g>
+
+                        <g class="sc-noeud">
+                            <rect x="40" y="42" width="152" height="62" rx="14"/>
+                            <text x="116" y="70" class="sc-nom">Laboratory</text>
+                            <text x="116" y="90">{{ nb(noeuds.get('Laboratory')) }}</text>
+                        </g>
+                        <g class="sc-noeud sc-noeud-pivot">
+                            <rect x="330" y="164" width="140" height="70" rx="14"/>
+                            <text x="400" y="194" class="sc-nom">Medicine</text>
+                            <text x="400" y="215">{{ nb(fiches) }}</text>
+                        </g>
+                        <g class="sc-noeud">
+                            <rect x="40" y="288" width="152" height="62" rx="14"/>
+                            <text x="116" y="316" class="sc-nom">ActiveIngredient</text>
+                            <text x="116" y="336">{{ nb(noeuds.get('ActiveIngredient')) }}</text>
+                        </g>
+                        <g class="sc-noeud">
+                            <rect x="284" y="330" width="152" height="62" rx="14"/>
+                            <text x="360" y="358" class="sc-nom">Substance</text>
+                            <text x="360" y="378">{{ nb(noeuds.get('Substance')) }}</text>
+                        </g>
+                        <g class="sc-noeud sc-noeud-pivot">
+                            <rect x="702" y="164" width="176" height="70" rx="14"/>
+                            <text x="790" y="194" class="sc-nom">DrugbankSubstance</text>
+                            <text x="790" y="215">{{ nb(substances) }}</text>
+                        </g>
+                    </svg>
+                    <figcaption>
+                        {{ libelle("Three marginal labels are left out of this drawing: Contraindication, Disease and DrugClass hold fewer than ten nodes each and serve no purpose yet.", "Trois étiquettes marginales sont laissées de côté sur ce dessin : Contraindication, Disease et DrugClass comptent moins de dix nœuds chacune et ne servent encore à rien.", lang) }}
+                    </figcaption>
+                </figure>
+
+                <aside class="ap-note ap-note-sombre">
+                    <h3>{{ libelle("The flaw the drawing shows", "Le défaut visible sur le dessin", lang) }}</h3>
+                    <p>
+                        <em>ActiveIngredient</em> {{ libelle("and", "et", lang) }} <em>Substance</em> {{ libelle("carry the same", "portent les mêmes", lang) }} {{ nb(noeuds.get('Substance')) }} {{ libelle("names, in two node sets that do not overlap at all, tied to the medicine by two near-identical relationships. Two import passes created them at two different times and nobody reconciled them. This is not fixed. The drawing shows it rather than hiding it.", "noms, dans deux ensembles de nœuds sans aucun recoupement, reliés au médicament par deux relations presque identiques. Deux passes d'import les ont créées à deux moments différents et personne ne les a réconciliées. Ce n'est pas corrigé. Le dessin le montre au lieu de le cacher.", lang) }}
+                    </p>
+                </aside>
+            </div>
+        </section>
+
+        <!-- 5. L'appariement ─────────────────────────────────────── -->
+        <section class="ap-appariement">
+            <div class="ap-large">
+                <p class="ap-sur">{{ libelle("The hard part", "Le point dur", lang) }}</p>
+                <div class="ap-appariement-tete">
+                    <h2>{{ libelle("Matching a French name", "Faire correspondre un nom français", lang) }}<br>{{ libelle("to an English substance", "à une substance anglaise", lang) }}</h2>
+                    <p>
+                        {{ libelle("The records come from the ANSM and the EMA, in French. The interactions come from DrugBank, in English, and are carried by substance names. Nothing links the two: for every record, a decision must be made about which substance it corresponds to. Nine rules apply in order, from the strictest to the most permissive, and every record keeps the one that matched it.", "Les fiches viennent de l'ANSM et de l'EMA, en français. Les interactions viennent de DrugBank, en anglais, et sont portées par des noms de substance. Rien ne relie les deux : il faut décider, pour chaque fiche, à quelle substance elle correspond. Neuf règles s'appliquent dans l'ordre, de la plus stricte à la plus permissive, et chaque fiche retient celle qui l'a appariée.", lang) }}
+                    </p>
+                </div>
+
+                {% if regles %}
+                {% set maximum = regles[0][1] %}
+                <ul class="ap-barres">
+                    {% for cle, n in regles %}
+                    <li class="{{ 'ap-barre-echec' if cle == 'no_match' }}">
+                        <span class="ap-barre-nom">{{ intitules_regles.get(cle, cle) }}</span>
+                        <span class="ap-barre-piste">
+                            <span class="ap-barre-trait" style="width: {{ (n * 100 / maximum)|round(1) }}%"></span>
+                        </span>
+                        <span class="ap-barre-n">{{ nb(n) }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+
+                <div class="ap-bilan">
+                    <div>
+                        <p class="ap-bilan-n">{{ nb(apparies) }}</p>
+                        <p class="ap-bilan-t">{{ libelle("matched records", "fiches appariées", lang) }}</p>
+                        <p class="ap-bilan-d">{{ libelle("Their page shows interactions, and states which rule produced the match.", "Leur page affiche des interactions, et dit par quelle règle l'appariement a été obtenu.", lang) }}</p>
+                    </div>
+                    <div>
+                        <p class="ap-bilan-n">{{ nb(non_apparies) }}</p>
+                        <p class="ap-bilan-t">{{ libelle("records with no match", "fiches sans correspondance", lang) }}</p>
+                        <p class="ap-bilan-d">{{ libelle("Their page does not show an empty section. It states that the substance could not be matched, which is information about us and not about the medicine.", "Leur page ne montre pas une rubrique vide. Elle écrit que la substance n'a pas pu être appariée, ce qui est une information sur nous et non sur le médicament.", lang) }}</p>
+                    </div>
+                </div>
+                {% else %}
+                <p class="ap-absent">{{ libelle("The breakdown of matching rules could not be read.", "Le détail des règles d'appariement n'a pas pu être lu.", lang) }}</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- 6. Le trajet d'une requête ───────────────────────────── -->
+        <section class="ap-trajet">
+            <div class="ap-large ap-trajet-inner">
+                <div class="ap-trajet-titre">
+                    <h2>{{ libelle("What happens", "Ce qui se passe", lang) }}<br>{{ libelle("when a record opens", "quand une fiche s'ouvre", lang) }}</h2>
+                    <p>
+                        {{ libelle("Six steps, all of them reads. The only outbound request happens if the reader asks for a summary, and it is flagged.", "Six étapes, toutes en lecture. La seule requête vers l'extérieur a lieu si le lecteur demande une synthèse, et elle est signalée.", lang) }}
+                    </p>
+                </div>
+                <ol class="ap-frise">
+                    <li>
+                        <h3>{{ libelle("The document is read by its identifier", "Le document est lu par son identifiant", lang) }}</h3>
+                        <p>{{ libelle("A key lookup in MongoDB. It is the cheapest operation on the whole page.", "Une lecture par clé dans MongoDB. C'est l'opération la moins chère de toute la page.", lang) }}</p>
+                    </li>
+                    <li>
+                        <h3>{{ libelle("The copied leaflet is set aside", "La notice recopiée est écartée", lang) }}</h3>
+                        <p>{{ libelle("The collector duplicates the entire patient leaflet into a section that ought to fit in two words. The display strips it out, the database keeps it: erasing the trace would remove the evidence of the defect.", "Le collecteur duplique la notice patient entière dans une rubrique qui devrait tenir en deux mots. L'affichage la retire, la base la garde : effacer la trace ferait disparaître la preuve du défaut.", lang) }}</p>
+                    </li>
+                    <li>
+                        <h3>{{ libelle("The matching is read back, not recomputed", "L'appariement est relu, pas recalculé", lang) }}</h3>
+                        <p>{{ libelle("The reconciliation with DrugBank was done offline. The request reads its result and never queries the million DrugBank documents directly.", "Le rapprochement avec DrugBank a été fait hors ligne. La requête lit son résultat et n'interroge jamais le million de documents DrugBank directement.", lang) }}</p>
+                    </li>
+                    <li>
+                        <h3>{{ libelle("The graph returns the interactions", "Le graphe rend les interactions", lang) }}</h3>
+                        <p>{{ libelle("An edge traversal around the matched substance. The English statements are translated by phrase-pattern recognition, with no network call.", "Un parcours d'arêtes autour de la substance appariée. Les énoncés anglais sont traduits par reconnaissance de tournures, sans appel réseau.", lang) }}</p>
+                    </li>
+                    <li>
+                        <h3>{{ libelle("Translations are served if they exist", "Les traductions sont servies si elles existent", lang) }}</h3>
+                        <p>{{ libelle("A record already translated opens in English straight away. Otherwise the translation happens on the first visit, which costs a few seconds, once.", "Une fiche déjà traduite s'ouvre en anglais aussitôt. Sinon la traduction se fait à la première visite, ce qui coûte quelques secondes, une seule fois.", lang) }}</p>
+                    </li>
+                    <li>
+                        <h3>{{ libelle("The formula is a file", "La formule est un fichier", lang) }}</h3>
+                        <p>{{ libelle("Served with a one-year cache lifetime, since the molecule's key will not change.", "Servie avec une durée de cache d'un an, puisque la clé de la molécule ne changera pas.", lang) }}</p>
+                    </li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- 7. Les agents ────────────────────────────────────────── -->
+        <section class="ap-agents">
+            <div class="ap-large">
+                <p class="ap-sur">{{ libelle("Collection", "Collecte", lang) }}</p>
+                <div class="ap-graphe-tete">
+                    <h2>{{ libelle("Three agents, and a single write permission", "Trois agents, et un droit d'écriture unique", lang) }}</h2>
+                    <p>
+                        {{ libelle("Automated collection queries the ANSM, the FDA and PubMed. The risk is not finding too little; it is writing nonsense into the database. Only one of the three agents is allowed to write.", "La collecte automatique interroge l'ANSM, la FDA et PubMed. Le risque n'est pas de trouver trop peu, c'est d'écrire n'importe quoi en base. Un seul des trois agents a le droit d'écrire.", lang) }}
+                    </p>
+                </div>
+
+                <figure class="ap-schema ap-schema-sombre">
+                    <svg viewBox="0 0 960 250" role="img" aria-labelledby="sc-agents-t sc-agents-d" preserveAspectRatio="xMidYMid meet">
+                        <title id="sc-agents-t">{{ libelle("The loop of the three collection agents", "La boucle des trois agents de collecte", lang) }}</title>
+                        <desc id="sc-agents-d">{{ libelle("The collector queries the sources and returns data only. The verifier returns a verdict. If the verdict is negative, the supervisor restarts the collection, at most three times. It writes to the database only on a positive verdict.", "Le collecteur interroge les sources et ne renvoie que des données. Le vérificateur rend un verdict. Si le verdict est négatif, le superviseur relance la collecte, trois fois au plus. Il n'écrit en base que sur un verdict positif.", lang) }}</desc>
+
+                        <defs>
+                            <marker id="fl3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 0 L 10 5 L 0 10 z" class="sc-pointe"/>
+                            </marker>
+                        </defs>
+
+                        <g class="sc-lien">
+                            <line x1="248" y1="96" x2="352" y2="96" marker-end="url(#fl3)"/>
+                            <line x1="608" y1="96" x2="712" y2="96" marker-end="url(#fl3)"/>
+                            <path d="M 480 140 C 480 214, 162 214, 162 142" marker-end="url(#fl3)" fill="none"/>
+                            <line x1="798" y1="140" x2="798" y2="184" marker-end="url(#fl3)"/>
+                        </g>
+
+                        <g class="sc-noeud">
+                            <rect x="76" y="64" width="172" height="76" rx="14"/>
+                            <text x="162" y="94" class="sc-nom">{{ libelle("Collector", "Collecteur", lang) }}</text>
+                            <text x="162" y="115">ANSM, FDA, PubMed</text>
+                            <text x="162" y="132">{{ libelle("writes nothing", "n'écrit rien", lang) }}</text>
+                        </g>
+                        <g class="sc-noeud">
+                            <rect x="352" y="64" width="256" height="76" rx="14"/>
+                            <text x="480" y="94" class="sc-nom">{{ libelle("Verifier", "Vérificateur", lang) }}</text>
+                            <text x="480" y="115">{{ libelle("coded rules, then optional", "règles codées, puis contrôle", lang) }}</text>
+                            <text x="480" y="132">{{ libelle("semantic check", "sémantique facultatif", lang) }}</text>
+                        </g>
+                        <g class="sc-noeud sc-noeud-pivot">
+                            <rect x="712" y="64" width="172" height="76" rx="14"/>
+                            <text x="798" y="94" class="sc-nom">{{ libelle("Supervisor", "Superviseur", lang) }}</text>
+                            <text x="798" y="115">{{ libelle("the only one allowed", "seul à pouvoir", lang) }}</text>
+                            <text x="798" y="132">{{ libelle("to write to the database", "écrire en base", lang) }}</text>
+                        </g>
+
+                        <g class="sc-arete-nom">
+                            <text x="300" y="86" text-anchor="middle">{{ libelle("data", "données", lang) }}</text>
+                            <text x="660" y="86" text-anchor="middle">{{ libelle("verdict", "verdict", lang) }}</text>
+                            <text x="330" y="234" text-anchor="middle">{{ libelle("negative verdict: retry, three attempts at most", "verdict négatif : on relance, trois essais au plus", lang) }}</text>
+                            <text x="798" y="204" text-anchor="middle" class="sc-arete-n">{{ libelle("write only if the verdict is positive", "écriture seulement si le verdict est positif", lang) }}</text>
+                        </g>
+                    </svg>
+                    <figcaption>
+                        {{ libelle("The collector accumulates without ever writing. That is what makes it possible to restart a failed collection without having to undo anything.", "Le collecteur accumule sans jamais écrire. C'est ce qui permet de relancer une collecte ratée sans avoir à défaire quoi que ce soit.", lang) }}
+                    </figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <!-- 8. Limites ───────────────────────────────────────────── -->
+        <section class="ap-limites">
+            <img class="ap-limites-photo"
+                 src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=2000&q=80"
+                 alt="" aria-hidden="true" loading="lazy" decoding="async">
+            <div class="ap-limites-voile" aria-hidden="true"></div>
+
+            <div class="ap-large ap-limites-inner">
+                <h2>{{ libelle("What this arrangement does not do", "Ce que ce montage ne fait pas", lang) }}</h2>
+                <div class="ap-limites-grille">
+                    <div>
+                        <h3>{{ libelle("It does not replace the official SmPC", "Il ne remplace pas le RCP officiel", lang) }}</h3>
+                        <p>{{ libelle("Every record links to the public medicines database and to the EMA. Where they differ, the source prevails.", "Chaque fiche renvoie vers la base publique des médicaments et vers l'EMA. En cas d'écart, la source fait foi.", lang) }}</p>
+                    </div>
+                    <div>
+                        <h3>{{ libelle("It does not rank risk", "Il ne hiérarchise pas le risque", lang) }}</h3>
+                        <p>Les {{ nb(interactions) }} {{ libelle("interactions are listed without a severity. DrugBank publishes none, and a scale invented by the import code was removed rather than documented.", "interactions sont listées sans gravité. DrugBank n'en publie aucune, et une échelle inventée par le code d'import a été supprimée plutôt que documentée.", lang) }}</p>
+                    </div>
+                    <div>
+                        <h3>{{ libelle("It does not cover everything", "Il ne couvre pas tout", lang) }}</h3>
+                        <p>{{ nb(non_apparies) }} {{ libelle("records have no matched substance, and 31 European medicines have no usable monograph. Their page says so instead of pretending.", "fiches n'ont aucune substance appariée, et 31 médicaments européens n'ont pas de monographie exploitable. Leur page le dit à la place de faire semblant.", lang) }}</p>
+                    </div>
+                    <div>
+                        <h3>{{ libelle("It is not a medical device", "Il n'est pas un dispositif médical", lang) }}</h3>
+                        <p>{{ libelle("A university project, developed in an educational setting, with no certification and no clinical validation.", "Projet universitaire, développé dans un cadre pédagogique, sans certification ni validation clinique.", lang) }}</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 9. Sources ───────────────────────────────────────────── -->
+        <section class="ap-sources">
+            <div class="ap-large">
+                <h2 class="ap-sources-titre">{{ libelle("Where the data comes from", "D'où viennent les données", lang) }}</h2>
+                <ul class="ap-sources-index">
+                    <li>
+                        <a href="https://base-donnees-publique.medicaments.gouv.fr/" target="_blank" rel="noopener">
+                            <span class="ap-source-nom">ANSM</span>
+                            <span class="ap-source-desc">{{ libelle("Public medicines database. Summaries of product characteristics and patient leaflets, in French.", "Base de données publique des médicaments. Résumés des caractéristiques du produit et notices patient, en français.", lang) }}</span>
+                            <i class="fas fa-external-link-alt ap-source-fleche" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.ema.europa.eu/en/medicines" target="_blank" rel="noopener">
+                            <span class="ap-source-nom">EMA</span>
+                            <span class="ap-source-desc">{{ libelle("European Medicines Agency. Centralised-procedure monographs, extracted from PDF then split by section.", "Agence européenne des médicaments. Monographies de la procédure centralisée, extraites de PDF puis découpées par rubrique.", lang) }}</span>
+                            <i class="fas fa-external-link-alt ap-source-fleche" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://go.drugbank.com/" target="_blank" rel="noopener">
+                            <span class="ap-source-nom">DrugBank</span>
+                            <span class="ap-source-desc">{{ libelle("Substance-to-substance interactions, molecular structures, pharmacology. Imported from the XML dump, in English.", "Interactions entre substances, structures moléculaires, pharmacologie. Importé depuis le dump XML, en anglais.", lang) }}</span>
+                            <i class="fas fa-external-link-alt ap-source-fleche" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 10. Clôture ──────────────────────────────────────────── -->
+        <section class="ap-cloture">
+            <div class="ap-large ap-cloture-inner">
+                <div class="ap-cloture-texte">
+                    <h2>{{ libelle("See the result", "Voir le résultat", lang) }}</h2>
+                    <p>{{ libelle("Exact search covers the name, the active substance and the laboratory. It does not look inside the body of the leaflets.", "La recherche exacte porte sur le nom, la substance active et le laboratoire. Elle ne va pas chercher dans le corps des notices.", lang) }}</p>
+                </div>
+                <div class="ap-cloture-action">
+                    <form class="ap-recherche" action="/search" method="GET" role="search">
+                        <label class="sr-only" for="ap-champ">{{ libelle('Name, active substance, laboratory', 'Nom, substance active, laboratoire', lang) }}</label>
+                        <input type="text" id="ap-champ" name="search"
+                               placeholder="{{ libelle('Name, active substance, laboratory...', 'Nom, substance active, laboratoire...', lang) }}" autocomplete="off">
+                        <button type="submit"><span>{{ libelle("Search", "Rechercher", lang) }}</span><i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+                    </form>
+                    <div class="ap-cloture-liens">
+                        <a href="/dashboard"><i class="fas fa-chart-line" aria-hidden="true"></i> {{ libelle("Dashboard", "Tableau de bord", lang) }}</a>
+                        <a href="/ordonnance"><i class="fas fa-tasks" aria-hidden="true"></i> {{ libelle("Check a prescription", "Vérifier une ordonnance", lang) }}</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    {% with now=now|default({"year": 2026}) %}
+    {% include 'components/footer.html' %}
+    {% endwith %}
+
+    <script>
+    // Revelation au defilement. Motivee (§5 du skill) : elle marque la
+    // progression d une page qui se lit de haut en bas, et rien d autre ne
+    // bouge. IntersectionObserver et non un ecouteur de scroll, qui est
+    // interdit (§5.D).
+    (function () {
+        var reduit = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var cibles = document.querySelectorAll(
+            '.ap-registre > li, .ap-frise > li, .ap-limites-grille > div, ' +
+            '.ap-sources-index > li, .ap-barres > li, .ap-bilan > div');
+        if (reduit || !('IntersectionObserver' in window)) {
+            cibles.forEach(function (c) { c.classList.add('ap-vu'); });
+            return;
+        }
+        var obs = new IntersectionObserver(function (entrees) {
+            entrees.forEach(function (e) {
+                if (e.isIntersecting) { e.target.classList.add('ap-vu'); obs.unobserve(e.target); }
+            });
+        }, { threshold: 0.15 });
+        cibles.forEach(function (c) { obs.observe(c); });
+    })();
+    </script>
+</body>
+</html>

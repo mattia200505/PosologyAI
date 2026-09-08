@@ -1,0 +1,193 @@
+{
+  "_lisez_moi": [
+    "Jeu d'essai annoté — phase P5 de la roadmap, § 8.2 de l'architecture.",
+    "",
+    "Trente diagnostics de médecine de ville. Pour chacun : les groupes ATC de",
+    "niveau 2 qu'on attend, et ceux qui seraient inacceptables.",
+    "",
+    "Sans annotation, aucune précision ne se mesure : on ne peut que constater",
+    "qu'un résultat *paraît* meilleur. C'est ce jeu qui rend le critère de",
+    "sortie de P5 vérifiable plutôt que déclaratif.",
+    "",
+    "PORTÉE ET RÉSERVE. Les correspondances sont celles des classes",
+    "thérapeutiques usuelles en médecine ambulatoire. Elles sont écrites pour",
+    "être relues une par une par un professionnel, et elles n'ont pas encore",
+    "été relues. Le § 9 de l'architecture le pose : une trame est proposable,",
+    "sa validation ne l'est pas.",
+    "",
+    "« inacceptables » ne liste pas tout ce qui est faux — ce serait la",
+    "quasi-totalité de la classification. Il nomme les erreurs effectivement",
+    "observées ou plausibles pour ce diagnostic.",
+    "",
+    "Codes ATC de niveau 2 (trois caractères). Rappel des groupes cités :",
+    "  A02 antiacides · A03 antispasmodiques · A06 laxatifs · A07 antidiarrhéiques",
+    "  A10 antidiabétiques · B01 antithrombotiques · B05 solutions de perfusion",
+    "  C01 cardiaques · C03 diurétiques · C07 bêta-bloquants · C08 inhibiteurs calciques",
+    "  C09 système rénine-angiotensine · C10 hypolipémiants · D01 antifongiques dermato",
+    "  D07 dermocorticoïdes · G04 urologie · H02 corticoïdes systémiques",
+    "  J01 antibactériens · J02 antifongiques systémiques · J05 antiviraux",
+    "  L01 antinéoplasiques · M01 anti-inflammatoires · M03 myorelaxants",
+    "  N02 analgésiques · N05 psycholeptiques · N06 psychoanaleptiques",
+    "  R01 rhinologie · R03 antiasthmatiques · R05 toux et rhume · R06 antihistaminiques",
+    "  S01 ophtalmologie · V04 agents diagnostiques"
+  ],
+
+  "cas": [
+    {
+      "diagnostic": "Pneumonie communautaire du lobe inférieur droit, forme non sévère",
+      "attendues": ["J01"],
+      "inacceptables": ["V04", "B05", "C09", "L01"],
+      "note": "Le cas qui a révélé le défaut : zéro antibiotique dans le vivier."
+    },
+    {
+      "diagnostic": "Angine bactérienne à streptocoque du groupe A",
+      "attendues": ["J01", "N02"],
+      "inacceptables": ["V04", "B05", "L01"]
+    },
+    {
+      "diagnostic": "Otite moyenne aiguë purulente de l'enfant",
+      "attendues": ["J01", "N02"],
+      "inacceptables": ["V04", "B05"]
+    },
+    {
+      "diagnostic": "Sinusite maxillaire aiguë purulente",
+      "attendues": ["J01", "R01", "N02"],
+      "inacceptables": ["V04", "B05"]
+    },
+    {
+      "diagnostic": "Cystite aiguë simple de la femme jeune",
+      "attendues": ["J01"],
+      "inacceptables": ["V04", "B05", "C09"]
+    },
+    {
+      "diagnostic": "Pyélonéphrite aiguë sans signe de gravité",
+      "attendues": ["J01"],
+      "inacceptables": ["V04", "B05"]
+    },
+    {
+      "diagnostic": "Bronchite aiguë virale",
+      "attendues": ["R05", "N02"],
+      "inacceptables": ["V04", "B05", "L01"]
+    },
+    {
+      "diagnostic": "Exacerbation de bronchopneumopathie chronique obstructive",
+      "attendues": ["R03", "H02", "J01"],
+      "inacceptables": ["V04", "B05"]
+    },
+    {
+      "diagnostic": "Crise d'asthme légère à modérée",
+      "attendues": ["R03"],
+      "inacceptables": ["C07", "V04", "B05"],
+      "note": "C07 inacceptable : les bêta-bloquants sont contre-indiqués."
+    },
+    {
+      "diagnostic": "Rhinite allergique saisonnière",
+      "attendues": ["R06", "R01"],
+      "inacceptables": ["J01", "V04", "B05"]
+    },
+    {
+      "diagnostic": "Urticaire aiguë",
+      "attendues": ["R06", "H02"],
+      "inacceptables": ["J01", "V04", "B05"]
+    },
+    {
+      "diagnostic": "Grippe saisonnière non compliquée",
+      "attendues": ["N02", "J05"],
+      "inacceptables": ["J01", "V04", "B05"],
+      "note": "J01 inacceptable : une grippe est virale."
+    },
+    {
+      "diagnostic": "Gastro-entérite aiguë avec déshydratation légère",
+      "attendues": ["A07", "A03"],
+      "inacceptables": ["J01", "V04"]
+    },
+    {
+      "diagnostic": "Reflux gastro-œsophagien avec pyrosis",
+      "attendues": ["A02"],
+      "inacceptables": ["J01", "V04", "B05"]
+    },
+    {
+      "diagnostic": "Ulcère gastroduodénal à Helicobacter pylori",
+      "attendues": ["A02", "J01"],
+      "inacceptables": ["V04", "B05"],
+      "note": "V04 inacceptable : le test respiratoire diagnostique n'est pas un traitement."
+    },
+    {
+      "diagnostic": "Constipation chronique fonctionnelle",
+      "attendues": ["A06"],
+      "inacceptables": ["A07", "J01", "V04"]
+    },
+    {
+      "diagnostic": "Colique néphrétique non compliquée",
+      "attendues": ["M01", "N02", "A03"],
+      "inacceptables": ["V04", "B05"]
+    },
+    {
+      "diagnostic": "Lombalgie commune aiguë sans signe neurologique",
+      "attendues": ["M01", "N02", "M03"],
+      "inacceptables": ["J01", "V04", "B05"]
+    },
+    {
+      "diagnostic": "Crise de goutte du gros orteil",
+      "attendues": ["M01", "M04"],
+      "inacceptables": ["J01", "V04"]
+    },
+    {
+      "diagnostic": "Migraine sans aura",
+      "attendues": ["N02"],
+      "inacceptables": ["J01", "V04", "B05"]
+    },
+    {
+      "diagnostic": "Hypertension artérielle essentielle non contrôlée",
+      "attendues": ["C09", "C08", "C03", "C07"],
+      "inacceptables": ["J01", "V04", "B05"]
+    },
+    {
+      "diagnostic": "Insuffisance cardiaque chronique à fraction d'éjection réduite",
+      "attendues": ["C03", "C09", "C07"],
+      "inacceptables": ["M01", "V04"],
+      "note": "M01 inacceptable : les AINS décompensent une insuffisance cardiaque."
+    },
+    {
+      "diagnostic": "Fibrillation auriculaire permanente",
+      "attendues": ["B01", "C01", "C07"],
+      "inacceptables": ["V04", "B05"]
+    },
+    {
+      "diagnostic": "Diabète de type 2 déséquilibré",
+      "attendues": ["A10"],
+      "inacceptables": ["J01", "V04", "B05"]
+    },
+    {
+      "diagnostic": "Hypercholestérolémie primaire",
+      "attendues": ["C10"],
+      "inacceptables": ["J01", "V04", "B05"]
+    },
+    {
+      "diagnostic": "Épisode dépressif caractérisé d'intensité modérée",
+      "attendues": ["N06"],
+      "inacceptables": ["J01", "V04", "B05"]
+    },
+    {
+      "diagnostic": "Trouble anxieux généralisé",
+      "attendues": ["N05", "N06"],
+      "inacceptables": ["J01", "V04"]
+    },
+    {
+      "diagnostic": "Insomnie chronique d'endormissement",
+      "attendues": ["N05"],
+      "inacceptables": ["J01", "V04", "B05"]
+    },
+    {
+      "diagnostic": "Conjonctivite bactérienne aiguë",
+      "attendues": ["S01"],
+      "inacceptables": ["V04", "B05", "L01"]
+    },
+    {
+      "diagnostic": "Zona intercostal chez l'adulte immunocompétent",
+      "attendues": ["J05", "N02"],
+      "inacceptables": ["J01", "V04"],
+      "note": "J01 inacceptable : un zona est viral."
+    }
+  ]
+}

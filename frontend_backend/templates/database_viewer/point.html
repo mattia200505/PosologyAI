@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Point {{ point_id if point_id else '' }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f1923; color: #e0e0e0; min-height: 100vh;
+        }
+        .header {
+            background: #1a2634; padding: 1rem 2rem;
+            display: flex; align-items: center; gap: 1rem;
+            border-bottom: 1px solid #2a3a4a;
+        }
+        .header h1 { font-size: 1.15rem; }
+        .header a { color: #4a9eff; text-decoration: none; font-size: .9rem; }
+        .header a:hover { text-decoration: underline; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+        .card {
+            background: #1a2634; border: 1px solid #2a3a4a;
+            border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem;
+        }
+        .card h2 { font-size: 1rem; color: #4a9eff; margin-bottom: 1rem; }
+        .field { padding: .5rem 0; border-bottom: 1px solid #1e2a36; }
+        .field:last-child { border-bottom: none; }
+        .field .key { color: #999; font-size: .8rem; text-transform: uppercase; letter-spacing: .5px; }
+        .field .value {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: .85rem; margin-top: .25rem; word-break: break-all;
+            color: #e0e0e0;
+        }
+        .value.json { white-space: pre-wrap; }
+        .vector-preview { font-size: .8rem; color: #666; }
+        .error {
+            background: #2a1a1a; border: 1px solid #6b2a2a;
+            padding: 1rem; border-radius: 8px; color: #ef6b6b;
+        }
+        .mono { font-family: 'Consolas', 'Courier New', monospace; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="{{ url_for('database_viewer.view_collection', name=name) }}">&larr; {{ name }}</a>
+        <h1>Point {{ point.id if point else point_id }}</h1>
+    </div>
+    <div class="container">
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% elif point %}
+        <div class="card">
+            <h2>Méta</h2>
+            <div class="field">
+                <div class="key">ID</div>
+                <div class="value">{{ point.id }}</div>
+            </div>
+            <div class="field">
+                <div class="key">Version</div>
+                <div class="value">{{ point.version if hasattr(point, 'version') else 'N/A' }}</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Payload</h2>
+            {% if point.payload %}
+            {% for key, value in point.payload.items() %}
+            <div class="field">
+                <div class="key">{{ key }}</div>
+                <div class="value {% if value is mapping %}json{% endif %}">
+                    {% if value is mapping %}
+                    {{ value | tojson(indent=2, ensure_ascii=False) }}
+                    {% elif value is sequence and value is not string %}
+                    [{{ value | join(', ') }}]
+                    {% else %}
+                    {{ value }}
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="field"><div class="key">Aucun payload</div></div>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h2>Vecteur</h2>
+            <div class="field">
+                <div class="key">Dimension</div>
+                <div class="value">{{ point.vector | length if point.vector is mapping and point.vector.default else (point.vector | length if point.vector is sequence else 'N/A') }}</div>
+            </div>
+            <div class="field">
+                <div class="key">Valeurs</div>
+                <div class="value vector-preview">
+                    {% if vector_display %}
+                    [{{ vector_display | join(', ') }}]
+                    {% else %}
+                    (aucun vecteur)
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

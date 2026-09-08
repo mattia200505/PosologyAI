@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recherche IA - PosologyAI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/hero.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/search.css') }}">
+</head>
+{# Trois libellés de cette page sont posés par `libelle()`, donc par le
+   serveur : les deux chronos et le bouton « Charger plus ». Ils ne sont pas
+   dans la table cliente, et la bascule de langue ne pouvait donc pas les
+   atteindre. Le marqueur demande le rechargement de la page — le cookie de
+   langue vient d'être écrit, le serveur rendra la bonne version. #}
+<body data-langue-serveur="1">
+    {% with active_page='search' %}
+    {% include 'components/header.html' %}
+    {% endwith %}
+
+    {# Voile de chargement : la synthèse Mistral prend plusieurs secondes,
+       un écran muet faisait croire à un blocage. Le formulaire et les tags
+       déclenchent tous deux l'affichage via le gestionnaire `submit`. #}
+    <div id="ai-search-loading" class="ai-search-loading" hidden aria-hidden="true">
+        <div class="ai-search-loading-box">
+            <span class="ai-search-spinner"></span>
+            <p data-i18n="ai_searching">L'IA analyse votre question…</p>
+        </div>
+    </div>
+
+    <main>
+    {# La meme bande que les deux autres modes de recherche. Passer d'un
+       mode a l'autre ne doit rien changer au decor : seul le contenu du
+       panneau change, et l'onglet actif dit ou l'on est. #}
+    <section class="search-banner hero-nuit hero-photo">
+        {% with photo = 'photo-1516549655169-df83a0774514' %}
+        {% include 'components/hero_photo.html' %}
+        {% endwith %}
+        <div class="search-container">
+            <p class="hero-sur"><i class="fas fa-magnifying-glass" aria-hidden="true"></i> <span data-i18n="search">Recherche</span></p>
+            <h1 class="page-title" data-i18n="ai_search_title">Recherche IA médicale</h1>
+            {% with mode_actif='assistant', requete=query|default('') %}{% include 'components/modes_recherche.html' %}{% endwith %}
+            <form method="post" action="{{ url_for('ai_search') }}" id="ai-search-form">
+                <input type="hidden" name="lang" id="lang-input" value="fr">
+                <div class="search-box">
+                    <input type="text" name="query" class="search-input" data-i18n-placeholder="ai_search_placeholder" placeholder="Posez votre question médicale..." value="{{ query|default('') }}" required>
+                    <button type="submit" class="search-button" id="ai-search-submit" aria-label="Rechercher">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+
+            {% if reformulated_query %}
+            <div class="reformulate-container">
+                <span class="search-tag-btn reformulate-badge">
+                    <b data-i18n="requete_reformulee">Requête IA reformulée :</b> {{ reformulated_query }}
+                </span>
+            </div>
+            {% endif %}
+
+            {% if not query %}
+            <div class="vector-placeholder">
+                <p data-i18n="try_ai_search">Essayez la recherche IA sur des exemples&nbsp;:</p>
+                <div class="search-tags-row">
+                    <button type="button" class="search-tag-btn translatable-tag" data-query="Quels antibiotiques pour infections graves ?" data-query-en="Which antibiotics for severe infections?">Quels antibiotiques pour infections graves ?</button>
+                    <button type="button" class="search-tag-btn translatable-tag" data-query="Différence entre gélule à libération prolongée et immédiate" data-query-en="Difference between extended-release and immediate-release capsule">Différence entre gélule à libération prolongée et immédiate</button>
+                    <button type="button" class="search-tag-btn translatable-tag" data-query="Indications solution pour instillation auriculaire" data-query-en="Ear instillation solution indications">Indications solution pour instillation auriculaire</button>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    {# ── Réponse de l'IA ──────────────────────────────────────────────
+       La réponse était générée par la route mais jamais insérée dans le
+       gabarit : l'utilisateur ne voyait qu'une liste brute de titres.
+       Elle est désormais l'élément central de la page. #}
+    {% if query and ai_answer %}
+    <section class="ai-answer-section" aria-live="polite">
+        <div class="container">
+            <div class="ai-answer-panel">
+                <div class="ai-answer-header">
+                    <span class="ai-answer-icon"><i class="fas fa-robot"></i></span>
+                    <div class="ai-answer-titles">
+                        <h3 data-i18n="ai_answer_title">Réponse de l'IA</h3>
+                        <p class="ai-answer-sub" data-i18n="ai_answer_sub">Synthèse générée à partir des notices de la base PosologyAI</p>
+                    </div>
+                    {% if duree_recherche or duree_synthese %}
+                    <div class="ai-answer-timings">
+                        {% if duree_recherche is not none %}
+                        <span class="ai-timing-chip"><i class="fas fa-bolt"></i> {{ libelle('Search', 'Recherche', lang) }} {{ duree_recherche }}s</span>
+                        {% endif %}
+                        {% if duree_synthese is not none %}
+                        <span class="ai-timing-chip"><i class="fas fa-brain"></i> {{ libelle('AI answer', 'Synthèse IA', lang) }} {{ duree_synthese }}s</span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="ai-answer-content">{{ ai_answer|safe }}</div>
+                <p class="ai-answer-disclaimer">
+                    <i class="fas fa-info-circle"></i>
+                    <span data-i18n="ai_disclaimer">Ces informations sont fournies à titre indicatif et ne remplacent pas l'avis d'un professionnel de santé.</span>
+                </p>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <section class="search-results-container{% if query and ai_answer %} apres-reponse{% endif %}">
+        <div class="container">
+            {% if results is defined and results %}
+                <h3><span data-i18n="ai_sources_title">Médicaments correspondants</span> (<span id="shown-count">{{ initial_count }}</span>/{{ total }})</h3>
+                <div id="vector-results-list" aria-live="polite">
+                {% for res in results %}
+                    {% set med = res.full_medicine %}
+                    {% set details = med.medicine_details if med else None %}
+                    <div class="medicine-card ai-result-card">
+                        <div class="ai-result-head">
+                            <a href="{{ url_for('medicine_details', id=res.mongo_id) }}?lang={{ lang|default('fr') }}" class="medicine-title">{{ res.title }}</a>
+                            {% if res.score %}
+                            <span class="ai-score-badge" title="Score de pertinence combiné">{{ '%.0f'|format((res.score * 100)) }}%</span>
+                            {% endif %}
+                        </div>
+                        {% if res.score %}
+                        <div class="ai-score-bar" aria-hidden="true"><span style="width: {{ [(res.score * 100)|round|int, 5]|max }}%"></span></div>
+                        {% endif %}
+                        <div class="medicine-meta">
+                            {% if details and details.substances_actives %}
+                            {% set substances = details.substances_actives[:4] %}
+                            {% set restants = details.substances_actives | length - substances | length %}
+                            <div class="medicine-meta-item">
+                                <i class="fas fa-flask medicine-meta-icon"></i>
+                                <span>{{ substances|join(', ') }}</span>
+                                {% if restants > 0 %}<em class="ai-chip-more">+{{ restants }}</em>{% endif %}
+                            </div>
+                            {% endif %}
+                            {% if details and details.forme %}
+                            <div class="medicine-meta-item">
+                                <i class="fas fa-pills medicine-meta-icon"></i>
+                                <span>{{ details.forme }}</span>
+                            </div>
+                            {% endif %}
+                            {% if details and details.laboratoire %}
+                            <div class="medicine-meta-item">
+                                <i class="fas fa-industry medicine-meta-icon"></i>
+                                <span>{{ details.laboratoire }}</span>
+                            </div>
+                            {% endif %}
+                            {% if med and med.groupe_anatomique %}
+                            <div class="medicine-meta-item meta-item-family">
+                                <i class="fas fa-tag medicine-meta-icon"></i>
+                                <span>{{ med.groupe_anatomique }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+                {% if results|length > initial_count %}
+                    <div class="load-more-container">
+                        <button id="load-more-btn" class="btn btn-primary">{{ libelle('Load more', 'Charger plus', lang) }}</button>
+                    </div>
+                {% endif %}
+            {% elif query %}
+                <p data-i18n="no_ai_results">Aucun résultat trouvé.</p>
+            {% endif %}
+        </div>
+    </section>
+
+    </main>
+
+    {% with now=now|default({"year": 2025}) %}
+    {% include 'components/footer.html' %}
+    {% endwith %}
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- VOILE DE CHARGEMENT ---
+        // La synthèse IA prend plusieurs secondes : sans retour visuel,
+        // l'utilisateur recharge ou reposte. Le voile couvre la page tant
+        // que la requête partante n'est pas revenue.
+        const voile = document.getElementById('ai-search-loading');
+        const formulaire = document.getElementById('ai-search-form');
+        function afficherVoile() {
+            if (!voile) return;
+            voile.hidden = false;
+            voile.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('ai-search-busy');
+        }
+        function masquerVoile() {
+            if (!voile) return;
+            voile.hidden = true;
+            voile.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('ai-search-busy');
+        }
+        if (formulaire) {
+            formulaire.addEventListener('submit', afficherVoile);
+        }
+        // Retour arrière du navigateur (cache bfcache) : la page se réaffiche
+        // telle quelle, il faut lever le voile sinon elle reste bloquée.
+        window.addEventListener('pageshow', masquerVoile);
+
+        // --- TAGS INTERACTIVES POUR LA RECHERCHE IA ---
+        const tagButtons = document.querySelectorAll('.search-tag-btn[data-query]');
+        tagButtons.forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                const value = btn.getAttribute('data-query');
+                const input = document.querySelector('input[name="query"]');
+                if (input) {
+                    input.value = value;
+                    let form = input.closest('form');
+                    if (form) {
+                        btn.disabled = true;
+                        btn.classList.add('loading');
+                        tagButtons.forEach(b => b.disabled = true);
+                        form.submit(); // le gestionnaire `submit` affiche le voile
+                    }
+                }
+            });
+        });
+
+        // Affichage progressif des résultats ("Charger plus")
+        const loadMoreBtn = document.getElementById('load-more-btn');
+        if (loadMoreBtn) {
+            let shownCount = Number('{{ initial_count }}');
+            const allCards = Array.from(document.querySelectorAll('#vector-results-list .medicine-card'));
+            loadMoreBtn.addEventListener('click', function() {
+                let toShow = Math.min(shownCount + 5, allCards.length);
+                for (let i = shownCount; i < toShow; i++) {
+                    if (allCards[i]) allCards[i].style.display = '';
+                }
+                shownCount = toShow;
+                document.getElementById('shown-count').textContent = shownCount;
+                if (shownCount >= allCards.length) {
+                    loadMoreBtn.style.display = 'none';
+                }
+            });
+            for (let i = shownCount; i < allCards.length; i++) {
+                if (allCards[i]) allCards[i].style.display = 'none';
+            }
+        }
+
+        // Synchroniser la langue avec localStorage
+        const langInput = document.getElementById('lang-input');
+        if (langInput) {
+            const currentLang = localStorage.getItem(window.CLE_LANGUE || 'posologyai_lang') || 'fr';
+            langInput.value = currentLang;
+        }
+
+        // Mettre à jour quand la langue change
+        const langToggle = document.getElementById('langToggle');
+        if (langToggle) {
+            langToggle.addEventListener('click', function() {
+                setTimeout(() => {
+                    const newLang = localStorage.getItem(window.CLE_LANGUE || 'posologyai_lang') || 'fr';
+                    if (langInput) langInput.value = newLang;
+                }, 100);
+            });
+        }
+    });
+    </script>
+    <!-- Fin du script principal. Aucun code JS/HTML orphelin après ce bloc. -->
+    </body>
+    </html>

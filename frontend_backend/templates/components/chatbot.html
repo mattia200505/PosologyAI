@@ -1,0 +1,96 @@
+{#
+   Le widget de l'assistant : le bouton flottant, sa fenetre, et le fil de
+   messages.
+
+   Il vivait dans `index.html`, en clair, avec son script. Il est desormais
+   sur deux pages d'accueil ; le recopier aurait fait deux versions qui
+   divergent des la premiere correction. Ses styles sont dans
+   `static/css/chatbot.css`, que la page appelante doit charger.
+
+   Le script inline d'origine est supprime : il injectait les reponses du
+   bot en innerHTML sans echappement (vecteur XSS) et entrait en conflit
+   avec `static/js/chatbot.js`. La logique vit desormais uniquement dans ce
+   fichier, charge par le composant lui-meme : inclure le widget suffit.
+
+   Deux valeurs facultatives, passees par `{% with %}` a l'inclusion :
+
+       cb_fiches        le nombre de fiches du catalogue
+       cb_interactions  le nombre d'interactions du graphe
+
+   Elles ne servent qu'a la phrase d'accueil. Absentes, la phrase se dit sans
+   chiffres plutot que d'annoncer des trous : les deux pages ne nomment pas
+   leurs compteurs pareil, et une variable manquante rendait « nos
+   medicaments et  interactions » sur l'accueil reel.
+#}
+<div id="chatbot-container">
+    <button id="chatbot-toggle" class="chatbot-toggle" aria-label="Ouvrir l'assistant PosologyAI" data-i18n-aria="cb_ouvrir" aria-haspopup="dialog" aria-expanded="false">
+        <i class="fas fa-comments"></i>
+    </button>
+
+    <div id="chatbot-window" class="chatbot-window hidden" role="dialog" aria-label="Assistant PosologyAI">
+        <div class="chatbot-header">
+            <div class="chatbot-header-content">
+                <span class="cb-header-icon"><i class="fas fa-robot"></i></span>
+                <span class="cb-header-titles">
+                    <span class="cb-titre" data-i18n="cb_titre">POSOLOGYAI L'ASSISTANT</span>
+                    <span class="cb-statut"><span class="cb-point"></span><span data-i18n="cb_en_ligne">En ligne</span></span>
+                </span>
+            </div>
+            <div class="chatbot-header-actions">
+                <button id="chatbot-clear" class="chatbot-icon-btn" aria-label="Effacer la conversation" data-i18n-aria="cb_effacer" title="Effacer la conversation">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+                <button id="chatbot-close" class="chatbot-close" aria-label="Fermer l'assistant" data-i18n-aria="cb_fermer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="chatbot-messages" class="chatbot-messages">
+            <div class="chatbot-message bot-message">
+                <div class="message-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                {# La cle cb_accueil_sans_chiffres existe deja dans les tables
+                   fr/en/ar : le moteur de traduction reecrit ce noeud au
+                   chargement et a chaque changement de langue. #}
+                <div class="message-content" data-i18n="cb_accueil_sans_chiffres">
+                    Bonjour ! Je suis POSOLOGYAI L'ASSISTANT, votre assistant medical intelligent.
+                    {%- if cb_fiches and cb_interactions %}
+                    Je peux vous aider a trouver des informations sur nos {{ cb_fiches }} medicaments
+                    et {{ cb_interactions }} interactions.
+                    {%- else %}
+                    Je peux vous aider a trouver des informations sur les medicaments et leurs
+                    interactions.
+                    {%- endif %}
+                    Posez-moi vos questions !
+                </div>
+            </div>
+            <div id="chatbot-suggestions" class="chatbot-suggestions">
+                <p class="cb-suggestions-titre" data-i18n="cb_suggestions">Essayez :</p>
+                <div id="suggestions-chips" class="suggestions-chips"></div>
+            </div>
+        </div>
+
+        <div class="chatbot-input-container">
+            <input
+                type="text"
+                id="chatbot-input"
+                class="chatbot-input"
+                placeholder="Posez votre question..." data-i18n-placeholder="cb_placeholder"
+                autocomplete="off"
+                maxlength="1000"
+            >
+            <button id="chatbot-send" class="chatbot-send" aria-label="Envoyer le message" data-i18n-aria="cb_envoyer" disabled>
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+
+        <p class="chatbot-footer">
+            <i class="fas fa-info-circle"></i>
+            <span data-i18n="cb_avertissement">Informations indicatives — ne remplacent pas un avis médical. En urgence : 15 ou 112.</span>
+        </p>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/chatbot.js') }}" defer></script>

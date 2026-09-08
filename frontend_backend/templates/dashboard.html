@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - PosologyAI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/hero.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vis-network@9.1.6/standalone/umd/vis-network.min.js"></script>
+</head>
+<body>
+    {% with active_page='dashboard' %}
+    {% include 'components/header.html' %}
+    {% endwith %}
+
+    <main class="tb">
+        {# Le bandeau bleu nuit en aplat devient la meme composition que
+           l'accueil : une bande sombre, et les compteurs qui montent
+           dessus par en dessous. Le texte est le meme, aux memes cles
+           i18n ; seule la forme change. #}
+        <section class="hero-nuit hero-photo">
+        {% with photo = 'photo-1532187863486-abf9dbad1b69' %}
+        {% include 'components/hero_photo.html' %}
+        {% endwith %}
+            <div class="dash-header">
+                <p class="hero-sur"><i class="fas fa-chart-line" aria-hidden="true"></i> <span data-i18n="nav_dashboard">Tableau de bord</span></p>
+                <h1><span data-i18n="dashboard_title">Dashboard</span></h1>
+                <p data-i18n="dashboard_desc">Statistiques en temps réel, analyses et exploration du graphe de connaissances</p>
+            </div>
+        </section>
+
+        <div class="dash-container" id="app">
+            <div class="loading" id="dash-loading"><i class="fas fa-spinner fa-spin"></i><br><span data-i18n="dash_chargement">Chargement du tableau de bord...</span></div>
+            <div id="dash-content" style="display:none;">
+
+                <div class="stats-grid" id="statsCards"></div>
+
+                <div class="charts-grid">
+                    <div class="chart-card entree">
+                        <h3><i class="fas fa-pills"></i> <span data-i18n="types_medicaments">Types de médicaments</span></h3>
+                        <div class="chart-wrap"><canvas id="typeDistChart"></canvas></div>
+                    </div>
+                    <div class="chart-card entree">
+                        <h3><i class="fas fa-flask"></i> <span data-i18n="top_laboratoires">Top laboratoires</span></h3>
+                        <div class="chart-wrap"><canvas id="topLabsChart"></canvas></div>
+                    </div>
+                    <div class="chart-card entree">
+                        <h3><i class="fas fa-project-diagram"></i> <span data-i18n="noeuds">Nœuds</span> Neo4j</h3>
+                        <div class="chart-wrap"><canvas id="neo4jNodesChart"></canvas></div>
+                    </div>
+                    <div class="chart-card entree">
+                        <h3><i class="fas fa-link"></i> <span data-i18n="relations">Relations</span> Neo4j</h3>
+                        <div class="chart-wrap"><canvas id="neo4jRelsChart"></canvas></div>
+                    </div>
+                </div>
+
+                <div class="neo4j-section entree">
+                    <h3><i class="fas fa-project-diagram"></i> <span data-i18n="graphe_interactions">Graphe d'interactions Neo4j</span></h3>
+                    <div class="graph-legend">
+                        <span><span class="dot" style="background:#42a5f5;"></span> <span data-i18n="medicament">Médicament</span></span>
+                        <span><span class="dot" style="background:#ef9a9a;"></span> <span data-i18n="dash_en_interaction">En interaction</span></span>
+                        <span><span class="dot" style="background:#a5d6a7;"></span> <span data-i18n="substance">Substance</span></span>
+                        <span><span class="dot" style="background:#ffe0b2;"></span> <span data-i18n="laboratoire">Laboratoire</span></span>
+                        <span><span class="dot" style="background:#e74c3c;"></span> <span data-i18n="severite_haute">Haute sévérité</span></span>
+                        <span><span class="dot" style="background:#f39c12;"></span> <span data-i18n="moderée">Modérée</span></span>
+                        <span><span class="dot" style="background:#2ecc71;"></span> <span data-i18n="basse">Basse</span></span>
+                    </div>
+                    <div class="graph-controls">
+                        <input type="text" id="medicineSearch" data-i18n-placeholder="search_placeholder" placeholder="Nom du médicament (ex: DOLIPRANE)" value="DOLIPRANE">
+                        <button id="searchGraphBtn"><i class="fas fa-search"></i> <span data-i18n="visualiser">Visualiser</span></button>
+                        <button id="fullGraphBtn"><i class="fas fa-globe"></i> <span data-i18n="graphe_global">Graphe global</span></button>
+                    </div>
+                    <div id="dashboardGraph" class="graph-container"></div>
+                </div>
+
+                <div class="chart-card full-width entree">
+                    <h3><i class="fas fa-exclamation-triangle"></i> <span data-i18n="top_interactions">Top interactions médicamenteuses</span></h3>
+                    <div class="chart-wrap-sm"><canvas id="topInteractionsChart"></canvas></div>
+                    <div style="margin-top:14px;overflow-x:auto;">
+                        <table class="recent-table">
+                            <thead><tr><th data-i18n="medicament">Médicament</th><th data-i18n="interactions">Interactions</th></tr></thead>
+                            <tbody id="topInteractionsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    {% with now=now %}
+    {% include 'components/footer.html' %}
+    {% endwith %}
+
+    <script>
+    // Huit categories, un seul registre : meme saturation, meme clarte,
+    // autour de l'indigo de l'application. Aucune ne code un degre.
+    var COLORS = ['#4f46e5','#7c3aed','#2563eb','#0d9488',
+                  '#be185d','#b45309','#0369a1','#4338ca'];
+    // ── L'entrée des panneaux, et la montée des nombres ──────────────
+    //
+    // Le même geste que sur l'accueil, avec la même réserve : la valeur
+    // exacte est déjà dans le HTML et dans `data-cible`. Si le script ne
+    // tourne pas, ou si le mouvement est refusé, le nombre juste s'affiche
+    // — un compteur bloqué à zéro serait un mensonge sur une page dont
+    // c'est le seul propos.
+    var MOUVEMENT_REDUIT =
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function compter(carte) {
+        var sortie = carte.querySelector('.num');
+        var cible = parseInt(carte.dataset.cible, 10);
+        if (!sortie || isNaN(cible)) return;
+        if (MOUVEMENT_REDUIT) { sortie.textContent = cible.toLocaleString('fr-FR'); return; }
+        var depart = performance.now(), duree = 1200;
+        function pas(maintenant) {
+            var part = Math.min((maintenant - depart) / duree, 1);
+            var eleve = 1 - Math.pow(1 - part, 3);
+            sortie.textContent = Math.round(cible * eleve).toLocaleString('fr-FR');
+            if (part < 1) requestAnimationFrame(pas);
+        }
+        requestAnimationFrame(pas);
+    }
+
+    function animerEntree(elements, avecCompteur) {
+        elements = [].slice.call(elements);
+        if (MOUVEMENT_REDUIT || !('IntersectionObserver' in window)) {
+            elements.forEach(function (el) {
+                el.classList.add('vu');
+                if (avecCompteur) compter(el);
+            });
+            return;
+        }
+        var observateur = new IntersectionObserver(function (entrees) {
+            entrees.forEach(function (entree) {
+                if (!entree.isIntersecting) return;
+                entree.target.classList.add('vu');
+                if (avecCompteur) compter(entree.target);
+                observateur.unobserve(entree.target);
+            });
+        }, { threshold: 0.2 });
+        elements.forEach(function (el) { observateur.observe(el); });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadDashboardData();
+        document.getElementById('searchGraphBtn').addEventListener('click', function() {
+            var q = document.getElementById('medicineSearch').value.trim();
+            if (q) loadDashboardGraph(q);
+        });
+        document.getElementById('medicineSearch').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') document.getElementById('searchGraphBtn').click();
+        });
+        document.getElementById('fullGraphBtn').addEventListener('click', function() {
+            loadFullGraph();
+        });
+        animerEntree(document.querySelectorAll('.entree:not(.stat-card)'), false);
+    });
+
+
+    function loadDashboardData() {
+        fetch('/api/dashboard/data')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                document.getElementById('dash-loading').style.display = 'none';
+                document.getElementById('dash-content').style.display = '';
+
+                var mongo = data.mongodb || {};
+                var neo4j = data.neo4j || {};
+
+                // Stats cards
+                var cards = '';
+                // Chaque carte annonce ce qu elle compte, et compte ce qu elle
+                // annonce. « Types » et « Laboratoires » lisaient la longueur
+                // des palmares ci-dessous, tronques a dix : elles affichaient
+                // donc invariablement 10, pour 56 types et 1 308 laboratoires.
+                var stats = [
+                    { icon: 'fa-pills', bg: 'rgba(79,70,229,.11)', color: '#4f46e5', num: mongo.medicines_count || 0, lbl: 'Médicaments' },
+                    { icon: 'fa-flask', bg: 'rgba(37,99,235,.11)', color: '#2563eb', num: mongo.types_count || 0, lbl: 'Types de médicament' },
+                    { icon: 'fa-building', bg: 'rgba(13,148,136,.12)', color: '#0d9488', num: mongo.labs_count || 0, lbl: 'Laboratoires' },
+                    { icon: 'fa-exclamation-triangle', bg: 'rgba(190,24,93,.11)', color: '#be185d', num: neo4j.interactions_count || 0, lbl: 'Interactions entre substances' },
+                    { icon: 'fa-project-diagram', bg: 'rgba(124,58,237,.11)', color: '#7c3aed', num: neo4j.total_nodes || 0, lbl: 'Nœuds Neo4j' },
+                    { icon: 'fa-link', bg: 'rgba(180,83,9,.11)', color: '#b45309', num: neo4j.total_rels || 0, lbl: 'Relations Neo4j' }
+                ];
+                stats.forEach(function(s) {
+                    cards += '<div class="stat-card entree" data-cible="' + s.num + '">'
+                        + '<div class="stat-icon" style="background:' + s.bg + ';color:' + s.color + ';">'
+                        + '<i class="fas ' + s.icon + '"></i></div>'
+                        + '<div class="stat-info"><div class="num">' + s.num.toLocaleString('fr-FR') + '</div>'
+                        + '<div class="lbl">' + s.lbl + '</div></div></div>';
+                });
+                document.getElementById('statsCards').innerHTML = cards;
+                animerEntree(document.getElementById('statsCards')
+                    .querySelectorAll('.stat-card'), true);
+
+                // Type distribution chart
+                var types = mongo.type_distribution || {};
+                var typeLabels = Object.keys(types);
+                if (typeLabels.length) {
+                    new Chart(document.getElementById('typeDistChart'), {
+                        type: 'doughnut',
+                        data: { labels: typeLabels, datasets: [{ data: Object.values(types), backgroundColor: typeLabels.map(function(_,i){return COLORS[i%COLORS.length];}), borderWidth: 0 }] },
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 9 } } } }, cutout: '60%' }
+                    });
+                }
+
+                // Top labs chart
+                var labs = mongo.top_labs || {};
+                var labLabels = Object.keys(labs).slice(0, 6);
+                if (labLabels.length) {
+                    new Chart(document.getElementById('topLabsChart'), {
+                        type: 'bar',
+                        data: { labels: labLabels, datasets: [{ label: 'Médicaments', data: labLabels.map(function(k){return labs[k];}), backgroundColor: '#4f46e5', borderRadius: 4, borderSkipped: false }] },
+                        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, grid: { color: '#f0f0f0' } }, y: { grid: { display: false }, ticks: { font: { size: 9 } } } } }
+                    });
+                }
+
+                // Neo4j nodes chart
+                var nd = (neo4j.nodes_by_label || []).filter(function(n) { var l = n.lbl || []; return l.length && l[0] !== 'Medicine' && n.c > 1; });
+                var allNodes = (neo4j.nodes_by_label || []).filter(function(n) { var l = n.lbl || []; return l.length; });
+                if (allNodes.length) {
+                    new Chart(document.getElementById('neo4jNodesChart'), {
+                        type: 'doughnut',
+                        data: { labels: allNodes.map(function(n){ return (n.lbl||['?'])[0]; }), datasets: [{ data: allNodes.map(function(n){ return n.c; }), backgroundColor: allNodes.map(function(_,i){return COLORS[i%COLORS.length];}), borderWidth: 0 }] },
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 9 } } } }, cutout: '60%' }
+                    });
+                }
+
+                // Neo4j relationships chart
+                var rd = (neo4j.rels_by_type || []).filter(function(r) { return r.c > 0; });
+                if (rd.length) {
+                    new Chart(document.getElementById('neo4jRelsChart'), {
+                        type: 'bar',
+                        data: { labels: rd.map(function(r){ return r.t; }), datasets: [{ label: 'Relations', data: rd.map(function(r){ return r.c; }), backgroundColor: rd.map(function(_,i){return COLORS[i%COLORS.length];}), borderRadius: 4, borderSkipped: false }] },
+                        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, grid: { color: '#f0f0f0' } }, y: { grid: { display: false }, ticks: { font: { size: 9 } } } } }
+                    });
+                }
+
+                // Top interactions chart
+                var topInt = neo4j.top_interactions || [];
+                if (topInt.length) {
+                    var intLabels = topInt.map(function(x){ return (x.t||'').length > 22 ? x.t.substring(0,20)+'...' : x.t; });
+                    new Chart(document.getElementById('topInteractionsChart'), {
+                        type: 'bar',
+                        data: { labels: intLabels, datasets: [{ label: 'Interactions', data: topInt.map(function(x){ return x.c; }), backgroundColor: '#e65100', borderRadius: 4, borderSkipped: false }] },
+                        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, grid: { color: '#f0f0f0' } }, y: { grid: { display: false }, ticks: { font: { size: 9 } } } } }
+                    });
+                    var html = '';
+                    topInt.forEach(function(x) {
+                        var name = x.t || 'Inconnu';
+                        html += '<tr><td><strong>' + name + '</strong></td><td>' + x.c + '</td></tr>';
+                    });
+                    document.getElementById('topInteractionsBody').innerHTML = html;
+                } else {
+                    document.getElementById('topInteractionsBody').innerHTML = '<tr><td colspan="2" style="text-align:center;color:#999;padding:20px;">Aucune donnée</td></tr>';
+                }
+
+                // Default graph
+                loadDashboardGraph('DOLIPRANE');
+            })
+            .catch(function(err) {
+                document.getElementById('dash-loading').innerHTML = '<div class="error-msg"><i class="fas fa-exclamation-triangle"></i> Erreur de chargement: ' + err.message + '</div>';
+            });
+    }
+
+    function loadDashboardGraph(title) {
+        var container = document.getElementById('dashboardGraph');
+        container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i><br>Chargement...</div>';
+
+        fetch('/api/neo4j/medicine-graph?title=' + encodeURIComponent(title))
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                container.innerHTML = '';
+                if (data.error || !data.nodes || !data.nodes.length) {
+                    container.innerHTML = '<div class="loading"><i class="fas fa-info-circle"></i><br>' + (data.error || 'Aucun résultat') + '</div>';
+                    return;
+                }
+                var nodes = new vis.DataSet(data.nodes.map(function(n) {
+                    var gc = { 'medicine': { background: '#42a5f5', border: '#1e88e5' }, 'medicine_interact': { background: '#ef9a9a', border: '#e53935' }, 'substance': { background: '#a5d6a7', border: '#43a047' }, 'laboratory': { background: '#ffe0b2', border: '#fb8c00' }, 'family': { background: '#ce93d8', border: '#8e24aa' }, 'medicinetype': { background: '#90caf9', border: '#1e88e5' } };
+                    var c = gc[n.group] || { background: '#b0bec5', border: '#78909c' };
+                    return { id: n.id, label: n.label, title: n.title || n.label, color: c, shape: n.group === 'medicine' ? 'dot' : 'square', size: n.group === 'medicine' ? 28 : 16, font: { size: 11, face: 'arial' } };
+                }));
+                var edges = new vis.DataSet(data.edges.map(function(e) {
+                    return { from: e.from, to: e.to, label: e.label || '', title: e.title || e.label || '', color: (e.color || {}).color || '#95a5a6', width: e.label === 'high' ? 2 : (e.label === 'moderate' ? 1.5 : 1), font: { size: 9, align: 'middle' }, smooth: { type: 'curvedCW', roundness: 0.15 } };
+                }));
+                new vis.Network(container, { nodes: nodes, edges: edges }, {
+                    physics: { solver: 'barnesHut', barnesHut: { gravitationalConstant: -3000, springLength: 130, springConstant: 0.04 }, stabilization: { iterations: 100 } },
+                    interaction: { hover: true, tooltipDelay: 200, navigationButtons: true, keyboard: true },
+                    edges: { arrows: { to: { enabled: false } } },
+                    nodes: { borderWidth: 2 },
+                    layout: { improvedLayout: false }
+                });
+            })
+            .catch(function(err) {
+                container.innerHTML = '<div class="error-msg"><i class="fas fa-triangle-exclamation"></i><span>Erreur : ' + err.message + '</span></div>';
+            });
+    }
+
+    function loadFullGraph() {
+        var container = document.getElementById('dashboardGraph');
+        container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i><br>Chargement du graphe global...</div>';
+
+        fetch('/api/neo4j/full-graph?limit=60')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                container.innerHTML = '';
+                if (data.error || !data.nodes || !data.nodes.length) {
+                    container.innerHTML = '<div class="loading"><i class="fas fa-info-circle"></i><br>' + (data.error || 'Aucune donnée') + '</div>';
+                    return;
+                }
+                var nodes = new vis.DataSet(data.nodes.map(function(n) {
+                    var c = n.group === 'medicine' ? { background: '#42a5f5', border: '#1e88e5' } : { background: '#ef9a9a', border: '#e53935' };
+                    return { id: n.id, label: n.label, title: n.title || n.label, color: c, shape: 'dot', size: n.group === 'medicine' ? 22 : 16, font: { size: 10, face: 'arial' } };
+                }));
+                var edges = new vis.DataSet(data.edges.map(function(e) {
+                    var color = (e.color || {}).color || '#95a5a6';
+                    return { from: e.from, to: e.to, label: e.label || '', title: e.title || '', color: color, width: e.label === 'high' ? 2 : 1, font: { size: 8, align: 'middle' }, smooth: { type: 'curvedCW', roundness: 0.1 } };
+                }));
+                new vis.Network(container, { nodes: nodes, edges: edges }, {
+                    physics: { solver: 'forceAtlas2Based', forceAtlas2Based: { gravitationalConstant: -100, springLength: 180, springConstant: 0.01 }, stabilization: { iterations: 150 } },
+                    interaction: { hover: true, tooltipDelay: 200, navigationButtons: true, keyboard: true },
+                    nodes: { borderWidth: 2 },
+                    layout: { improvedLayout: false }
+                });
+            })
+            .catch(function(err) {
+                container.innerHTML = '<div class="error-msg"><i class="fas fa-triangle-exclamation"></i><span>Erreur : ' + err.message + '</span></div>';
+            });
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,2388 @@
+/* ========== MENU PAGE ==========
+   La bande de tete et l'entree des panneaux viennent de `hero.css`,
+   partagees avec le tableau de bord et cousines du hero de l'accueil.
+   Le degrade fige a 135 degres et la seule tache radiale qui tenaient
+   lieu de fond leur cedent la place : meme voiles qui derivent, meme
+   constellation. */
+.prescription-menu {
+  /* dvh et non vh : sur mobile, la barre d'adresse fausse le calcul et la
+     section saute au premier defilement. */
+  min-height: calc(100dvh - var(--header-height));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 78px var(--spacing-md) 92px;
+}
+
+.menu-header {
+  position: relative;
+  z-index: 1;
+  max-width: 960px;
+  margin: 0 auto var(--spacing-xl);
+  text-align: center;
+}
+
+/* Pas d'ombre portee : le blanc tient deja 8,26:1 sur le point le plus
+   clair du fond, l'ombre ne faisait que salir les contours. */
+.menu-header h1 {
+  margin: 0 0 var(--spacing-sm);
+  font-size: clamp(2.1rem, 4.6vw, 3.2rem);
+  font-weight: 800;
+  letter-spacing: -0.032em;
+  line-height: 1.08;
+  color: #fff;
+}
+
+.menu-header p {
+  max-width: 520px;
+  margin: 0 auto;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+/* Les règles .medical-warning sont retirées avec le bandeau qu'elles
+   habillaient. Elles portaient le commentaire « non supprimable » : il datait
+   d'une application ouverte au public, elle est aujourd'hui réservée aux
+   professionnels de santé. */
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+  max-width: 960px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* Colonne, pour que le bouton puisse etre pousse en bas : sans cela, il
+   suivait le dernier point de la liste et les deux cartes n'avaient pas
+   leur appel a la meme hauteur des qu'une ligne passait sur deux. */
+.menu-card {
+  display: flex;
+  flex-direction: column;
+  text-align: start;
+  background: rgba(255, 255, 255, 0.97);
+  /* Le rayon de l'application, 22 px, et non `--radius-xl` : un seul
+     rayon de coin sur tout le produit. */
+  border-radius: 22px;
+  padding: var(--spacing-xl);
+  text-decoration: none;
+  border-top: 4px solid var(--primary);
+  /* Ombre franche : c'est elle qui decolle les cartes de la bande, comme
+     le bandeau de chiffres de l'accueil se decolle de son hero. */
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.22), 0 2px 8px rgba(15, 23, 42, 0.08);
+  transition: opacity 0.62s ease,
+              transform 0.62s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.3s ease;
+}
+
+.menu-card.vu:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 34px 78px rgba(15, 23, 42, 0.3), 0 2px 8px rgba(15, 23, 42, 0.1);
+}
+
+/* Une fois entree, la carte n'a plus besoin de la duree de l'entree :
+   le survol doit repondre tout de suite. */
+.menu-card.vu {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+/* La seconde carte entre juste apres la premiere. */
+.menu-grid .menu-card:nth-child(2) { transition-delay: 0.09s; }
+.menu-grid .menu-card.vu:nth-child(2) { transition-delay: 0s; }
+
+/* Le contour par defaut du navigateur se voit mal sur le fond indigo. */
+.menu-card:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 4px;
+}
+
+/* L'etat du patient, au-dessus du titre : c'est lui qui decide du choix,
+   et il etait jusqu'ici noye dans le paragraphe. */
+.menu-card-etat {
+  margin: 0 0 12px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.menu-card-tete {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: var(--spacing-sm);
+}
+
+/* 44 px a cote du titre, et non plus une pastille de 72 px centree : la
+   hauteur gagnee profite au texte. */
+.menu-card-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 1.1rem;
+  color: white;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.24);
+}
+
+.menu-card h3 {
+  margin: 0;
+  font-size: 1.35rem;
+  color: var(--text-primary);
+}
+
+.menu-card > p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: var(--spacing-md);
+}
+
+.menu-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--spacing-lg);
+}
+
+.menu-features li {
+  padding: 0.6rem 0;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* Coches a l'accent de la page : en vert, elles tombaient a 2,28:1 pour un
+   seuil de 3:1 sur les elements graphiques. */
+.menu-features li i {
+  color: var(--primary);
+  font-size: 0.875rem;
+  width: 18px;
+  margin-top: 2px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* margin-top: auto colle le bouton au bas de la carte, quelle que soit la
+   longueur de ce qui precede. */
+.menu-card-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: auto;
+  padding: 0.875rem;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  text-align: center;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  transition: var(--transition-fast);
+}
+
+/* Aucun mouvement propre : la carte entiere se souleve deja, deux
+   deplacements pour un seul survol se genaient. */
+.menu-card:hover .menu-card-btn {
+  filter: brightness(1.07);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-card,
+  .menu-card-btn { transition: none; }
+  .menu-card:hover { transform: none; }
+}
+
+/* ========== ASSISTANT PAGE ========== */
+.assistant-section {
+  padding: var(--spacing-xl) 0;
+  flex: 1;
+  background: var(--bg);
+}
+
+.assistant-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+  align-items: start;
+}
+
+/* ========== PATIENT FORM ========== */
+.patient-form-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+}
+
+.patient-form-card h2 {
+  font-size: 1.35rem;
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--border);
+}
+
+.patient-form-card h2 i {
+  color: var(--primary);
+  font-size: 1.25rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.form-row-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.form-group {
+  margin-bottom: var(--spacing-md);
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+}
+
+.form-group label i {
+  color: var(--primary);
+  margin-inline-end: 6px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--text-primary);
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: var(--transition-fast);
+  line-height: 1.5;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-subtle);
+}
+
+textarea.form-control {
+  resize: vertical;
+  min-height: 80px;
+}
+
+select.form-control {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-inline-end: 36px;
+}
+
+.form-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.form-actions .btn-primary,
+.form-actions .btn-secondary {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0.875rem 1.5rem;
+  font-size: 0.9375rem;
+}
+
+/* ========== LOADING ========== */
+.loading-indicator {
+  text-align: center;
+  padding: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+}
+
+.loading-indicator .spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin: 0 auto var(--spacing-sm);
+}
+
+.loading-indicator p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ========== RESULTS COLUMN ========== */
+.results-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.result-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  animation: fadeInUp 0.4s ease forwards;
+}
+
+.result-section h3 {
+  font-size: 1.1rem;
+  margin-bottom: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--border);
+}
+
+.result-section h3 i {
+  font-size: 1.1rem;
+}
+
+/* Alerts */
+.alerts-section h3 { color: var(--danger); }
+.alerts-section h3 i { color: var(--danger); }
+
+.alert-item {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-sm);
+  border-inline-start: 4px solid;
+  position: relative;
+  overflow: hidden;
+}
+
+.alert-item.severity-high {
+  background: rgba(239, 68, 68, 0.06);
+  border-inline-start-color: var(--danger);
+}
+
+.alert-item.severity-moderate {
+  background: rgba(245, 158, 11, 0.06);
+  border-inline-start-color: var(--warning);
+}
+
+.alert-item.severity-low {
+  background: rgba(34, 197, 94, 0.06);
+  border-inline-start-color: var(--success);
+}
+
+.alert-item i.alert-icon {
+  font-size: 1.25rem;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.severity-high i.alert-icon { color: var(--danger); }
+.severity-moderate i.alert-icon { color: var(--warning); }
+.severity-low i.alert-icon { color: var(--success); }
+
+.alert-item h4 {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: var(--text-primary);
+}
+
+.alert-item p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-sm);
+  line-height: 1.5;
+}
+
+.alert-meta {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.severity-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.severity-high .severity-badge {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--danger);
+}
+
+.severity-moderate .severity-badge {
+  background: rgba(245, 158, 11, 0.15);
+  color: #b45309;
+}
+
+.severity-low .severity-badge {
+  background: rgba(34, 197, 94, 0.15);
+  color: #15803d;
+}
+
+.alert-symptoms {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+/* Diagnostic */
+.diagnostic-card-item {
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.diagnostic-card-item.ds-primary {
+  border-inline-start: 4px solid #1e40af;
+}
+
+.diagnostic-card-item.ds-differential {
+  border-inline-start: 4px solid #d97706;
+}
+
+.diagnostic-card-item.ds-conclusion {
+  border-inline-start: 4px solid #059669;
+}
+
+.ds-header {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6b7280;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ds-header i {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.typing-content {
+  font-size: 0.9375rem;
+  color: #111827;
+  line-height: 1.7;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.typing-content strong {
+  color: #111827;
+  font-weight: 700;
+}
+
+.typing-content em {
+  font-style: italic;
+  color: #374151;
+}
+
+.typing-content p {
+  margin-bottom: 0.5em;
+  color: #111827;
+}
+
+.typing-content p:last-child {
+  margin-bottom: 0;
+}
+
+.typing-content hr.section-divider {
+  border: none;
+  height: 1px;
+  background: #e5e7eb;
+  margin: 0.5em 0;
+}
+
+.diagnostic-section h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+}
+
+.diagnostic-section h3 i {
+  color: #1e40af;
+  margin-inline-end: 6px;
+}
+
+/* Suggestions */
+.suggestions-section h3 { color: var(--success); }
+.suggestions-section h3 i { color: var(--success); }
+
+/* Cards médicaments format moderne */
+.rx-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-inline-start: 4px solid #6366f1;
+  border-radius: 10px;
+  margin-bottom: 18px;
+  padding: 18px 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.rx-card:hover {
+  border-color: #c7d2fe;
+  border-inline-start-color: #4f46e5;
+  box-shadow: 0 4px 16px rgba(99,102,241,0.10);
+  transform: translateY(-1px);
+}
+
+.rx-drug-name {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 2px;
+  line-height: 1.4;
+}
+
+.rx-substance {
+  display: block;
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.rx-detail {
+  font-size: 0.875rem;
+  color: #374151;
+  line-height: 1.6;
+  margin-bottom: 4px;
+  padding-inline-start: 2px;
+}
+
+.rx-detail-label {
+  font-weight: 600;
+  color: #111827;
+}
+
+.rx-explanation {
+  margin-top: 14px;
+  padding: 14px 16px;
+  background: #f8f9ff;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: #4b5563;
+  line-height: 1.6;
+  border: 1px solid #eef0ff;
+}
+
+.rx-explanation .rx-detail-label {
+  display: block;
+  margin-bottom: 4px;
+  color: #6366f1;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.rx-explanation p {
+  margin: 0;
+}
+
+/* Recommendations */
+.recommendations-section h3 { color: var(--info); }
+.recommendations-section h3 i { color: var(--info); }
+
+.recommendation-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: 0.5rem 0;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.recommendation-item i {
+  color: var(--info);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+/* Generate button */
+.generate-btn-container {
+  margin-top: var(--spacing-md);
+}
+
+.btn-generate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--success), #16a34a);
+  color: white;
+  transition: var(--transition-base);
+  box-shadow: var(--shadow-md);
+  font-family: inherit;
+}
+
+.btn-generate:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-generate:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Toast notification */
+.toast-notification {
+  position: fixed;
+  top: 20px;
+  inset-inline-end: 20px;
+  background: var(--success);
+  color: white;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  animation: fadeInUp 0.3s ease forwards;
+}
+
+.prescription-menu .menu-wrapper {
+  max-width: 960px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.lang-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-fast);
+}
+
+.lang-btn:hover {
+  color: var(--primary);
+  background: var(--primary-subtle);
+}
+
+/* ========== ROUTING / BACK LINKS ========== */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-lg);
+}
+
+.page-header a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: var(--transition-fast);
+}
+
+.page-header a:hover {
+  color: var(--primary);
+}
+
+/* ========== DIAGNOSTIC PRESCRIPTION PAGE ========== */
+.diag-layout {
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+/* ── Prescription par diagnostic : après l'analyse ───────────────────
+   Le formulaire a fini son office et cède la place, exactement comme sur
+   l'assistant : son résumé passe dans le bandeau patient, qui porte le
+   bouton pour le rouvrir.
+
+   L'encadré d'aide part avec lui : « Comment utiliser cette
+   fonctionnalité ? » n'a plus rien à apprendre à quelqu'un qui vient de
+   s'en servir.
+
+   La colonne s'élargit ensuite, parce qu'elle porte maintenant quatre
+   panneaux au lieu d'un formulaire. Les 57 règles `.analyse-faite` —
+   matériau de verre, tuiles, fond ambiant — s'appliquent d'elles-mêmes :
+   une seule d'entre elles était liée à `.assistant-grid`, toutes les
+   autres ne demandent que la classe. */
+.diag-layout.analyse-faite {
+  max-width: 1180px;
+}
+
+.diag-layout.analyse-faite .diag-form-card.repliee,
+.diag-layout.analyse-faite .info-box.repliee {
+  display: none;
+}
+
+/* Le bandeau patient de l'assistant est masqué tant qu'aucune analyse n'a
+   eu lieu, et rendu visible ensuite par `.analyse-faite`. Ici, la même
+   règle, sur la disposition de cette page. */
+.diag-layout.analyse-faite .resume-patient {
+  display: block;
+  padding: 18px 24px;
+}
+
+/* Info box */
+.info-box {
+  background: rgba(59, 130, 246, 0.06);
+  border-inline-start: 4px solid var(--info);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+}
+
+.info-box i {
+  color: var(--info);
+  font-size: 1.25rem;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.info-box h3 {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.info-box p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 0;
+}
+
+.info-box p strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+/* Diagnosis form card */
+.diag-form-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.diag-form-card h2 {
+  font-size: 1.35rem;
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--border);
+}
+
+.diag-form-card h2 i {
+  color: var(--primary);
+}
+
+.diag-form-card .section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.diag-form-card .section-title i {
+  color: var(--primary);
+}
+
+.form-hint {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  margin-top: 4px;
+}
+
+/* Loading with badges */
+.loading-badges {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.loading-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.375rem 0.875rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.loading-badge.blue {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--info);
+}
+
+.loading-badge.green {
+  background: rgba(34, 197, 94, 0.1);
+  color: var(--success);
+}
+
+.loading-badge.purple {
+  background: rgba(139, 92, 246, 0.1);
+  color: #7c3aed;
+}
+
+/* Interactions alert */
+.interactions-alert {
+  background: rgba(239, 68, 68, 0.06);
+  border-inline-start: 4px solid var(--danger);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+}
+
+.interactions-alert i {
+  color: var(--danger);
+  font-size: 1.25rem;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.interactions-alert h3 {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--danger);
+  margin-bottom: var(--spacing-sm);
+}
+
+.interaction-item {
+  background: var(--surface);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  font-size: 0.85rem;
+}
+
+.interaction-item strong {
+  color: var(--text-primary);
+}
+
+.interaction-severity {
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--danger);
+}
+
+.interaction-item p {
+  width: 100%;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
+/* Summary section */
+.summary-section {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(59, 130, 246, 0.05));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.summary-section h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.summary-section h3 i {
+  color: var(--primary);
+}
+
+.summary-section p,
+.summary-text {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 0;
+}
+
+/* Utilities */
+.hidden {
+  display: none !important;
+}
+
+.mt-lg { margin-top: var(--spacing-lg); }
+.text-danger { color: var(--danger); }
+.text-success { color: var(--success); }
+.text-tertiary { color: var(--text-tertiary); }
+.flex-1 { flex: 1; }
+.text-sm { font-size: 0.8rem; }
+
+.spinner-lg {
+  width: 44px;
+  height: 44px;
+  border-width: 4px;
+}
+
+.text-center { text-align: center; }
+.py-xl { padding-top: var(--spacing-xl); padding-bottom: var(--spacing-xl); }
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 992px) {
+  .assistant-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .menu-grid {
+    grid-template-columns: 1fr;
+    max-width: 500px;
+  }
+}
+
+@media (max-width: 768px) {
+  .form-row,
+  .form-row-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .prescription-menu {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .assistant-section {
+    padding: var(--spacing-md) 0;
+  }
+
+  .patient-form-card {
+    padding: var(--spacing-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .menu-card {
+    padding: var(--spacing-lg);
+  }
+
+  .menu-card-tete { gap: 12px; }
+  .menu-card h3 { font-size: 1.2rem; }
+}
+
+
+/* ══ Résultats de l'assistant : les états et la fiche-lien ═══════════
+   Ajouts liés à la correction du panneau d'alertes et des fiches
+   médicament. Ils ne changent aucune règle existante. */
+
+/* Aucune couleur ne code une gravité : la source n'en publie pas. Le filet
+   reprend l'accent de l'application, comme partout ailleurs. */
+.alert-item.severity-unknown {
+  background: rgba(79, 70, 229, 0.05);
+  border-inline-start-color: var(--primary);
+}
+
+.alert-item.severity-unknown i.alert-icon { color: var(--primary); }
+
+/* Ce que le panneau dit quand il n'a rien trouvé, ou rien pu vérifier. Le
+   panneau ne se masque plus : ces trois lignes sont ce qui remplit le vide
+   à la place du silence. */
+.alert-etat,
+.alert-reserve,
+.alert-lus {
+  margin: 0 0 10px;
+  font-size: 0.86rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.alert-etat {
+  padding: 12px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.alert-reserve {
+  padding: 12px 14px;
+  color: var(--text-primary);
+  background: rgba(79, 70, 229, 0.06);
+  border: 1px solid rgba(79, 70, 229, 0.22);
+  border-radius: var(--radius-md);
+}
+
+.alert-reserve i { margin-inline-end: 6px; color: var(--primary); }
+.alert-lus { font-size: 0.8rem; }
+
+/* La fiche est devenue un lien : sans ces trois lignes, elle hériterait du
+   soulignement et de la couleur des liens du site. */
+a.rx-card {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+a.rx-card:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+
+/* Le score de pertinence était calculé, renvoyé, puis jeté par l'affichage. */
+.rx-score {
+  float: inline-end;
+  padding: 2px 9px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--primary);
+  background: rgba(79, 70, 229, 0.1);
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* ══ Résultats de l'assistant : contexte, rangs et lisibilité ════════
+   Ces règles s'ajoutent, elles ne remplacent rien. Elles ne s'appliquent
+   pour la plupart qu'une fois l'analyse faite, quand la grille porte la
+   classe `analyse-faite`. */
+
+/* ── Le bandeau patient ──────────────────────────────────────────────
+   Les résultats apparaissaient sans rappeler de qui il s'agit. */
+.resume-patient {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px 24px;
+  padding: 14px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-inline-start: 3px solid var(--primary);
+  border-radius: var(--radius-md);
+}
+
+.rp-identite { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; }
+.rp-nom { font-size: 1.02rem; font-weight: 700; color: var(--text-primary); }
+.rp-traits { font-size: 0.86rem; color: var(--text-secondary); }
+.rp-mesures { display: flex; flex-wrap: wrap; gap: 18px; font-size: 0.82rem; color: var(--text-secondary); }
+.rp-mesures strong { color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
+/* ── Le formulaire replié ────────────────────────────────────────────
+   Il occupait la moitié de l'écran alors qu'il a fini son office, et les
+   résultats tenaient dans l'autre moitié. */
+.patient-form-card.repliee > h2,
+.patient-form-card.repliee > form { display: none; }
+
+.patient-form-card.repliee {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.form-resume { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; width: 100%; }
+.form-resume p { margin: 0; font-size: 0.9rem; color: var(--text-secondary); }
+
+.btn-secondaire-mince {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: transparent;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-secondaire-mince:hover { background: rgba(79, 70, 229, 0.07); }
+.btn-secondaire-mince:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* ── Deux rangs plutôt que quatre panneaux identiques ────────────────
+   Ce qui doit être lu tient la pleine largeur ; ce qui est proposé suit,
+   côte à côte. */
+.assistant-grid.analyse-faite { grid-template-columns: 1fr; }
+
+.analyse-faite .results-column {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-md);
+  align-items: start;
+}
+
+/* L ordre suit la decision : qui, ce qu on conclut, ce qu on propose,
+   puis la verification et l acte. Les trois premiers tiennent la pleine
+   largeur ; le controle des interactions et les recommandations, qui se
+   lisent apres coup, se partagent la derniere rangee. */
+.analyse-faite .resume-patient,
+.analyse-faite .diagnostic-section,
+.analyse-faite .suggestions-section,
+.analyse-faite .generate-btn-container { grid-column: 1 / -1; }
+
+/* ── L'hypothèse clinique ────────────────────────────────────────────
+   Un seul accent : les filets bleu, ambre et vert des trois sections se
+   lisaient comme une échelle de gravité, ce que le projet s'interdit
+   partout ailleurs. Le titre de la section suffit à les distinguer. */
+.diagnostic-card-item.ds-primary,
+.diagnostic-card-item.ds-differential,
+.diagnostic-card-item.ds-conclusion {
+  border-inline-start-color: var(--primary);
+}
+
+.diagnostic-card-item.ds-primary { border-inline-start-width: 4px; }
+.diagnostic-card-item.ds-differential,
+.diagnostic-card-item.ds-conclusion { border-inline-start-width: 2px; }
+
+/* Le degré de confiance sort de la prose : c'était l'élément le plus
+   rapide à lire, et le plus enfoui. */
+.ds-confiance {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0 0 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ds-confiance-chiffre {
+  font-size: 1.6rem;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-confiance-mot { font-size: 0.82rem; line-height: 1.5; color: var(--text-secondary); }
+
+/* Les différentiels arrivaient crochets compris, en une seule coulée. */
+.ds-differentiels { margin: 0; padding: 0; list-style: none; }
+
+.ds-differentiels li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 14px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+}
+
+.ds-differentiels li:first-child { border-top: none; padding-top: 0; }
+.ds-diff-nom { font-size: 0.95rem; font-weight: 650; color: var(--text-primary); }
+
+.ds-diff-part {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+.ds-diff-detail { grid-column: 1 / -1; margin: 0; font-size: 0.86rem; line-height: 1.6; color: var(--text-secondary); }
+
+/* ── L'action irréversible ───────────────────────────────────────────
+   Générer l'ordonnance avait le poids d'un panneau de plus. */
+.generate-btn-container.action-detachee {
+  margin-top: var(--spacing-sm);
+  padding-top: var(--spacing-md);
+  border-top: 2px solid var(--border);
+}
+
+@media (max-width: 992px) {
+  .analyse-faite .results-column { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .result-section { animation: none; }
+}
+
+
+/* ══ Les fiches portent leurs propres interactions ═══════════════════
+   Une interaction affichée dans un panneau séparé oblige à chercher
+   laquelle des six fiches elle vise, au moment précis où le choix se
+   fait. Elle est désormais rattachée à la fiche. */
+
+/* Les fiches passent sur deux colonnes : la section occupe toute la
+   largeur, six fiches empilées feraient défiler pour rien. */
+.analyse-faite #suggestionsContainer {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.analyse-faite #suggestionsContainer .rx-card { margin-bottom: 0; }
+
+/* Signalée, pas colorée en rouge : aucune couleur de cette application ne
+   code un degré de gravité, DrugBank n'en publiant aucun. Le filet
+   s'épaissit, c'est tout, et le texte dit le reste. */
+.rx-card-signale { border-inline-start-width: 6px; }
+
+.rx-interactions {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+}
+
+.rx-interactions-titre {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 0 8px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.rx-interaction {
+  margin: 0 0 6px;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.rx-interaction:last-child { margin-bottom: 0; }
+.rx-interaction strong { color: var(--text-primary); }
+
+/* ── L'hypothèse clinique tient le centre de l'écran ─────────────────
+   C'est la conclusion, elle passe en premier et se donne le format qui
+   va avec. */
+.analyse-faite .diagnostic-section {
+  border-top: 3px solid var(--primary);
+}
+
+.analyse-faite .diagnostic-section > h3 {
+  font-size: 1.2rem;
+}
+
+@media (max-width: 992px) {
+  .analyse-faite #suggestionsContainer { grid-template-columns: minmax(0, 1fr); }
+}
+
+
+/* ══ La bande d'hypothèse ════════════════════════════════════════════
+   L'hypothèse clinique était une carte blanche parmi cinq, alors que
+   c'est la conclusion de l'analyse. Elle prend le dégradé nuit déjà en
+   service ailleurs sur le site, et devient le seul moment sombre d'un
+   écran clair : une bascule de thème, employée une fois, en bloc de
+   couleur délibéré.
+
+   Aucun rouge, aucun vert : la couleur ne code rien ici, elle hiérarchise.
+   Rayon de coin unique, celui de la page. */
+
+.analyse-faite .diagnostic-section {
+  padding: 0;
+  overflow: hidden;
+  background: linear-gradient(142deg, #1e1b4b 0%, #312e81 56%, #3730a3 100%);
+  border: none;
+  border-radius: var(--radius-xl);
+  box-shadow: 0 24px 60px rgba(30, 27, 75, 0.28);
+}
+
+/* Couleur déclarée et non héritée : theme.css applique
+   `color: var(--text-primary)` à h1..h6, et une règle directe l'emporte
+   toujours sur l'héritage. */
+.analyse-faite .diagnostic-section > h3 {
+  margin: 0;
+  padding: 20px 28px;
+  font-size: 0.94rem;
+  font-weight: 650;
+  color: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.analyse-faite #diagnosticContent { padding: 28px; }
+
+/* Une seule colonne. La seconde, large de 210 px, portait le cadran de
+   confiance ; il a été retiré en `c737fe3` et la colonne est restée, vide.
+   La confiance est revenue depuis, mais à côté du nom du diagnostic, dans
+   `.ds-confiance` : rien n'occupe plus ce vis-à-vis. */
+.ds-tete {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 36px;
+  align-items: start;
+  padding-bottom: 26px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.ds-sur {
+  margin: 0 0 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.ds-nom {
+  margin: 0 0 14px;
+  font-size: clamp(1.5rem, 3vw, 2.15rem);
+  font-weight: 760;
+  line-height: 1.12;
+  letter-spacing: -0.032em;
+  color: #fff;
+}
+
+/* La confiance de l'hypothèse principale, revenue à l'écran. Elle vit dans
+   la bande nuit : sa couleur ne peut pas être celle des probabilités des
+   différentiels, qui se lisent sur fond clair. Même rôle, même graisse, même
+   chiffres tabulaires — le fond seul change. */
+.ds-confiance {
+  display: inline-block;
+  margin-inline-start: 14px;
+  padding: 3px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.10);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.4;
+  vertical-align: middle;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* Le compte rendu se contredit : un différentiel est annoncé au niveau de
+   l'hypothèse principale ou au-dessus. Dit en toutes lettres, sans couleur
+   d'alerte — le projet s'interdit qu'une couleur code une gravité, et il
+   s'agit ici d'un défaut de rédaction du modèle, pas d'un risque clinique. */
+.ds-incoherence {
+  margin: 18px 0 0;
+  padding: 12px 14px;
+  border: 1px dashed rgba(255, 255, 255, 0.30);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.ds-prose { color: rgba(255, 255, 255, 0.84); font-size: 0.94rem; line-height: 1.72; }
+.ds-prose p { color: inherit; margin: 0 0 10px; }
+.ds-prose p:last-child { margin-bottom: 0; }
+.ds-prose strong { color: #fff; }
+
+/* Le chiffre porte la lecture : il est le premier element que l oeil
+   accroche, et le compteur signale que l analyse vient d aboutir. */
+
+
+/* Les differentiels et la conduite a tenir, sur le meme fond. */
+.analyse-faite .diagnostic-card-item {
+  padding: 0 0 20px;
+  margin: 0 0 20px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0;
+}
+
+.analyse-faite .diagnostic-card-item:last-child { padding-bottom: 0; margin-bottom: 0; border-bottom: none; }
+
+@media (max-width: 768px) {
+  .ds-tete { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .analyse-faite #diagnosticContent { padding: 20px; }
+  .analyse-faite .diagnostic-section > h3 { padding: 16px 20px; }
+}
+
+
+/* ══ Matériau, air et anneau ═════════════════════════════════════════
+   Dials remontés : VARIANCE 7, MOTION 6, DENSITY 3. Plus d'air, moins de
+   bordures, un matériau plutôt que des cartes posées.
+
+   Le verre employé ici est une approximation web : `backdrop-filter`,
+   bordure interne d'un pixel et rehaut en ombre intérieure. Ce n'est pas
+   le Liquid Glass d'Apple, qui appartient à ses plateformes et n'existe
+   pas en paquet CSS. Repli opaque déclaré pour qui réduit la
+   transparence.
+
+   Un seul rayon de coin sur tout l'écran, 22 px, et la pilule pleine pour
+   ce qui est interactif. Une seule couleur d'accent. */
+
+.assistant-section {
+  --verre: rgba(255, 255, 255, 0.72);
+  --verre-bord: rgba(255, 255, 255, 0.9);
+  --rayon-app: 22px;
+  position: relative;
+  isolation: isolate;
+}
+
+/* Sans ce fond, le verre n'a rien à filtrer et se lit comme un aplat gris.
+   Fixé, non cliquable, sous tout le reste. */
+.assistant-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 52% 42% at 12% 4%, rgba(79, 70, 229, 0.13), transparent 62%),
+    radial-gradient(ellipse 44% 38% at 88% 22%, rgba(129, 140, 248, 0.12), transparent 64%),
+    radial-gradient(ellipse 60% 40% at 50% 96%, rgba(55, 48, 163, 0.08), transparent 66%);
+}
+
+.analyse-faite .result-section,
+.analyse-faite .resume-patient {
+  background: var(--verre);
+  border: 1px solid var(--verre-bord);
+  border-radius: var(--rayon-app);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    0 18px 46px rgba(30, 27, 75, 0.09);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+}
+
+.analyse-faite .result-section { padding: 30px 32px; }
+.analyse-faite .resume-patient { padding: 20px 26px; border-inline-start-width: 1px; }
+
+/* Les entetes cessent d etre soulignes : l air separe mieux qu un filet. */
+.analyse-faite .result-section > h3 {
+  margin-bottom: 22px;
+  padding-bottom: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  border-bottom: none;
+}
+
+.analyse-faite .result-section > h3 i { font-size: 0.85rem; color: var(--primary); }
+.analyse-faite .rp-nom { font-size: 1.24rem; letter-spacing: -0.02em; }
+
+/* La bande nuit devient une piece de materiau : rayon plus large, rehaut
+   sur l arete superieure, ombre teintee de son propre bleu. */
+.analyse-faite .diagnostic-section {
+  border-radius: var(--rayon-app);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 30px 70px rgba(30, 27, 75, 0.34);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.analyse-faite #diagnosticContent { padding: 8px 32px 32px; }
+.ds-nom { font-weight: 700; letter-spacing: -0.038em; }
+
+
+/* ── Les fiches deviennent des tuiles ────────────────────────────────
+   Le cadre complet et l ombre portee cedent la place a une surface qui se
+   souleve au survol. */
+.analyse-faite .rx-card {
+  padding: 20px 22px;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.86);
+  border-inline-start: 1px solid rgba(255, 255, 255, 0.86);
+  border-radius: var(--rayon-app);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease;
+}
+
+.analyse-faite .rx-card:hover {
+  transform: translateY(-3px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 16px 34px rgba(30, 27, 75, 0.13);
+}
+
+.analyse-faite .rx-card:active { transform: scale(0.994); }
+.analyse-faite .rx-card-signale { border-inline-start: 3px solid var(--primary); }
+.analyse-faite .rx-drug-name { font-size: 1.12rem; letter-spacing: -0.022em; }
+.analyse-faite .rx-score { background: rgba(79, 70, 229, 0.12); }
+
+/* ── L'entrée ────────────────────────────────────────────────────────
+   Les panneaux montent d'un cran en arrivant, décalés. Motivé : la
+   séquence dit l'ordre de lecture. */
+@media (prefers-reduced-motion: no-preference) {
+  .analyse-faite .results-column > * {
+    animation: pa-monte 0.62s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  }
+  .analyse-faite .results-column > :nth-child(1) { animation-delay: 0.02s; }
+  .analyse-faite .results-column > :nth-child(2) { animation-delay: 0.09s; }
+  .analyse-faite .results-column > :nth-child(3) { animation-delay: 0.16s; }
+  .analyse-faite .results-column > :nth-child(4) { animation-delay: 0.23s; }
+  .analyse-faite .results-column > :nth-child(5) { animation-delay: 0.3s; }
+  .analyse-faite .results-column > :nth-child(6) { animation-delay: 0.37s; }
+}
+
+@keyframes pa-monte {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Le verre suppose de la transparence. Sans elle, une surface opaque. */
+@media (prefers-reduced-transparency: reduce) {
+  .analyse-faite .result-section,
+  .analyse-faite .resume-patient,
+  .analyse-faite .rx-card {
+    background: #fff;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .analyse-faite .rx-card { transition: none; }
+  .analyse-faite .rx-card:hover { transform: none; }
+}
+
+@media (max-width: 768px) {
+  .analyse-faite .result-section { padding: 22px 20px; }
+}
+
+
+/* ══ Correctifs signalés à l'usage ═══════════════════════════════════ */
+
+/* Les tuiles ne se distinguaient plus les unes des autres : leur bordure
+   était blanche sur un fond clair, donc invisible, et l'ombre avait été
+   retirée en même temps. Un filet teinté du bleu de la page redonne
+   l'arête, sans remettre le cadre lourd d'avant. */
+.analyse-faite .rx-card {
+  border-color: rgba(30, 27, 75, 0.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 2px 6px rgba(30, 27, 75, 0.05);
+}
+
+.analyse-faite .rx-card:hover { border-color: rgba(79, 70, 229, 0.28); }
+.analyse-faite .rx-card-signale { border-inline-start-color: var(--primary); }
+
+/* Même remarque pour les panneaux de verre : leur bordure blanche les
+   faisait flotter sans limite nette sur le fond ambiant. */
+.analyse-faite .result-section,
+.analyse-faite .resume-patient {
+  border-color: rgba(30, 27, 75, 0.09);
+}
+
+
+/* ══ Le fond nuit ne dépend plus de rien ═════════════════════════════
+   Signalé à l'usage : « du blanc sur du blanc, on ne voit pas le
+   diagnostic ».
+
+   La cause. Les couleurs de texte de cette section (blanc, bleu pâle)
+   étaient déclarées sans condition, alors que le fond sombre qui les
+   rend lisibles était conditionné à `.analyse-faite`, une classe posée
+   par le script sur la grille. Dès que cette classe manquait, pour
+   quelque raison que ce soit, le texte blanc se retrouvait sur la carte
+   blanche par défaut. Une paire de couleurs dont les deux moitiés ne
+   s'appliquent pas dans les mêmes conditions finit toujours par se
+   séparer.
+
+   Le fond est donc reposé ici sans condition. Le sélecteur porte les
+   deux classes pour l'emporter sur la règle de verre qui vise
+   `.analyse-faite .result-section`, et il vient après elle dans la
+   feuille. */
+
+.result-section.diagnostic-section {
+  padding: 0;
+  overflow: hidden;
+  color: #fff;
+  background: linear-gradient(142deg, #1e1b4b 0%, #312e81 56%, #3730a3 100%);
+  border: none;
+  border-radius: var(--rayon-app, 22px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 30px 70px rgba(30, 27, 75, 0.34);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.result-section.diagnostic-section > h3 {
+  margin: 0;
+  padding: 20px 28px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.result-section.diagnostic-section > h3 i { color: #c7d2fe; }
+.diagnostic-section #diagnosticContent { padding: 24px 32px 32px; }
+
+/* Les mêmes valeurs, désormais liées au fond et non à l'état de la page. */
+.diagnostic-section .diagnostic-card-item {
+  padding: 0 0 20px;
+  margin: 0 0 20px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0;
+}
+
+.diagnostic-section .diagnostic-card-item:last-child {
+  padding-bottom: 0;
+  margin-bottom: 0;
+  border-bottom: none;
+}
+
+.diagnostic-section .ds-header { color: rgba(255, 255, 255, 0.7); }
+.diagnostic-section .typing-content { color: rgba(255, 255, 255, 0.86); }
+.diagnostic-section .typing-content p { color: inherit; }
+.diagnostic-section .typing-content strong { color: #fff; }
+.diagnostic-section .ds-differentiels li { border-top-color: rgba(255, 255, 255, 0.14); }
+.diagnostic-section .ds-diff-nom { color: #fff; }
+.diagnostic-section .ds-diff-part { color: #c7d2fe; }
+.diagnostic-section .ds-diff-detail { color: rgba(255, 255, 255, 0.74); }
+.diagnostic-section .section-divider { border-color: rgba(255, 255, 255, 0.16); }
+.diagnostic-section .ds-nom { color: #fff; }
+.diagnostic-section .ds-sur { color: rgba(255, 255, 255, 0.7); }
+
+@media (max-width: 768px) {
+  .diagnostic-section #diagnosticContent { padding: 20px; }
+  .result-section.diagnostic-section > h3 { padding: 16px 20px; }
+}
+
+
+/* La spécialité ouverte par une dénomination commune. Le clic doit mener
+   quelque part, mais le lecteur doit savoir où : le catalogue contient
+   plusieurs spécialités par substance, et l'une d'elles est choisie. */
+.rx-vers {
+  margin: 12px 0 0;
+  padding-top: 10px;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  border-top: 1px dashed var(--border);
+}
+
+.rx-vers i { margin-inline-end: 6px; font-size: 0.7rem; color: var(--primary); }
+
+
+/* ══ Bandeau patient unique ══════════════════════════════════════════
+   Le resume du formulaire replie et le bandeau patient disaient la meme
+   chose sur deux rangees pleine largeur. Il n'en reste qu'une, qui porte
+   aussi le motif de consultation et le bouton de modification. */
+
+.analyse-faite .patient-form-card.repliee { display: none; }
+
+.analyse-faite .resume-patient {
+  display: block;
+  padding: 18px 24px;
+}
+
+.resume-patient .rp-identite { margin-bottom: 6px; }
+
+.rp-motif {
+  max-width: 92ch;
+  margin: 0 0 12px;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.rp-pied {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 20px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.rp-pied .rp-mesures { display: inline; font-size: 0.8rem; color: var(--text-secondary); }
+.rp-sep { margin: 0 7px; }
+.rp-pied .btn-secondaire-mince { padding: 7px 14px; font-size: 0.8rem; }
+
+
+/* ══ Contre-indications relevées dans le RCP ═════════════════════════
+   Un antécédent du patient rencontré dans la rubrique 4.3. La phrase du
+   RCP est montrée avec : c'est elle qui permet de juger si le
+   rapprochement tient. Rien n'est retiré de la liste, seulement signalé,
+   et le médicament passe en fin de liste.
+
+   Le filet s'épaissit, il ne devient pas rouge : aucune couleur de cette
+   application ne code un degré de gravité, et le rapprochement est
+   textuel, pas clinique. */
+.rx-card-contre-indique { border-inline-start-width: 6px; }
+
+.rx-ci {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: rgba(79, 70, 229, 0.05);
+  border: 1px solid rgba(79, 70, 229, 0.2);
+  border-radius: var(--radius-md);
+}
+
+.rx-ci-titre {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 0 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.rx-ci-titre i { color: var(--primary); font-size: 0.78rem; }
+
+.rx-ci-phrase {
+  margin: 0 0 6px;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.rx-ci-phrase:last-child { margin-bottom: 0; }
+.rx-ci-phrase strong { color: var(--text-primary); text-transform: capitalize; }
+
+/* ── Résultats biologiques, dans le formulaire ───────────────────────
+   Repliés par défaut : facultatifs, ils ne doivent pas alourdir un cas
+   simple. C'est toute la raison de les proposer — laissés vides, ils ne
+   déclenchent rien. */
+.bloc-biologie {
+  margin-bottom: var(--spacing-lg);
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: rgba(79, 70, 229, 0.03);
+}
+
+.bloc-biologie > summary {
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  list-style: none;
+}
+
+.bloc-biologie > summary::-webkit-details-marker { display: none; }
+.bloc-biologie > summary i { color: var(--primary); margin-inline-end: 8px; }
+
+.bio-facultatif {
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.bio-aide {
+  margin: 10px 0 14px;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.bio-grille {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+/* Sépare les constantes des résultats de laboratoire : ce sont deux natures
+   de mesure, et le médecin ne les relève pas au même moment. */
+.bio-sous-titre {
+  margin: 18px 0 10px;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-top: 1px solid var(--border-color);
+  padding-top: 14px;
+}
+
+.bio-unite {
+  font-weight: 400;
+  font-size: 0.74rem;
+  color: var(--text-tertiary, var(--text-secondary));
+}
+
+@media (max-width: 640px) {
+  .bio-grille { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Un traitement en cours que les antécédents ou la biologie contredisent.
+   Même matériau que les autres alertes : c'est un signalement, pas une
+   gravité — et aucune couleur ne code une gravité dans ce projet. */
+.rx-a-revoir { border-inline-start-width: 6px; border-inline-start-style: dashed; }
+
+/* ── Substance annoncée contredite par la fiche ──────────────────────
+   Le modèle annonce la substance de ce qu'il propose, et il se trompe :
+   HELIKIT donné pour de la clarithromycine porte en réalité de l'urée 13 C.
+
+   Filet épaissi et pointillé, comme les écartés — pas de couleur d'alerte :
+   le projet s'interdit qu'une couleur code une gravité, et il s'agit ici
+   d'un défaut de la source, pas d'un risque clinique en soi. */
+.rx-card-substance-douteuse {
+  border-inline-start-width: 6px;
+  border-inline-start-style: dashed;
+}
+
+.rx-ecart-substance {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: rgba(79, 70, 229, 0.05);
+  border: 1px dashed rgba(79, 70, 229, 0.35);
+  border-radius: var(--radius-md);
+}
+
+.rx-ecart-substance-titre {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 0 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.rx-ecart-substance-titre i { color: var(--primary); font-size: 0.78rem; }
+
+.rx-ecart-substance-detail {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.rx-ecart-substance-detail strong { color: var(--text-primary); }
+
+/* ── Classe, indication, et ce qui reste en anglais ──────────────────
+   La classe est celle du niveau 2 de l'ATC, en français : le niveau 4 de
+   DrugBank annonçait CLAMOXYL comme « Combinations for eradication of
+   Helicobacter pylori » sur une pneumonie.
+
+   La mention de langue est une réserve, pas une décoration : de l'anglais
+   présenté comme du français serait pire que de l'anglais annoncé. */
+.rx-classe,
+.rx-indication {
+  margin: 8px 0 0;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* Les règles de niveau « surveillance ». Elles n'écartent pas et ne touchent
+   pas à la note : le ton est celui d'un rappel, pas d'un avertissement. */
+.rx-alertes {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-left: 3px solid rgba(245, 158, 11, 0.55);
+  background: rgba(245, 158, 11, 0.06);
+  border-radius: 0 8px 8px 0;
+}
+
+.rx-alertes-titre {
+  margin: 0 0 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #b45309;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.rx-alerte {
+  margin: 5px 0 0;
+  font-size: 0.79rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* Le rapprochement s'est fait sur la classe ATC faute de reconnaître la
+   substance. Marqué comme approximatif : c'est un filet, pas une règle. */
+.rx-approx {
+  font-style: italic;
+  opacity: 0.85;
+}
+
+.rx-alerte-par-classe {
+  border-left: 2px dotted rgba(245, 158, 11, 0.5);
+  padding-left: 8px;
+}
+
+/* Le niveau d'une règle, sur un traitement en cours. */
+.rx-niveau {
+  display: inline-block;
+  padding: 2px 9px;
+  margin-right: 6px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.rx-niveau-exclusion { background: rgba(220, 38, 38, 0.12); color: #b91c1c; }
+.rx-niveau-surveillance { background: rgba(245, 158, 11, 0.14); color: #b45309; }
+.rx-niveau-classement { background: rgba(100, 116, 139, 0.14); color: #475569; }
+
+/* Ne rien avoir à proposer est une réponse. Elle se présente comme telle,
+   pas comme un panneau resté vide. */
+.rx-vide {
+  padding: 18px 20px;
+  border: 1px dashed var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-secondary, transparent);
+}
+
+.rx-vide-titre {
+  margin: 0 0 8px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rx-vide-note {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+/* L'origine de la proposition. Discrète mais lisible : elle nuance ce que le
+   score affirme, et une mention qu'on ne voit pas ne nuance rien. */
+.rx-origine {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  line-height: 1.5;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.rx-origine-conduite_clinique {
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #0f766e;
+}
+
+.rx-origine-similarite {
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #b45309;
+}
+
+.rx-langue {
+  font-size: 0.9em;
+  font-style: italic;
+  color: var(--trait-fort, var(--text-secondary));
+  opacity: 0.85;
+}
+
+/* Trois écartés d'abord, le reste sur demande. Trente-six fiches d'un coup
+   noieraient le motif de chacune. */
+.rx-voir-plus {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  padding: 10px 14px;
+  text-align: center;
+  cursor: pointer;
+}
+
+/* ── Rang thérapeutique ──────────────────────────────────────────────
+   Les conduites cliniques du dépôt rangent leurs traitements en première
+   intention et alternatives. L'écran présentait les deux comme des
+   propositions équivalentes : le raisonnement était dans les données et
+   n'arrivait pas au lecteur.
+
+   Un intertitre, pas une couleur : le projet s'interdit qu'une couleur code
+   une hiérarchie clinique, ici comme pour la gravité des interactions. Ce
+   qui distingue les groupes est leur ordre et leur nom. */
+.rx-rang {
+  margin: 22px 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.rx-rang:first-child {
+  margin-top: 0;
+}
+
+.rx-rang-titre {
+  margin: 0 0 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.rx-rang-note {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.analyse-faite .rx-rang {
+  border-bottom-color: rgba(30, 27, 75, 0.12);
+}
+
+/* ── Écartés par les antécédents ─────────────────────────────────────
+   Une règle de CONTRAINTES_ANTECEDENTS a retiré ces médicaments des
+   propositions. Ils restent à l'écran : un médicament écarté en silence
+   emporte avec lui la raison de son retrait.
+
+   Aucune couleur ne code la gravité — c'est la règle du projet, et elle
+   tient ici comme ailleurs. Ce qui distingue une carte écartée d'une carte
+   proposée est qu'elle est en retrait et qu'elle ne réagit pas au survol :
+   elle n'est pas une proposition, et ne doit pas en avoir l'air. */
+.rx-card-ecarte {
+  cursor: default;
+  opacity: 0.82;
+  border-inline-start-width: 6px;
+  border-inline-start-style: dashed;
+}
+
+.rx-card-ecarte:hover {
+  border-color: #e5e7eb;
+  border-inline-start-color: #6366f1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transform: none;
+}
+
+.rx-ecart {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: rgba(79, 70, 229, 0.05);
+  border: 1px solid rgba(79, 70, 229, 0.2);
+  border-radius: var(--radius-md);
+}
+
+.rx-ecart-titre {
+  margin: 0 0 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.rx-ecart-motif {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* L'état du panneau, dans les mêmes termes que celui des interactions : il
+   dit ce que les règles ont fait, y compris quand elles n'ont rien fait. */
+.ecartes-etat {
+  margin: 0 0 16px;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* Ce qui a fait baisser la note. Le champ existait depuis `peser_la_securite`
+   et aucun écran ne le lisait : le médicament passait de 60 à 30 sans que
+   rien ne l'explique. */
+.rx-penalites {
+  margin: 8px 0 0;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: #b45309;
+}
+
+
+/* ══ La fiche d'un médicament suggéré : quatre étages ═════════════════
+   Ces règles s'ajoutent en fin de feuille et ne remplacent rien : les
+   couches précédentes gardent la main sur la surface de la tuile, son
+   ombre et son survol. Ce qui change ici est la **disposition** de ce
+   qu'elle contient.
+
+   Le défaut : douze blocs de même poids empilés en une colonne — nom,
+   note flottée, trois lignes de détail, justification, provenance,
+   classe, indication, puis les avertissements. Rien ne disait par où
+   commencer, et la posologie se relisait à chaque fois au milieu.
+
+   Aucune couleur nouvelle n'encode un degré de gravité : la source n'en
+   publie aucun, et la règle vaut ici comme ailleurs. Ce qui distingue
+   les étages est l'espace, le poids et la graisse — pas la teinte. */
+
+/* ── 1. L'identité : le nom, la substance, la note ───────────────────
+   La note était `float: inline-end`. Un flottant à côté d'un nom en
+   bloc : le texte de la substance s'enroulait autour, et sur un nom
+   long — « FUROSEMIDE ZYDUS 20 mg, comprimé sécable » — la note se
+   retrouvait sous le nom au lieu d'être en face. Une rangée flex met
+   les deux à la même hauteur, quelle que soit la longueur du nom. */
+.rx-card-tete {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rx-card-identite {
+  min-width: 0;                 /* sans quoi un nom long pousse la note dehors */
+}
+
+.rx-card-tete .rx-drug-name {
+  margin-bottom: 3px;
+}
+
+/* La substance devient le sous-titre du nom, et non plus une ligne
+   séparée du reste par un filet : c'est la même information que le
+   titre, dite autrement. Le filet passe sous l'étage entier. */
+.rx-card-tete .rx-substance {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+/* Plus de flottant : la rangée s'en charge. `flex-shrink` garde la note
+   entière quand le nom est long — c'est le nom qui se replie. */
+.rx-card-tete .rx-score {
+  float: none;
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+/* ── 2. Les faits : ce qu'on prescrit ────────────────────────────────
+   Posologie, durée et forme étaient trois lignes « Intitulé : valeur ».
+   L'intitulé y pesait autant que la valeur, alors qu'on ne le lit
+   qu'une fois. Il passe au-dessus, en petit ; la valeur reste seule sur
+   sa ligne, et la grille les aligne d'une fiche à l'autre. */
+.rx-faits {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+  gap: 10px 16px;
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(99, 102, 241, 0.045);
+}
+
+.rx-fait { min-width: 0; }
+
+.rx-fait dt {
+  margin: 0 0 2px;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  opacity: 0.85;
+}
+
+.rx-fait dd {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--text-primary, #111827);
+  overflow-wrap: anywhere;
+}
+
+/* ── 3. Le pourquoi : provenance, classe, indication, justification ──
+   Ces quatre-là répondent à la même question — « pourquoi celui-ci ? ».
+   Ils étaient dispersés : la justification avant la provenance, la
+   classe après, l'indication ensuite. Réunis, ils se lisent d'un coup,
+   et le filet de gauche dit qu'ils forment un ensemble. */
+.rx-pourquoi {
+  margin: 14px 0 0;
+  padding-inline-start: 12px;
+  border-inline-start: 2px solid rgba(99, 102, 241, 0.22);
+}
+
+.rx-pourquoi > :first-child { margin-top: 0; }
+
+/* La justification n'a plus besoin de son propre fond : elle est déjà
+   dans le cadre du « pourquoi », et deux cadres imbriqués font du
+   bruit. Elle garde son intitulé en capitales, qui la démarque. */
+.rx-pourquoi .rx-explanation {
+  margin-top: 10px;
+  padding: 0;
+  background: none;
+  border: 0;
+}
+
+/* ── 4. Les réserves ─────────────────────────────────────────────────
+   Pénalités, surveillance, écart de substance, contre-indication,
+   interaction : elles arrivent après, et se suivent à distance égale.
+   L'espacement était fixé bloc par bloc — 8, 12, 14 px — et deux
+   réserves consécutives ne se détachaient pas l'une de l'autre. */
+.rx-card-body > .rx-penalites,
+.rx-card-body > .rx-alertes,
+.rx-card-body > .rx-ecart-substance,
+.rx-card-body > .rx-ci,
+.rx-card-body > .rx-interactions {
+  margin-top: 12px;
+}
+
+/* Le renvoi vers la spécialité ouverte ferme la fiche, détaché du reste. */
+.rx-card-body > .rx-vers {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color, #eef0f6);
+}
+
+/* ── Étroit ──────────────────────────────────────────────────────────
+   Sur une colonne, la grille des faits tomberait à un seul élément par
+   ligne et rendrait la fiche interminable. Deux suffisent. */
+@media (max-width: 640px) {
+  .rx-faits { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rx-card-tete { gap: 8px; }
+}
+
+
+/* ══ La section « Médicaments suggérés » : les rangs redeviennent des
+      bandes ═════════════════════════════════════════════════════════
+
+   `#suggestionsContainer` est une grille à deux colonnes, et les
+   intertitres de rang y étaient des enfants comme les autres : chacun
+   occupait **une cellule**, pas une rangée.
+
+   Mesuré sur une réponse réelle de quatorze propositions :
+
+       cellule  1  col1  INTERTITRE Première intention
+       cellule  2  col2  fiche          <- accolée au titre, sans lien
+       cellule  3  col1  fiche
+       cellule  4  col2  INTERTITRE Alternatives   <- au milieu d'une rangée
+       …
+       cellule 16  col2  INTERTITRE Adjuvants      <- idem
+
+   « Alternatives » s'affichait donc à droite, à hauteur d'une fiche de
+   première intention, et le regroupement par rang — qui est le
+   raisonnement même de l'écran — ne se lisait plus. */
+
+/* La bande occupe la rangée entière. C'est la correction. */
+.analyse-faite #suggestionsContainer > .rx-rang,
+.analyse-faite #suggestionsContainer > .rx-vide {
+  grid-column: 1 / -1;
+}
+
+/* Une bande a besoin d'air au-dessus pour séparer deux groupes, et de
+   peu en dessous : elle appartient à ce qui la suit. Le premier rang
+   n'a rien à séparer. */
+.analyse-faite #suggestionsContainer > .rx-rang {
+  margin: 18px 0 0;
+  padding: 0 0 10px;
+}
+
+.analyse-faite #suggestionsContainer > .rx-rang:first-child {
+  margin-top: 0;
+}
+
+/* Le titre et son compte sur une rangée, la note en dessous. */
+.rx-rang-tete {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rx-rang-tete .rx-rang-titre {
+  margin: 0;
+}
+
+/* Combien de traitements porte ce rang. « Alternatives » suivi de neuf
+   fiches et « Adjuvants » suivi d'une seule s'annonçaient pareil. */
+.rx-rang-compte {
+  flex: 0 0 auto;
+  min-width: 22px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.6;
+  text-align: center;
+  color: var(--primary);
+  background: rgba(79, 70, 229, 0.1);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Le filet de la bande court sur toute la largeur, sous le titre et sa
+   note : c'est lui qui dit où commence le groupe. */
+.analyse-faite #suggestionsContainer > .rx-rang .rx-rang-note {
+  margin-top: 3px;
+}

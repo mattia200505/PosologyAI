@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ medicine['title'] }} - PosologyAI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/medicine_details.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/dist/vis-network.min.css">
+    <script src="{{ url_for('static', filename='js/medicine_animations.js') }}" defer></script>
+</head>
+<body data-langue-serveur="1">
+    {#
+       `lang` vient de la route, et de nulle part ailleurs.
+
+       Cette ligne portait `{% set lang = request.args.get('lang', 'fr') %}`,
+       qui écrasait la variable passée par `medicine_details()`. La route
+       lisait pourtant déjà la langue dans l'URL **ou** dans le cookie ; le
+       gabarit annulait la seconde moitié.
+
+       Conséquence mesurée : seule une langue écrite dans l'URL traduisait
+       cette page. Le sélecteur, qui n'écrit pas dans l'URL, ne pouvait rien
+       changer aux 136 libellés rendus ici par `libelle()` — la fiche restait
+       intégralement en français pendant que le reste du site basculait.
+
+       `data-langue-serveur` sur le corps : cette page est traduite par le
+       serveur, le sélecteur doit donc la recharger au lieu de croire qu'il
+       lui suffit de réécrire le DOM.
+    #}
+    {% with active_page='medicine' %}
+    {% include 'components/header.html' %}
+    {% endwith %}
+
+    <main>
+        <!-- ============================================================
+             HERO BANNER
+             ============================================================ -->
+        <section class="medicine-hero">
+            <div class="container">
+                <div class="medicine-hero-top">
+                    <div class="medicine-hero-info">
+                        <h1 class="medicine-hero-name">{{ medicine['title'] }}</h1>
+                        {% set substance = medicine['medicine_details'].get('substances_actives', [''])|first %}
+                        {% if substance %}
+                        <span class="medicine-hero-substance">{{ substance }}</span>
+                        {% endif %}
+
+                        <div class="medicine-hero-tags">
+                            {% if medicine.get('prescription_status') %}
+                            <span class="medicine-tag medicine-tag-status"><i class="fas fa-prescription-bottle-alt"></i> {{ medicine['prescription_status'] }}</span>
+                            {% endif %}
+                            {% if medicine['medicine_details'].get('laboratoire') %}
+                            <span class="medicine-tag"><i class="fas fa-flask"></i> {{ medicine['medicine_details']['laboratoire'] }}</span>
+                            {% endif %}
+                            {% if medicine['medicine_details'].get('forme') %}
+                            <span class="medicine-tag"><i class="fas fa-capsules"></i> {{ medicine['medicine_details']['forme'] }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="medicine-hero-meta">
+                            <span><i class="far fa-calendar-alt"></i> {{ libelle('Notice updated:', 'Notice mise à jour:', lang) }} {{ medicine['update_date'] }}</span>
+                            {% if medicine.get('last_scraped') %}
+                            <span><i class="fas fa-database"></i> {{ libelle('Data collected:', 'Données collectées:', lang) }} {{ medicine['last_scraped'].strftime('%d/%m/%Y') if medicine['last_scraped'] is not string else medicine['last_scraped'][:10] }}</span>
+                            {% endif %}
+                            <span><i class="fas fa-external-link-alt"></i> <a href="{{ medicine['url'] }}" target="_blank">{{ libelle('French Public Medication Database', 'Base de données publique des médicaments', lang) }}</a></span>
+                        </div>
+                    </div>
+
+                    {% if g.user %}
+                    <div class="hero-favorite">
+                        <button id="favorite-btn" class="favorite-btn" aria-pressed="{{ 'true' if is_favorite else 'false' }}">
+                            <i id="favorite-icon" class="heart-icon {{ 'fas fa-heart favorited' if is_favorite else 'far fa-heart not-favorited' }}"></i>
+                            <span id="favorite-text">{{ libelle('Remove from favorites', 'Retirer des favoris', lang) if is_favorite else libelle('Add to favorites', 'Ajouter aux favoris', lang) }}</span>
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+             SAFETY FLAGS — statut réglementaire ANSM
+             Rien n'est affiché quand il n'y a rien à signaler : un bandeau
+             systématique diluerait les cas qui méritent l'attention.
+             ============================================================ -->
+        {% if safety_flags %}
+        <section class="regulatory-banner" aria-label="{{ libelle('Regulatory status', 'Statut réglementaire', lang) }}">
+            <div class="container">
+                {% for flag in safety_flags %}
+                <div class="reg-flag reg-flag-{{ flag.level }}" role="{{ 'alert' if flag.level == 'critical' else 'note' }}">
+                    <i class="fas {{ flag.icon }} reg-flag-icon" aria-hidden="true"></i>
+                    <div class="reg-flag-text">
+                        <span class="reg-flag-label">{{ flag.label }}</span>
+                        <span class="reg-flag-detail">{{ flag.detail }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- ============================================================
+             MAIN CONTENT
+             ============================================================ -->
+        <section class="medicine-page">
+            <div class="container">
+                <div class="medicine-layout">
+                    <!-- Sidebar Navigation -->
+                    <nav class="medicine-nav">
+                        <div class="medicine-nav-inner">
+                            <ul class="nav-sections">
+                                <li class="nav-item"><a href="#section-ai-summary" class="nav-link active"><i class="fas fa-robot"></i><span>{{ libelle('AI Summary', 'Résumé par IA', lang) }}</span></a></li>
+                                {% if medicine.get('enriched') %}
+                                <li class="nav-item"><a href="#section-drugbank" class="nav-link"><i class="fas fa-flask"></i><span>DrugBank</span></a></li>
+                                {% endif %}
+                                {% if medicine.get('synthesis') %}
+                                <li class="nav-item"><a href="#section-synthesis" class="nav-link"><i class="fas fa-microscope"></i><span>{{ libelle('Medical Synthesis', 'Synthèse médicale', lang) }}</span></a></li>
+                                {% endif %}
+                                {# Les contre-indications n'avaient aucune entrée de navigation,
+                                   alors que « Données techniques » en avait une : un lecteur qui
+                                   parcourt le sommaire voyait le second et pas les premières.
+                                   Elles sont enfouies en 4.3 du RCP, sous « DONNÉES CLINIQUES ». #}
+                                {% if structures %}
+                                <li class="nav-item"><a href="#section-structure" class="nav-link"><i class="fas fa-atom"></i><span>{{ libelle('Molecular structure', 'Structure moleculaire', lang) }}</span></a></li>
+                                {% endif %}
+                                {# Signalee comme critique seulement quand une agence demande
+                                   quelque chose. « Informative PGx » cite le gene sans conduite
+                                   a tenir, « No Clinical PGx » dit qu'il n'y en a pas : les
+                                   marquer d'un rouge d'alerte ferait lire un risque la ou
+                                   l'agence a ecrit son absence. #}
+                                {% if pgx %}
+                                <li class="nav-item"><a href="#section-pharmacogenomique" class="nav-link{% if pgx['conduite'] %} nav-link-critical{% endif %}"><i class="fas fa-dna"></i><span>{{ libelle('Pharmacogenomics', 'Pharmacogénomique', lang) }}</span></a></li>
+                                {% endif %}
+                                {% if a_contre_indications %}
+                                <li class="nav-item"><a href="#section-contraindications" class="nav-link nav-link-critical"><i class="fas fa-ban"></i><span>{{ libelle('Contraindications', 'Contre-indications', lang) }}</span></a></li>
+                                {% endif %}
+                                {# Fiche EMA sans RCP : la limite doit se voir dans le sommaire,
+                                   avant d'avoir deroule la page. #}
+                                {% if medicine.get('source') == 'EMA' and not medicine.get('sections') %}
+                                <li class="nav-item"><a href="#section-monographie" class="nav-link nav-link-critical"><i class="fas fa-exclamation-triangle"></i><span>{{ libelle('Monograph unavailable', 'Monographie indisponible', lang) }}</span></a></li>
+                                {% endif %}
+                                <li class="nav-item"><a href="#section-essentials" class="nav-link"><i class="fas fa-notes-medical"></i><span>{{ libelle('Essentials', 'Infos essentielles', lang) }}</span></a></li>
+                                {% if medicine.get('enrichment') and medicine.enrichment.get('composition') %}
+                                <li class="nav-item"><a href="#section-molecule" class="nav-link"><i class="fas fa-atom"></i><span>{{ libelle('Composition', 'Composition', lang) }}</span></a></li>
+                                {% endif %}
+                                <li class="nav-item"><a href="#section-interactions" class="nav-link"><i class="fas fa-exclamation-triangle"></i><span>{{ libelle('Interactions', 'Interactions', lang) }}</span></a></li>
+                                <li class="nav-item"><a href="#section-alternatives" class="nav-link"><i class="fas fa-exchange-alt"></i><span>{{ libelle('Alternatives', 'Alternatives', lang) }}</span></a></li>
+                                {#
+                                   Les sections du RCP sont regroupées sous un intitulé unique,
+                                   replié par défaut. Elles occupaient 18 des 29 entrées du
+                                   sommaire : « 9. DATE DE PREMIERE AUTORISATION », « 11.
+                                   DOSIMETRIE » figuraient au même niveau typographique que les
+                                   contre-indications, et sur mobile — où la barre passe à
+                                   l'horizontale — cela donnait un bandeau de 29 éléments à faire
+                                   défiler au doigt. L'ordre réglementaire est conservé à
+                                   l'intérieur du groupe : il fait foi.
+                                #}
+                                {% if medicine.get('sections') %}
+                                <li class="nav-item nav-groupe">
+                                    <button type="button" class="nav-link nav-groupe-bouton" aria-expanded="false" aria-controls="nav-rcp">
+                                        <i class="fas fa-file-alt"></i><span>{{ libelle('Regulatory document', 'Document réglementaire', lang) }} ({{ medicine['sections']|length }})</span>
+                                        <i class="fas fa-chevron-down nav-groupe-fleche"></i>
+                                    </button>
+                                    <ul id="nav-rcp" class="nav-groupe-liste" hidden>
+                                        {% for section in medicine['sections'] %}
+                                        <li class="nav-item"><a href="#section-{{ loop.index }}" class="nav-link nav-link-imbrique"><span title="{{ section['title'] }}">{{ section['title'] }}</span></a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                                {% endif %}
+                                <li class="nav-item"><a href="#section-medical-sources" class="nav-link"><i class="fas fa-database"></i><span>{{ libelle('Sources', 'Sources', lang) }}</span></a></li>
+                                <li class="nav-item"><a href="#section-knowledge-graph" class="nav-link"><i class="fas fa-project-diagram"></i><span>{{ libelle('Knowledge Graph', 'Graphe de connaissances', lang) }}</span></a></li>
+                                <li class="nav-item"><a href="#section-comments" class="nav-link"><i class="fas fa-comments"></i><span>{{ libelle('Comments', 'Commentaires', lang) }}</span></a></li>
+                                <li class="nav-item"><a href="#section-technical-data" class="nav-link"><i class="fas fa-code"></i><span>{{ libelle('Technical Data', 'Données techniques', lang) }}</span></a></li>
+                            </ul>
+                        </div>
+                    </nav>
+
+                    <!-- Content Area -->
+                    <div class="medicine-main">
+
+                        <!-- ─── AI Summary ──────────────────────────── -->
+                        <span class="section-anchor" id="section-ai-summary"></span>
+                        <div class="section-card">
+                            <div class="section-header">
+                                <span class="section-icon section-icon-ai"><i class="fas fa-robot"></i></span>
+                                <h2>{{ libelle('AI Summary', 'Résumé par IA', lang) }}</h2>
+                            </div>
+                            <div class="section-body">
+                                {% if medicine.ai_summary %}
+                                <div class="ai-summary-content">
+                                    {{ medicine.ai_summary|safe }}
+                                    <div class="ai-disclaimer">
+                                        <i class="fas fa-info-circle"></i> {{ libelle('This summary is automatically generated and may contain inaccuracies. Always consult a healthcare professional.', 'Ce résumé est généré automatiquement et pourrait contenir des imprécisions. Consultez toujours un professionnel de santé.', lang) }}
+                                        <span class="ai-model">{{ libelle('Model used:', 'Modèle utilisé:', lang) }} mistral-small-latest</span>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="loading-box" id="ai-loading">
+                                    <div class="loading-spinner"></div>
+                                    <p class="load-status">{{ libelle('Generating summary...', 'Génération du résumé en cours...', lang) }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- ─── DrugBank Data ────────────────────────── -->
+                        {% if medicine.get('enriched') %}
+                        {% set dbank = medicine.enriched %}
+                        <span class="section-anchor" id="section-drugbank"></span>
+                        <div class="section-card">
+                            <div class="section-header">
+                                <span class="section-icon section-icon-tech" style="background:#fffbeb;color:#d97706;"><i class="fas fa-flask"></i></span>
+                                <h2>DrugBank <span class="drugbank-subtitle">{{ medicine.get('match_summary', '') or dbank.get('match_summary', '') }}</span></h2>
+                            </div>
+                            <div class="section-body">
+                                {% if dbank.get('match_summary') %}
+                                <div class="drugbank-badge
+                                    {%- if medicine.get('match_confidence', 0) >= 95 %} drugbank-badge-high
+                                    {%- elif medicine.get('match_confidence', 0) >= 85 %} drugbank-badge-medium
+                                    {%- else %} drugbank-badge-low{% endif %}">
+                                    <i class="fas fa-check-circle"></i> {{ dbank['match_summary'] }}
+                                </div>
+                                {% endif %}
+
+                                {% if dbank.get('drugbank_name') %}
+                                <div class="tech-item mb-2">
+                                    <span class="tech-item-label">DrugBank Name</span>
+                                    <span class="tech-item-value">{{ dbank['drugbank_name'] }}</span>
+                                </div>
+                                {% endif %}
+
+                                {% if dbank.get('drugbank_description') %}
+                                <div class="clinical-card">
+                                    <h4>{{ libelle('Description', 'Description', lang) }}</h4>
+                                    <p>{{ dbank['drugbank_description'] }}</p>
+                                </div>
+                                {% endif %}
+
+                                {#
+                                   Les quatre rubriques de prose ci-dessous sont
+                                   traduites hors ligne par
+                                   scripts/traduire_drugbank.py, puis rangées à
+                                   côté de l'original : le serveur ne traduit
+                                   rien à l'affichage, il lit un champ de plus
+                                   dans un document qu'il charge déjà.
+
+                                   La traduction ne sert que si l'interface est
+                                   en français. En anglais — ou dans toute autre
+                                   langue — c'est le texte original de DrugBank
+                                   qui s'affiche : traduire de l'anglais vers le
+                                   français pour le rendre à un lecteur anglais
+                                   n'aurait aucun sens, et lui donnerait une
+                                   version dégradée de ce que la source dit
+                                   déjà mieux.
+
+                                   Ce qui n'a pas de traduction reste en anglais
+                                   et porte `lang="en"`, pour qu'un lecteur
+                                   d'écran change de voix au lieu de prononcer
+                                   l'anglais avec les règles françaises. Une
+                                   rubrique à moitié traduite serait pire que
+                                   l'anglais : elle laisserait croire au
+                                   français.
+                                #}
+                                <p class="interactions-disclaimer"><i class="fas fa-language"></i>
+                                    {% if (lang or 'fr') == 'fr' %}
+                                    Texte de DrugBank, traduit hors ligne. Les passages restés en anglais sont signalés comme tels.
+                                    {% else %}
+                                    Text from DrugBank, shown in its original English wording.
+                                    {% endif %}</p>
+
+                                {% if dbank.get('mechanism_of_action') %}
+                                <div class="clinical-card">
+                                    <div class="clinical-card-icon" style="background:#eef2ff;color:#6366f1;"><i class="fas fa-microscope"></i></div>
+                                    <h4>{{ libelle('Mechanism of Action', "Mécanisme d'action", lang) }}</h4>
+                                    {% if (lang or 'fr') == 'fr' and dbank.get('mechanism_of_action_fr') %}<p>{{ dbank['mechanism_of_action_fr'] }}</p>{% else %}<p lang="en">{{ dbank['mechanism_of_action'] }}</p>{% endif %}
+                                </div>
+                                {% endif %}
+
+                                {% if dbank.get('pharmacodynamics') %}
+                                <div class="clinical-card">
+                                    <div class="clinical-card-icon" style="background:#ecfdf5;color:#059669;"><i class="fas fa-chart-line"></i></div>
+                                    <h4>{{ libelle('Pharmacodynamics', 'Pharmacodynamie', lang) }}</h4>
+                                    {% if (lang or 'fr') == 'fr' and dbank.get('pharmacodynamics_fr') %}<p>{{ dbank['pharmacodynamics_fr'] }}</p>{% else %}<p lang="en">{{ dbank['pharmacodynamics'] }}</p>{% endif %}
+                                </div>
+                                {% endif %}
+
+                                {% if dbank.get('indication_en') %}
+                                <div class="clinical-card">
+                                    <div class="clinical-card-icon" style="background:#fffbeb;color:#d97706;"><i class="fas fa-stethoscope"></i></div>
+                                    <h4>{{ libelle('Indication', 'Indication', lang) }}</h4>
+                                    {% if (lang or 'fr') == 'fr' and dbank.get('indication_fr') %}<p>{{ dbank['indication_fr'] }}</p>{% else %}<p lang="en">{{ dbank['indication_en'] }}</p>{% endif %}
+                                </div>
+                                {% endif %}
+
+                                {% if dbank.get('atc_codes') and dbank['atc_codes']|length > 0 %}
+                                <div class="tech-item mb-2">
+                                    <span class="tech-item-label">{{ libelle('ATC Codes', 'Codes ATC', lang) }}</span>
+                                    <span class="tech-item-value">{{ dbank['atc_codes']|join(', ') }}</span>
+                                </div>
+                                {% endif %}
+
+                                {% if dbank.get('classification') %}
+                                <div class="tech-item mb-2">
+                                    <span class="tech-item-label">{{ libelle('Classification', 'Classification', lang) }}</span>
+                                    <span class="tech-item-value">{{ dbank['classification'] }}</span>
+                                </div>
+                                {% endif %}
+
+                                {% if dbank.get('groups') and dbank['groups']|length > 0 %}
+                                <div class="tech-item mb-2">
+                                    <span class="tech-item-label">{{ libelle('Groups', 'Groupes', lang) }}</span>
+                                    <span class="tech-item-value">{{ dbank['groups']|join(', ') }}</span>
+                                </div>
+                                {% endif %}
+
+                                <!-- Pharmacokinetics -->
+                                {% if dbank.get('half_life') or dbank.get('protein_binding') or dbank.get('metabolism') or dbank.get('absorption') or dbank.get('route_of_elimination') or dbank.get('clearance') %}
+                                <div class="mt-4">
+                                    <h4 class="mb-3" style="font-size:0.9rem;color:#374151;">{{ libelle('Pharmacokinetics', 'Pharmacocinétique', lang) }}</h4>
+                                    <div class="pharm-grid">
+                                        {% if dbank.get('half_life') %}
+                                        <div class="tech-item">
+                                            <span class="tech-item-label">{{ libelle('Half-life', 'Demi-vie', lang) }}</span>
+                                            <span class="tech-item-value">{{ dbank['half_life'] }}</span>
+                                        </div>
+                                        {% endif %}
+                                        {% if dbank.get('protein_binding') %}
+                                        <div class="tech-item">
+                                            <span class="tech-item-label">{{ libelle('Protein Binding', 'Liaison protéique', lang) }}</span>
+                                            <span class="tech-item-value">{{ dbank['protein_binding'] }}</span>
+                                        </div>
+                                        {% endif %}
+                                        {% if dbank.get('metabolism') %}
+                                        <div class="tech-item">
+                                            <span class="tech-item-label">{{ libelle('Metabolism', 'Métabolisme', lang) }}</span>
+                                            <span class="tech-item-value">{{ dbank['metabolism'] }}</span>
+                                        </div>
+                                        {% endif %}
+                                        {% if dbank.get('absorption') %}
+                                        <div class="tech-item">
+                                            <span class="tech-item-label">{{ libelle('Absorption', 'Absorption', lang) }}</span>
+                                            <span class="tech-item-value">{{ dbank['absorption'] }}</span>
+                                        </div>
+                                        {% endif %}
+                                        {% if dbank.get('route_of_elimination') %}
+                                        <div class="tech-item">
+                                            <span class="tech-item-label">{{ libelle('Elimination', 'Élimination', lang) }}</span>
+                                            <span class="tech-item-value">{{ dbank['route_of_elimination'] }}</span>
+                                        </div>
+                                        {% endif %}
+                                        {% if dbank.get('clearance') %}
+                                        <div class="tech-item">
+                                            <span class="tech-item-label">{{ libelle('Clearance', 'Clairance', lang) }}</span>
+                                            <span class="tech-item-value">{{ dbank['clearance'] }}</span>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                {% if dbank.get('toxicity') %}
+                                <div class="clinical-card mt-3">
+                                    <div class="clinical-card-icon" style="background:#fef2f2;color:#dc2626;"><i class="fas fa-skull-crossbones"></i></div>
+                                    <h4>{{ libelle('Toxicity', 'Toxicité', lang) }}</h4>
+                                    {% if (lang or 'fr') == 'fr' and dbank.get('toxicity_fr') %}<p>{{ dbank['toxicity_fr'] }}</p>{% else %}<p lang="en">{{ dbank['toxicity'] }}</p>{% endif %}
+                                </div>
+                                {% endif %}
+
+                                <div class="source-attribution source-attribution-centered mt-4">
+                                    <a href="https://go.drugbank.com" target="_blank" class="source-link">
+                                        <i class="fas fa-flask" style="color:#d97706;"></i> DrugBank
+                                    </a>
+                                    <p class="source-credit">{{ libelle('Enriched with DrugBank data — confidence score', 'Enrichi avec les données DrugBank — score de confiance', lang) }} : {{ medicine.get('match_confidence', 0) }}/100</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- ─── Synthesis / Clinical Summary ────────── -->
+                        {% if medicine.get('synthesis') %}
+                        {% set syn = medicine.synthesis %}
+                        <span class="section-anchor" id="section-synthesis"></span>
+                        <div class="section-card">
+                            <div class="section-header">
+                                <span class="section-icon section-icon-info"><i class="fas fa-microscope"></i></span>
+                                <h2>{{ libelle('Medical Synthesis', 'Synthèse médicale', lang) }}</h2>
+                            </div>
+                            <div class="section-body">
+                                <div class="clinical-summary">
+                                    {# Contre-indications et mises en garde d'abord : la convention
+                                       du domaine — VIDAL, Thériaque — les place avant le reste de
+                                       la monographie. Elles occupaient ici une carte identique à
+                                       celle du « Résumé » ; elles prennent maintenant toute la
+                                       largeur de la grille, donc le premier rang. #}
+                                    {% if syn.get('contre_indications') %}
+                                    <span class="section-anchor" id="section-contraindications"></span>
+                                    <div class="clinical-card clinical-card-critical">
+                                        <div class="clinical-card-icon" style="background:#fef2f2;color:#dc2626;"><i class="fas fa-ban"></i></div>
+                                        <h4>{{ libelle('Contraindications', 'Contre-indications', lang) }}</h4>
+                                        <p>{{ syn['contre_indications'] }}</p>
+                                    </div>
+                                    {% endif %}
+                                    {% if syn.get('precautions') %}
+                                    <div class="clinical-card clinical-card-warning">
+                                        <div class="clinical-card-icon" style="background:#fffbeb;color:#d97706;"><i class="fas fa-exclamation-triangle"></i></div>
+                                        <h4>{{ libelle('Precautions and warnings', 'Précautions et mises en garde', lang) }}</h4>
+                                        <p>{{ syn['precautions'] }}</p>
+                                    </div>
+                                    {% endif %}
+                                    {% if syn.get('indications') %}
+                                    <div class="clinical-card">
+                                        <div class="clinical-card-icon" style="background:#ecfdf5;color:#059669;"><i class="fas fa-stethoscope"></i></div>
+                                        <h4>{{ libelle('Indications', 'Indications', lang) }}</h4>
+                                        <p>{{ syn['indications'] }}</p>
+                                    </div>
+                                    {% endif %}
+                                    {% if syn.get('resume') %}
+                                    <div class="clinical-card">
+                                        <div class="clinical-card-icon" style="background:#eef2ff;color:#6366f1;"><i class="fas fa-align-left"></i></div>
+                                        <h4>{{ libelle('Summary', 'Résumé', lang) }}</h4>
+                                        <p><em>{{ syn['resume'] }}</em></p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Essential Info Grid -->
+                                <div class="essentials-grid mt-4">
+                                    {% if syn.get('posologie') %}
+                                    <div class="ess-posology">
+                                        <div class="essential-card">
+                                            <div class="essential-card-header">
+                                                <i class="fas fa-pills"></i>
+                                                <h3>{{ libelle('Dosage', 'Posologie', lang) }}</h3>
+                                            </div>
+                                            <p>{{ syn['posologie'] }}</p>
+                                        </div>
+                                        <p class="posology-warning"><i class="fas fa-exclamation-circle"></i> {{ libelle('posology_warning', 'Cette posologie est le schéma standard de l\'adulte (sans insuffisance rénale/hépatique). Elle peut nécessiter un ajustement chez l\'enfant, la personne âgée ou en cas d\'insuffisance rénale/hépatique — seule un médecin peut en décider.', lang) }}</p>
+                                    </div>
+                                    {% endif %}
+                                    {% if syn.get('effets_secondaires') %}
+                                    <div class="ess-sideeffects">
+                                        <div class="essential-card">
+                                            <div class="essential-card-header">
+                                                <i class="fas fa-heartbeat"></i>
+                                                <h3>{{ libelle('Side Effects', 'Effets indésirables', lang) }}</h3>
+                                            </div>
+                                            <p>{{ syn['effets_secondaires'] }}</p>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if syn.get('interactions') %}
+                                    <div class="ess-interactions">
+                                        <div class="essential-card">
+                                            <div class="essential-card-header">
+                                                <i class="fas fa-link"></i>
+                                                <h3>{{ libelle('Interactions', 'Interactions', lang) }}</h3>
+                                            </div>
+                                            <p>{{ syn['interactions'] }}</p>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="source-attribution source-attribution-centered mt-4">
+                                    <a href="{{ SOURCE_URLS.get('ANSM', {}).get('url', '#') }}" target="_blank" class="source-link">
+                                        <i class="fas fa-{{ SOURCE_URLS.get('ANSM', {}).get('icon', 'file-alt') }}"></i> {{ SOURCE_URLS.get('ANSM', {}).get('name', 'ANSM') }}
+                                    </a>
+                                    <p class="source-credit">{{ libelle('Source of this content', 'Source de ce contenu', lang) }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- ─── Essentials (from medicine_details) ──── -->
+                        <span class="section-anchor" id="section-essentials"></span>
+                        <div class="section-card">
+                            <div class="section-header">
+                                <span class="section-icon section-icon-info"><i class="fas fa-notes-medical"></i></span>
+                                <h2>{{ libelle('Essential Information', 'Informations essentielles', lang) }}</h2>
+                            </div>
+                            <div class="section-body">
+                                {% if medicine.get('medicine_details') %}
+                                <div class="grid-2">
+                                    {% if medicine['medicine_details'].get('forme') %}
+                                    <div class="tech-item">
+                                        <span class="tech-item-label">{{ libelle('Form', 'Forme', lang) }}</span>
+                                        <span class="tech-item-value">{{ medicine['medicine_details']['forme'] }}</span>
+                                    </div>
+                                    {% endif %}
+                                    {% if medicine['medicine_details'].get('dosages') and medicine['medicine_details']['dosages']|length > 0 %}
+                                    <div class="tech-item">
+                                        <span class="tech-item-label">{{ libelle('Dosage(s)', 'Dosage(s)', lang) }}</span>
+                                        <span class="tech-item-value">{{ medicine['medicine_details']['dosages']|join(', ') }}</span>
+                                    </div>
+                                    {% endif %}
+                                    {% if medicine['medicine_details'].get('substances_actives') and medicine['medicine_details']['substances_actives']|length > 0 %}
+                                    <div class="tech-item">
+                                        <span class="tech-item-label">{{ libelle('Active Substance(s)', 'Substance(s) active(s)', lang) }}</span>
+                                        <span class="tech-item-value">{{ medicine['medicine_details']['substances_actives']|join(', ') }}</span>
+                                    </div>
+                                    {% endif %}
+                                    {% if medicine['medicine_details'].get('laboratoire') %}
+                                    <div class="tech-item">
+                                        <span class="tech-item-label">{{ libelle('Laboratory', 'Laboratoire', lang) }}</span>
+                                        <span class="tech-item-value">{{ medicine['medicine_details']['laboratoire'] }}</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% else %}
+                                <div class="empty-state">
+                                    <i class="fas fa-info-circle"></i>
+                                    <p>{{ libelle('No general information available.', 'Aucune information générale disponible.', lang) }}</p>
+                                </div>
+                                {% endif %}
+
+                                <!-- ─── Données réglementaires (fichier maître ANSM) ─── -->
+                                {% if regulatory_facts %}
+                                <h3 class="reg-facts-title">
+                                    <i class="fas fa-stamp" aria-hidden="true"></i>
+                                    {{ libelle('Regulatory information', 'Informations réglementaires', lang) }}
+                                </h3>
+                                <dl class="reg-facts">
+                                    {% for fact in regulatory_facts %}
+                                    <div class="reg-fact">
+                                        <dt>{{ fact.label }}</dt>
+                                        <dd>{{ fact.value }}</dd>
+                                    </div>
+                                    {% endfor %}
+                                </dl>
+                                {% endif %}
+
+                                <div class="source-attribution source-attribution-centered mt-4">
+                                    <a href="{{ SOURCE_URLS.get('ANSM', {}).get('url', '#') }}" target="_blank" class="source-link">
+                                        <i class="fas fa-{{ SOURCE_URLS.get('ANSM', {}).get('icon', 'file-alt') }}"></i> {{ SOURCE_URLS.get('ANSM', {}).get('name', 'ANSM') }}
+                                    </a>
+                                    <p class="source-credit">{{ libelle('Source of this content', 'Source de ce contenu', lang) }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ─── Composition / Molecule ─────────────── -->
+                        {% if medicine.get('enrichment') and medicine.enrichment.get('composition') %}
+                        {% set comp = medicine.enrichment.composition %}
+                        <span class="section-anchor" id="section-molecule"></span>
+                        <div class="section-card">
+                            <div class="section-header">
+                                <span class="section-icon section-icon-mol"><i class="fas fa-atom"></i></span>
+                                <h2>{{ libelle('Composition', 'Composition', lang) }} &amp; {{ libelle('Molecular Data', 'Données moléculaires', lang) }}</h2>
+                            </div>
+                            <div class="section-body">
+                                {% if comp.get('molecules') and comp['molecules']|length > 0 %}
+                                <div class="molecule-grid">
+                                    {% for molecule in comp['molecules'] %}
+                                    <div class="molecule-card">
+                                        <div class="molecule-symbol">{{ molecule[:2]|upper }}</div>
+                                        <h4>{{ molecule }}</h4>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                <div class="grid-2 mt-3">
+                                    {% if comp.get('pharmaceutical_form') %}
+                                    <div class="tech-item">
+                                        <span class="tech-item-label">{{ libelle('Pharmaceutical Form', 'Forme pharmaceutique', lang) }}</span>
+                                        <span class="tech-item-value">{{ comp['pharmaceutical_form'] }}</span>
+                                    </div>
+                                    {% endif %}
+                                    {% if comp.get('dosages') and comp['dosages']|length > 0 %}
+                                    <div class="tech-item">
+                                        <span class="tech-item-label">{{ libelle('Dosages', 'Dosages', lang) }}</span>
+                                        <span class="tech-item-value">{{ comp['dosages']|join(', ') }}</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                {% if medicine.enrichment.get('external_databases') %}
+                                {% set ext = medicine.enrichment.external_databases %}
+                                <hr class="section-divider">
+                                <div class="ext-db-grid">
+                                    {% if medicine.get('enriched') %}
+                                    <a href="#section-drugbank" style="text-decoration:none;color:inherit;">
+                                    <div class="ext-db-card ext-db-drugbank">
+                                        <h5><i class="fas fa-flask"></i> DrugBank</h5>
+                                        <p>{{ libelle('See dedicated section below for full DrugBank data', 'Voir la section DrugBank dédiée ci-dessous', lang) }}</p>
+                                        <span class="source-card-btn">{{ libelle('Go to DrugBank', 'Voir DrugBank', lang) }} →</span>
+                                    </div>
+                                    </a>
+                                    {% endif %}
+                                    {% if ext.get('therique') %}
+                                    {% set th = ext.therique %}
+                                    <div class="ext-db-card ext-db-theriaque">
+                                        <h5><i class="fas fa-flag"></i> Thériaque</h5>
+                                        <p>{{ libelle('French database available', 'Base de données française disponible', lang) }}</p>
+                                        {% if th.get('indications') %}<p><strong>{{ libelle('Indications:', 'Indications:', lang) }}</strong> {{ th['indications'][:120] }}...</p>{% endif %}
+                                    </div>
+                                    {% endif %}
+                                    {% if ext.get('has') %}
+                                    {% set has = ext.has %}
+                                    <div class="ext-db-card ext-db-has">
+                                        <h5><i class="fas fa-user-md"></i> HAS</h5>
+                                        {% if has.get('clinical_data') %}
+                                        {% if has.clinical_data.get('efficacy') %}<p><strong>{{ libelle('Efficacy:', 'Efficacité:', lang) }}</strong> {{ has.clinical_data['efficacy'] }}</p>{% endif %}
+                                        {% if has.clinical_data.get('safety_profile') %}<p><strong>{{ libelle('Safety:', 'Sécurité:', lang) }}</strong> {{ has.clinical_data['safety_profile'] }}</p>{% endif %}
+                                        {% endif %}
+                                        {% if has.get('asmr') %}<p><strong>ASMR:</strong> {{ has['asmr'] }}</p>{% endif %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+
+                                <div class="source-attribution source-attribution-centered mt-4">
+                                    <a href="{{ SOURCE_URLS.get('ANSM', {}).get('url', '#') }}" target="_blank" class="source-link">
+                                        <i class="fas fa-{{ SOURCE_URLS.get('ANSM', {}).get('icon', 'file-alt') }}"></i> {{ SOURCE_URLS.get('ANSM', {}).get('name', 'ANSM') }}
+                                    </a>
+                                    <p class="source-credit">{{ libelle('Source of this content', 'Source de ce contenu', lang) }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- ─── Structure moléculaire ─────────────────── -->
+                        {#
+                           Rattachée à la substance, jamais à la spécialité :
+                           il y a 13 594 spécialités pour 1 633 substances, et
+                           les cinq dosages d'ACTISKENAN afficheraient sinon
+                           cinq fois la même molécule de morphine (§12 du plan).
+                           Les biologiques — anticorps, vaccins — n'ont pas de
+                           SMILES et n'en auront pas : une formule topologique
+                           n'a pas de sens pour un anticorps. Le bloc le dit
+                           plutôt que de laisser un vide.
+                        #}
+                        {% if structures %}
+                        <span class="section-anchor" id="section-structure"></span>
+                        <div class="section-card">
+                            <div class="section-header">
+                                <span class="section-icon section-icon-mol"><i class="fas fa-atom"></i></span>
+                                <h2>{{ libelle('Molecular structure', 'Structure moléculaire', lang) }}</h2>
+                            </div>
+                            <div class="section-body">
+                                {% for s in structures %}
+                                <div class="structure-card">
+                                    <h4>{{ s['nom'] }}</h4>
+                                    {#
+                                       Le SVG est pré-calculé par RDKit — voir
+                                       scripts/render_structures.py — mais servi
+                                       par /structure/<clé>.svg et non plus
+                                       inline : 25 Ko en moyenne, identiques à
+                                       chaque visite, que le navigateur peut
+                                       garder un an. Les cinq dosages
+                                       d'ACTISKENAN partagent ainsi le même
+                                       dessin de morphine.
+
+                                       Effet de bord : plus besoin de `|safe`.
+                                       Un SVG chargé par <img> ne peut ni
+                                       exécuter de script ni appeler l'extérieur.
+                                    #}
+                                    {% if s['svg'] %}
+                                    <div class="structure-dessin">
+                                        <img src="{{ url_for('structure_svg', cle=(s['inchikey'] or s['nom'])) }}"
+                                             alt="{{ libelle('Skeletal formula of', 'Formule topologique de', lang) }} {{ s['nom'] }}"
+                                             loading="lazy" decoding="async">
+                                    </div>
+                                    {% endif %}
+                                    <div class="structure-grid">
+                                        {% if s['formule'] %}
+                                        <div><span class="structure-cle">{{ libelle('Molecular formula', 'Formule brute', lang) }}</span>
+                                             <span class="structure-formule">{{ s['formule'] }}</span></div>
+                                        {% endif %}
+                                        {% if s['masse'] %}
+                                        <div><span class="structure-cle">{{ libelle('Molecular weight', 'Masse moléculaire', lang) }}</span>
+                                             <span class="structure-valeur">{{ s['masse'] }} g/mol</span></div>
+                                        {% endif %}
+                                        {% if s['inchikey'] %}
+                                        <div><span class="structure-cle">InChIKey</span>
+                                             <span class="structure-valeur structure-mono">{{ s['inchikey'] }}</span></div>
+                                        {% endif %}
+                                    </div>
+                                    {% if s['smiles'] %}
+                                    <div class="structure-smiles">
+                                        <span class="structure-cle">SMILES</span>
+                                        <code>{{ s['smiles'] }}</code>
+                                    </div>
+                                    {% else %}
+                                    <p class="structure-absente"><i class="fas fa-info-circle"></i>
+                                        {{ libelle('No topological structure: this is a biological molecule (antibody, vaccine, protein), for which a structural formula has no meaning.',
+                                                   "Pas de structure topologique : il s'agit d'une molécule biologique — anticorps, vaccin, protéine — pour laquelle une formule développée n'a pas de sens.", lang) }}</p>
+                                    {% endif %}
+                                    {# Le SMILES existe mais la molécule est trop étendue pour un
+                                       schéma lisible — peptides et oligonucléotides. Le dire vaut
+                                       mieux que d'afficher un enchevêtrement illisible. #}
+                                    {% if s['smiles'] and not s['svg'] %}
+                                    <p class="structure-absente"><i class="fas fa-info-circle"></i>
+                                        {{ libelle('Structure too large to be drawn legibly at this scale — this molecule is a peptide or an oligonucleotide. The SMILES above describes it in full.',
+                                                   "Structure trop étendue pour un schéma lisible à cette échelle — cette molécule est un peptide ou un oligonucléotide. Le SMILES ci-dessus la décrit intégralement.", lang) }}</p>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                                <p class="source-credit mt-4">{{ libelle('Source: DrugBank calculated properties.', 'Source : propriétés calculées de DrugBank.', lang) }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- ─── Pharmacogénomique (PharmGKB) ────────────── -->
+                        {#
+                           Ce que le gène d'un patient change à ce médicament,
+                           quand une agence l'a écrit dans la notice.
+
+                           Portée par la substance, comme la structure : le
+                           CYP2C19 concerne le clopidogrel, pas le
+                           conditionnement. 73 % des fiches atteignent une
+                           molécule PharmGKB, 20 % un gène nommé par une
+                           agence — voir scripts/construire_pharmgkb.py.
+
+                           Le niveau n'est pas décoratif. « Testing Required »
+                           veut dire que l'agence exige le test avant de
+                           prescrire — c'est le cas du DPYD avant un
+                           5-fluorouracile, obligatoire en France depuis 2018.
+                           « No Clinical PGx » dit l'inverse : le gène est
+                           cité pour signaler qu'il n'y a rien à faire. Les
+                           afficher du même rouge inverserait le sens de la
+                           seconde.
+                        #}
+                        {% if pgx %}
+                        {% set pgx_niveaux = {
+                            'Testing Required':    ('Testing required before prescribing', 'Test exigé avant prescription', 'pgx-n1'),
+                            'Testing Recommended': ('Testing recommended', 'Test recommandé', 'pgx-n2'),
+                            'Actionable PGx':      ('Label gives a course of action', 'La notice donne une conduite à tenir', 'pgx-n3'),
+                            'Informative PGx':     ('Label mentions the gene, without a course of action', 'La notice mentionne le gène, sans conduite à tenir', 'pgx-n4'),
+                            'No Clinical PGx':     ('Label states no action is required', 'La notice indique qu’aucune action n’est requise', 'pgx-n5')
+                        } %}
+                        <span class="section-anchor" id="section-pharmacogenomique"></span>
+                        <div class="section-card">
+                            <div class="section-header">
+                                <span class="section-icon section-icon-pgx"><i class="fas fa-dna"></i></span>
+                                <h2>{{ libelle('Pharmacogenomics', 'Pharmacogénomique', lang) }}</h2>
+                            </div>
+                            <div class="section-body">
+
+                                {% if pgx['genes'] %}
+                                {% if pgx['conduite'] %}
+                                <p class="pgx-conduite"><i class="fas fa-exclamation-triangle"></i>
+                                    {{ libelle('For this drug, at least one medicines agency asks that a gene be taken into account before prescribing.',
+                                               'Pour ce médicament, au moins une agence du médicament demande de tenir compte d’un gène avant la prescription.', lang) }}</p>
+                                {% endif %}
+
+                                <div class="pgx-genes">
+                                    {% for g in pgx['genes'] %}
+                                    {% set n = pgx_niveaux.get(g['niveau']) %}
+                                    <div class="pgx-gene {{ n[2] if n else 'pgx-n6' }}">
+                                        <div class="pgx-gene-tete">
+                                            <span class="pgx-symbole">
+                                                {% if g['accession'] %}<a href="https://www.pharmgkb.org/gene/{{ g['accession'] }}" target="_blank" rel="noopener noreferrer">{{ g['symbole'] }}</a>{% else %}{{ g['symbole'] }}{% endif %}
+                                            </span>
+                                            <span class="pgx-niveau">{{ (n[0] if lang == 'en' else n[1]) if n else libelle('Level not specified by the agency', 'Niveau non précisé par l’agence', lang) }}</span>
+                                        </div>
+                                        {% if g['nom'] %}<p class="pgx-gene-nom">{{ g['nom'] }}</p>{% endif %}
+                                        <div class="pgx-gene-pied">
+                                            <span class="pgx-agences">
+                                                <i class="fas fa-landmark"></i>
+                                                {{ libelle('Stated by', 'Indiqué par', lang) }} {{ g['agences']|join(', ') }}
+                                            </span>
+                                            {% if g['guide_cpic'] %}
+                                            <span class="pgx-marque" title="{{ libelle('A CPIC dosing guideline exists for this gene', 'Une recommandation posologique CPIC existe pour ce gène', lang) }}"><i class="fas fa-book-medical"></i> CPIC</span>
+                                            {% endif %}
+                                            {% if g['molecules']|length > 1 or pgx['molecules']|length > 1 %}
+                                            <span class="pgx-marque pgx-marque-mol"><i class="fas fa-flask"></i> {{ g['molecules']|join(', ') }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% else %}
+                                {#
+                                   La molécule est dans PharmGKB, mais aucune agence n'y a
+                                   nommé de gène. Le dire vaut mieux que de masquer la
+                                   section : sans cette phrase, « rien affiché » se lit
+                                   « pas encore regardé », alors que la réponse est connue.
+                                #}
+                                <p class="pgx-vide"><i class="fas fa-info-circle"></i>
+                                    {{ libelle('No medicines agency has named a gene to take into account for this drug. The molecule is covered by PharmGKB: this is a documented absence, not missing data.',
+                                               'Aucune agence du médicament n’a nommé de gène à prendre en compte pour ce médicament. La molécule est bien couverte par PharmGKB : c’est une absence constatée, non une donnée manquante.', lang) }}</p>
+                                {% endif %}
+
+                                <div class="pgx-molecules">
+                                    <span class="pgx-molecules-cle">{{ libelle('Molecules covered', 'Molécules couvertes', lang) }}</span>
+                                    {% for m in pgx['molecules'] %}
+                                    <span class="pgx-molecule">
+                                        {% if m['accession'] %}<a href="https://www.pharmgkb.org/chemical/{{ m['accession'] }}" target="_blank" rel="noopener noreferrer">{{ m['nom'] }}</a>{% else %}{{ m['nom'] }}{% endif %}
+                                        {% if m['guide_posologie'] %}<i class="fas fa-book-medical" title="{{ libelle('A dosing guideline exists (CPIC / DPWG)', 'Une recommandation posologique existe (CPIC / DPWG)', lang) }}"></i>{% endif %}
+                                    </span>
+                                    {% endfor %}
+                                </div>
+
+                                {#
+                                   Même réserve que la posologie et les interactions : ce
+                                   bloc décrit ce qu'une agence a écrit, il ne prescrit pas
+                                   de test et n'interprète aucun résultat génétique.
+                                #}
+                                <p class="posology-warning"><i class="fas fa-exclamation-circle"></i>
+                                    {{ libelle('This section reports what medicines agencies have written in the labelling. It is neither a test prescription nor an interpretation of a genetic result: the decision to test, and what to conclude from it, belongs to the prescriber.',
+                                               'Cette section rapporte ce que les agences du médicament ont écrit dans les notices. Elle ne prescrit pas de test et n’interprète aucun résultat génétique : la décision de tester, et ce qu’il faut en conclure, appartiennent au médecin.', lang) }}</p>
+
+                                <p class="source-credit mt-4">
+                                    {{ libelle('Source: PharmGKB — drug label annotations (FDA, EMA, HCSC, Swissmedic, PMDA).', 'Source : PharmGKB — annotations des notices (FDA, EMA, HCSC, Swissmedic, PMDA).', lang) }}
+                                </p>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- ─── Monographie absente : fiche d'origine EMA ── -->
+                        {#
+                           Ces fiches viennent du tableur EMA, qui ne contient
+                           pas le RCP — l'agence le publie en PDF, séparément.
+                           Sans cet avertissement, la page affiche interactions
+                           et statut mais aucune indication, posologie ni
+                           contre-indication, sans dire pourquoi : sur un
+                           anticoagulant, une fiche qui paraît sans
+                           contre-indications est le pire endroit où laisser
+                           cette ambiguïté. Même principe que la distinction
+                           « aucune interaction connue » / « données
+                           indisponibles » (§11.5 du plan P9).
+                        #}
+                        {% if medicine.get('source') == 'EMA' and not medicine.get('sections') %}
+                        <span class="section-anchor" id="section-monographie"></span>
+                        <div class="section-card">
+                            <div class="section-header">
+                                <span class="section-icon section-icon-inter"><i class="fas fa-file-excel"></i></span>
+                                <h2>{{ libelle('Monograph not available here', 'Monographie non disponible sur cette fiche', lang) }}</h2>
+                            </div>
+                            <div class="section-body">
+                                <div class="clinical-card clinical-card-warning">
+                                    <div class="clinical-card-icon" style="background:#fffbeb;color:#d97706;"><i class="fas fa-exclamation-triangle"></i></div>
+                                    <h4>{{ libelle('What this page does not show', 'Ce que cette page ne montre pas', lang) }}</h4>
+                                    <p>{{ libelle(
+                                        'This medicine is authorised through the European centralised procedure. Its summary of product characteristics is published by the EMA as a separate PDF, which this catalogue does not import. Indications, posology, contraindications and warnings therefore do not appear on this page — their absence here says nothing about the medicine.',
+                                        "Ce médicament est autorisé par la procédure centralisée européenne. Son résumé des caractéristiques du produit est publié par l'EMA sous forme de PDF distinct, que ce catalogue n'importe pas. Les indications, la posologie, les contre-indications et les mises en garde ne figurent donc pas sur cette page — leur absence ici ne dit rien du médicament.",
+                                        lang) }}</p>
+                                </div>
+                                <p class="interactions-disclaimer"><i class="fas fa-info-circle"></i>
+                                    {{ libelle('The interactions listed below come from DrugBank and are unaffected by this limitation.',
+                                               'Les interactions listées plus bas proviennent de DrugBank et ne sont pas concernées par cette limite.', lang) }}</p>
+                                {% if medicine.get('url') %}
+                                <div class="source-attribution source-attribution-centered mt-4">
+                                    <a href="{{ medicine['url'] }}" target="_blank" rel="noopener" class="source-link">
+                                        <i class="fas fa-external-link-alt"></i> {{ libelle('Read the official EMA monograph', "Consulter la monographie officielle sur le site de l'EMA", lang) }}
+                                    </a>
+                                    <p class="source-credit">{{ libelle('European Medicines Agency — authoritative source for this medicine.', "Agence européenne des médicaments — source de référence pour ce médicament.", lang) }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- ─── Contre-indications ──────────────────── -->
+                        {#
+                           Extraites de la rubrique 4.3 et remontées ici, au
+                           premier niveau de la fiche.
+
+                           Le bloc « Synthèse médicale » était censé les porter,
+                           mais `synthesis.contre_indications` est absent des
+                           13 594 fiches : il n'a jamais rien affiché. Les
+                           contre-indications n'existaient donc que dans la
+                           monographie, en 4.3, au même rang typographique que
+                           la date de renouvellement d'AMM.
+
+                           Le texte est celui du RCP, sans reformulation. Le
+                           lien renvoie à la rubrique d'origine : c'est elle qui
+                           fait foi, et son contexte — les mises en garde de
+                           4.4 — se lit à côté.
+                        #}
+                        {% if contre_indications %}
+                        <span class="section-anchor" id="section-contraindications"></span>
+                        <div class="section-card section-card-critical">
+                            <div class="section-header">
+                                <span class="section-icon" style="background:#fef2f2;color:#dc2626;"><i class="fas fa-ban"></i></span>
+                                <h2>{{ libelle('Contraindications', 'Contre-indications', lang) }}</h2>
+                            </div>
+                            <div class="section-body">
+                                <ul class="liste-contre-indications">
+                                    {% for enonce in contre_indications %}
+                                    <li>{{ enonce }}</li>
+                                    {% endfor %}
+                                </ul>
+                                <p class="interactions-disclaimer"><i class="fas fa-info-circle"></i>
+                                    {{ libelle('Text taken verbatim from section 4.3 of the SmPC, without rewording.',
+                                               "Texte repris tel quel de la rubrique 4.3 du RCP, sans reformulation.", lang) }}
+                                    {% if rang_ci %}
+                                    <a href="#section-{{ rang_ci }}">{{ libelle('Read it in context', 'La lire dans son contexte', lang) }}</a>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- ─── Interactions ────────────────────────── -->
+                        <span class="section-anchor" id="section-interactions"></span>
+                        <div class="section-card">
+                            <div class="section-header">
+                                <span class="section-icon section-icon-inter"><i class="fas fa-exclamation-triangle"></i></span>
+                                <h2>{{ libelle('Drug Interactions', 'Interactions médicamenteuses', lang) }}</h2>
+                            </div>
+                            <div class="section-body">
+                                <div class="loading-box" id="interactions-loading">
+                                    <div class="loading-spinner"></div>
+                                    <p>{{ libelle('Loading interactions...', 'Chargement des interactions...', lang) }}</p>
+                                </div>
+                                <div id="interactions-content"></div>
+                                <div class="source-attribution source-attribution-centered mt-4">
+                                    <a href="https://base-donnees-publique.medicaments.gouv.fr/" target="_blank" rel="noopener" class="source-link">
+                                        <i class="fas fa-external-link-alt"></i> {{ libelle('Verify in the official SmPC (French public medicines database)', 'Vérifier dans le RCP officiel (base de données publique des médicaments)', lang) }}
+                                    </a>
+                                    <a href="https://ansm.sante.fr/documents/reference/thesaurus-des-interactions-medicamenteuses-1" target="_blank" rel="noopener" class="source-link">
+                                        <i class="fas fa-archive"></i> {{ libelle('ANSM interactions thesaurus (archived, no longer updated)', 'Thésaurus ANSM des interactions (archivé, non mis à jour)', lang) }}
+                                    </a>
+                                    <p class="source-credit">{{ libelle('Summaries of product characteristics and patient leaflets are the only binding official references. The ANSM interactions thesaurus has not been updated since September 2023 and is no longer binding; it remains available for consultation until 15 June 2027.', "Les RCP et les notices sont les seules références officielles opposables. Le thésaurus ANSM des interactions n'est plus mis à jour depuis septembre 2023 et n'est plus opposable ; il reste consultable jusqu'au 15 juin 2027.", lang) }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ─── Alternatives ────────────────────────── -->
+                        <span class="section-anchor" id="section-alternatives"></span>
+                        <div class="section-card">
+                            <div class="section-header">
+                                <span class="section-icon" style="background:#f0fdf4;color:#16a34a;"><i class="fas fa-exchange-alt"></i></span>
+                                <h2>{{ libelle('Alternatives', 'Alternatives thérapeutiques', lang) }}</h2>
+                            </div>
+                            <div class="section-body">
+                                <p style="font-size:0.82rem;color:#6b7280;margin:0 0 16px;">
+                                    {{ libelle('Other medications with the same active ingredient(s).', 'Autres médicaments avec le(s) même(s) principe(s) actif(s).', lang) }}
+                                </p>
+                                <div class="loading-box" id="alternatives-loading">
+                                    <div class="loading-spinner"></div>
+                                    <p>{{ libelle('Loading alternatives...', 'Chargement des alternatives...', lang) }}</p>
+                                </div>
+                                <div id="alternatives-content"></div>
+                            </div>
+                        </div>
+
+                        {#
+                           Frontière entre les deux niveaux de la fiche.
+
+                           Jusqu'ici, la page suivait l'ordre du RCP : les
+                           dix-huit sections réglementaires s'intercalaient
+                           entre les rubriques cliniques et les interactions.
+                           Un prescripteur qui cherchait les interactions
+                           devait faire défiler « 9. DATE DE PREMIERE
+                           AUTORISATION » et « 11. DOSIMETRIE » pour les
+                           atteindre.
+
+                           Les interactions et les alternatives remontent donc
+                           avant la monographie : elles relèvent du même niveau
+                           que les contre-indications, celui de la décision.
+                           L'ordre réglementaire est conservé à l'intérieur de
+                           la monographie — il fait foi — mais il ne commande
+                           plus la page entière.
+                        #}
+                        <div class="frontiere-monographie">
+                            <span class="frontiere-trait" aria-hidden="true"></span>
+                            <h2 class="frontiere-titre">{{ libelle('Regulatory monograph', 'Monographie réglementaire', lang) }}</h2>
+                            <p class="frontiere-aide">{{ libelle(
+                                'The official summary of product characteristics, in its regulatory order. Everything above is what a prescriber consults first.',
+                                "Le résumé officiel des caractéristiques du produit, dans son ordre réglementaire. Tout ce qui précède est ce qu'un prescripteur consulte en premier.",
+                                lang) }}</p>
+                        </div>
+
+                        <!-- ─── Document Sections ──────────────────── -->
+                        {% if medicine.get('sections') %}
+                        {# `namespace` : un `set` ordinaire ne survit pas à un tour de boucle.
+                           Sert à n'ancrer que la première sous-section de contre-indications. #}
+                        {% set ns = namespace(ci_ancree=false) %}
+                        {% for section in medicine['sections'] %}
+                        <span class="section-anchor" id="section-{{ loop.index }}"></span>
+                        <div class="section-card" data-collapsible>
+                            <div class="section-header">
+                                <span class="section-icon section-icon-notice"><i class="fas fa-file-alt"></i></span>
+                                <h2>{{ section['title'] }}</h2>
+                            </div>
+                            <div class="section-body collapsible-wrap">
+                                <div class="collapsible-content">
+                                    <div class="doc-content">
+                                    {% if section.get('content') and section['content']|length > 0 %}
+                                        {% for content_item in section['content'] %}
+                                            {% if content_item.get('table') %}
+                                                <div class="doc-table-wrap">
+                                                    {% if content_item.get('caption') %}
+                                                    <div class="doc-caption">{{ content_item['caption'] }}</div>
+                                                    {% endif %}
+                                                    <table class="doc-table">
+                                                        {% if content_item.get('headers') %}
+                                                        <thead>
+                                                            <tr>{% for header in content_item['headers'] %}<th>{{ header }}</th>{% endfor %}</tr>
+                                                        </thead>
+                                                        {% endif %}
+                                                        <tbody>
+                                                            {% for row in content_item['table'] %}
+                                                            <tr>{% for cell in row %}{% if loop.index == 1 and not content_item.get('headers') %}<th>{{ cell }}</th>{% else %}<td>{{ cell }}</td>{% endif %}{% endfor %}</tr>
+                                                            {% endfor %}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            {% elif content_item.get('text') %}
+                                                {% if content_item.get('formatting', {}).get('bold') and content_item.get('formatting', {}).get('italic') and content_item.get('formatting', {}).get('underline') %}
+                                                    <p><strong><em><u>{{ content_item['text'] }}</u></em></strong></p>
+                                                {% elif content_item.get('formatting', {}).get('bold') and content_item.get('formatting', {}).get('italic') %}
+                                                    <p><strong><em>{{ content_item['text'] }}</em></strong></p>
+                                                {% elif content_item.get('formatting', {}).get('bold') and content_item.get('formatting', {}).get('underline') %}
+                                                    <p><strong><u>{{ content_item['text'] }}</u></strong></p>
+                                                {% elif content_item.get('formatting', {}).get('italic') and content_item.get('formatting', {}).get('underline') %}
+                                                    <p><em><u>{{ content_item['text'] }}</u></em></p>
+                                                {% elif content_item.get('formatting', {}).get('bold') %}
+                                                    <p><strong>{{ content_item['text'] }}</strong></p>
+                                                {% elif content_item.get('formatting', {}).get('italic') %}
+                                                    <p><em>{{ content_item['text'] }}</em></p>
+                                                {% elif content_item.get('formatting', {}).get('underline') %}
+                                                    <p><u>{{ content_item['text'] }}</u></p>
+                                                {% else %}
+                                                    <p>{{ content_item['text'] }}</p>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+
+                                    {% if section.get('subsections') and section['subsections']|length > 0 %}
+                                        {% for subsection in section['subsections'] %}
+                                        {# Contre-indications et mises en garde : le RCP les enfouit
+                                           en 4.3 et 4.4, au même niveau que la dosimétrie ou le
+                                           numéro d'AMM. La convention du domaine — VIDAL, Thériaque —
+                                           les fait ressortir. On les distingue ici sans toucher à
+                                           l'ordre réglementaire, qui fait foi. #}
+                                        {% set t_sub = (subsection['title'] or '')|lower %}
+                                        {% set est_ci = 'contre-indication' in t_sub or 'contre indication' in t_sub %}
+                                        {% set est_garde = 'mise en garde' in t_sub or 'mises en garde' in t_sub %}
+                                        <div class="subsection-block{% if est_ci %} subsection-critical{% elif est_garde %} subsection-warning{% endif %}">
+                                            {% if est_ci and not ns.ci_ancree %}<span class="section-anchor" id="section-contraindications"></span>{% set ns.ci_ancree = true %}{% endif %}
+                                            <h4>{% if est_ci %}<i class="fas fa-ban"></i> {% elif est_garde %}<i class="fas fa-exclamation-triangle"></i> {% endif %}{{ subsection['title'] }}</h4>
+                                            {% for content_item in subsection.get('content', []) %}
+                                                {% if content_item.get('table') %}
+                                                <div class="doc-table-wrap">
+                                                    {% if content_item.get('caption') %}<div class="doc-caption">{{ content_item['caption'] }}</div>{% endif %}
+                                                    <table class="doc-table">
+                                                        {% if content_item.get('headers') %}<thead><tr>{% for h in content_item['headers'] %}<th>{{ h }}</th>{% endfor %}</tr></thead>{% endif %}
+                                                        <tbody>{% for row in content_item['table'] %}<tr>{% for cell in row %}{% if loop.index == 1 and not content_item.get('headers') %}<th>{{ cell }}</th>{% else %}<td>{{ cell }}</td>{% endif %}{% endfor %}</tr>{% endfor %}</tbody>
+                                                    </table>
+                                                </div>
+                                                {% elif content_item.get('text') %}
+                                                    <p>{{ content_item['text'] }}</p>
+                                                {% endif %}
+                                            {% endfor %}
+
+                                            {% if subsection.get('subsections') %}
+                                                {% for sub_subsection in subsection['subsections'] %}
+                                                <div class="subsubsection-block">
+                                                    <h5>{{ sub_subsection['title'] }}</h5>
+                                                    {% for content_item in sub_subsection.get('content', []) %}
+                                                        {% if content_item.get('table') %}
+                                                        <div class="doc-table-wrap">
+                                                            {% if content_item.get('caption') %}<div class="doc-caption">{{ content_item['caption'] }}</div>{% endif %}
+                                                            <table class="doc-table">
+                                                                {% if content_item.get('headers') %}<thead><tr>{% for h in content_item['headers'] %}<th>{{ h }}</th>{% endfor %}</tr></thead>{% endif %}
+                                                                <tbody>{% for row in content_item['table'] %}<tr>{% for cell in row %}{% if loop.index == 1 and not content_item.get('headers') %}<th>{{ cell }}</th>{% else %}<td>{{ cell }}</td>{% endif %}{% endfor %}</tr>{% endfor %}</tbody>
+                                                            </table>
+                                                        </div>
+                                                        {% elif content_item.get('text') %}
+                                                        <p>{{ content_item['text'] }}</p>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                    {% if sub_subsection.get('source') %}
+                                <div class="source-attribution mt-3">
+                                    {% set srcs = sub_subsection['source'] if sub_subsection['source'] is iterable and sub_subsection['source'] is not string else [sub_subsection['source']] %}
+                                    {% for s in srcs %}
+                                    {% set sd = SOURCE_URLS.get(s, SOURCE_URLS.get('ANSM', {})) %}
+                                    <a href="{{ sd.get('url', '#') }}" target="_blank" class="source-link"><i class="fas fa-{{ sd.get('icon', 'file-alt') }}"></i> {{ sd.get('name', s) }}</a>
+                                    {% endfor %}
+                                    <p class="source-credit">{{ libelle('Source(s) of this content', 'Source(s) de ce contenu', lang) }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                            {% endif %}
+
+                            {% if subsection.get('source') %}
+                            <div class="source-attribution mt-3">
+                                                {% set srcs = subsection['source'] if subsection['source'] is iterable and subsection['source'] is not string else [subsection['source']] %}
+                                                {% for s in srcs %}
+                                                {% set sd = SOURCE_URLS.get(s, SOURCE_URLS.get('ANSM', {})) %}
+                                                <a href="{{ sd.get('url', '#') }}" target="_blank" class="source-link"><i class="fas fa-{{ sd.get('icon', 'file-alt') }}"></i> {{ sd.get('name', s) }}</a>
+                                                {% endfor %}
+                                                <p class="source-credit">{{ libelle('Source(s) of this content', 'Source(s) de ce contenu', lang) }}</p>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        {% endfor %}
+                                    {% endif %}
+
+                                    {% if (not section.get('content') or section['content']|length == 0) and (not section.get('subsections') or section['subsections']|length == 0) %}
+                                    <div class="empty-state">
+                                        <i class="fas fa-info-circle"></i>
+                                        <p>{{ libelle('This section has no content.', 'Cette section ne contient pas de contenu.', lang) }}</p>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if section.get('source') %}
+                                    <div class="source-attribution source-attribution-centered mt-4">
+                                        {% set srcs = section['source'] if section['source'] is iterable and section['source'] is not string else [section['source']] %}
+                                        {% for s in srcs %}
+                                        {% set sd = SOURCE_URLS.get(s, SOURCE_URLS.get('ANSM', {})) %}
+                                        <a href="{{ sd.get('url', '#') }}" target="_blank" class="source-link"><i class="fas fa-{{ sd.get('icon', 'file-alt') }}"></i> {{ sd.get('name', s) }}</a>
+                                        {% endfor %}
+                                        <p class="source-credit">{{ libelle('Source(s) of this content', 'Source(s) de ce contenu', lang) }}</p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                </div><!-- /.collapsible-content -->
+                                <div class="collapsible-fade"></div>
+                            </div><!-- /.section-body.collapsible-wrap -->
+                            <button class="collapsible-toggle">{{ libelle('Show more', 'Afficher plus', lang) }}</button>
+                        </div><!-- /.section-card -->
+                        {% endfor %}
+                        {% endif %}
+
+                        <!-- ─── Medical Sources ─────────────────────── -->
+                        <span class="section-anchor" id="section-medical-sources"></span>
+                        <div class="section-card">
+                            <div class="section-header">
+                                <span class="section-icon section-icon-source"><i class="fas fa-database"></i></span>
+                                <h2>{{ libelle('Medical Sources', 'Sources médicales', lang) }}</h2>
+                            </div>
+                            <div class="section-body">
+                                <div class="loading-box" id="medical-sources-container">
+                                    <div class="loading-spinner"></div>
+                                    <p>{{ libelle('Loading sources...', 'Chargement des sources...', lang) }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ─── Knowledge Graph ──────────────────────── -->
+                        <span class="section-anchor" id="section-knowledge-graph"></span>
+                        <div class="section-card">
+                            <div class="section-header">
+                                <span class="section-icon section-icon-graph"><i class="fas fa-project-diagram"></i></span>
+                                <h2>{{ libelle('Knowledge Graph', 'Graphe de connaissances', lang) }}</h2>
+                            </div>
+                            <div class="section-body">
+                                <p style="font-size:0.82rem;color:#6b7280;margin:0 0 16px;">
+                                    {{ libelle('Visual exploration of Neo4j relationships: active ingredients, interactions, and FAERS adverse events.', 'Exploration visuelle des relations Neo4j : principes actifs, interactions et effets indésirables FAERS.', lang) }}
+                                </p>
+                                <div class="loading-box" id="graph-loading">
+                                    <div class="loading-spinner"></div>
+                                    <p>{{ libelle('Loading graph...', 'Chargement du graphe...', lang) }}</p>
+                                </div>
+                                <div id="graph-container" class="medicine-graph-container" style="display:none;"></div>
+                                <div id="graph-legend" class="graph-legend" style="display:none;">
+                                    <span><span class="legend-dot" style="background:#4f46e5;"></span> {{ libelle('Drug', 'Médicament', lang) }}</span>
+                                    <span><span class="legend-dot" style="background:#0d9488;"></span> {{ libelle('Active Ingredient', 'Principe actif', lang) }}</span>
+                                    <span><span class="legend-dot" style="background:#6366f1;"></span> {{ libelle('Alternative', 'Alternative', lang) }}</span>
+                                    <span><span class="legend-dot" style="background:#e11d48;"></span> {{ libelle('Interaction', 'Interaction', lang) }}</span>
+                                    <span><span class="legend-dot" style="background:#d97706;"></span> {{ libelle('FAERS Effect', 'Effet indésirable', lang) }}</span>
+                                </div>
+                                <div class="source-attribution source-attribution-centered mt-4">
+                                    <span class="source-link"><i class="fas fa-database"></i> Neo4j Knowledge Graph</span>
+                                    <p class="source-credit">{{ libelle('Data from Neo4j (interactions, ingredients, FAERS adverse events)', 'Données Neo4j (interactions, principes actifs, effets indésirables FAERS)', lang) }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ─── Comments ────────────────────────────── -->
+                        <span class="section-anchor" id="section-comments"></span>
+                        <div class="section-card">
+                            <div class="section-header">
+                                <span class="section-icon section-icon-comment"><i class="fas fa-comments"></i></span>
+                                <h2>{{ libelle('Comments', 'Commentaires', lang) }}</h2>
+                            </div>
+                            <div class="section-body">
+                                {% if g.user %}
+                                <div class="comment-form-box">
+                                    <h4>
+                                        {{ libelle('Add a comment', 'Ajouter un commentaire', lang) }}
+                                    </h4>
+                                    <form method="POST" action="{{ url_for('users.add_comment', medicine_id=medicine._id) }}">
+                                        <div class="rating mb-3" role="radiogroup" aria-label="{{ libelle('Rating', 'Note', lang) }}">
+                                            <input type="radio" id="star5" name="rating" value="5" required><label for="star5"></label>
+                                            <input type="radio" id="star4" name="rating" value="4"><label for="star4"></label>
+                                            <input type="radio" id="star3" name="rating" value="3"><label for="star3"></label>
+                                            <input type="radio" id="star2" name="rating" value="2"><label for="star2"></label>
+                                            <input type="radio" id="star1" name="rating" value="1"><label for="star1"></label>
+                                        </div>
+                                        <textarea name="content" placeholder="{{ libelle('Share your thoughts about this medication...', 'Partagez votre avis sur ce médicament...', lang) }}" required></textarea>
+                                        <input type="hidden" name="lang" value="{{ lang }}">
+                                        <button type="submit" class="btn btn-primary mt-3">{{ libelle('Submit', 'Publier', lang) }}</button>
+                                    </form>
+                                </div>
+                                {% else %}
+                                <div class="empty-state" style="border:1px dashed #d1d5db;">
+                                    <i class="fas fa-sign-in-alt" style="opacity:0.3;"></i>
+                                    <p><a href="{{ url_for('users.login') }}?next={{ request.path }}" style="color:#4f46e5;font-weight:600;">{{ libelle('Log in', 'Connectez-vous', lang) }}</a> {{ libelle('to leave a comment.', 'pour laisser un commentaire.', lang) }}</p>
+                                </div>
+                                {% endif %}
+
+                                {% if comments and comments|length > 0 %}
+                                <div>
+                                    <h4 class="comments-header">
+                                        {{ comments|length }} {{ libelle('comment(s)', 'commentaire(s)', lang) }}
+                                    </h4>
+                                    {% for comment in comments %}
+                                    <div class="comment-item" id="comment-{{ comment._id }}">
+                                        <div class="comment-header">
+                                            <div class="comment-user">
+                                                <i class="fas fa-user"></i>
+                                                {{ comment.user.first_name + ' ' + comment.user.last_name if comment.user else 'Anonymous' }}
+                                            </div>
+                                            <div class="comment-meta">
+                                                <div class="comment-stars">
+                                                    {% for i in range(comment.rating) %}★{% endfor %}{% for i in range(5 - comment.rating) %}☆{% endfor %}
+                                                </div>
+                                                <span class="comment-date">{{ comment.timestamp.strftime('%d/%m/%Y') if comment.timestamp else '' }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="comment-text">{{ comment.content }}</div>
+                                        {% if g.user and comment.user_id == g.user._id|string %}
+                                        <div class="comment-actions">
+                                            <button onclick="document.getElementById('edit-form-{{ comment._id }}').style.display='block'" class="btn btn-sm" style="background:transparent;border:1px solid #d1d5db;">{{ libelle('Edit', 'Modifier', lang) }}</button>
+                                            <form method="POST" action="{{ url_for('users.delete_comment', comment_id=comment._id) }}" style="display:inline;">
+                                                <input type="hidden" name="lang" value="{{ lang }}">
+                                                <button type="submit" class="btn btn-sm" style="background:transparent;border:1px solid #fecaca;color:#dc2626;" onclick="return confirm('{{ libelle('Delete this comment?', 'Supprimer ce commentaire?', lang) }}')">{{ libelle('Delete', 'Supprimer', lang) }}</button>
+                                            </form>
+                                        </div>
+                                        <div id="edit-form-{{ comment._id }}" class="edit-comment-form" style="display:none;">
+                                            <form method="POST" action="{{ url_for('users.edit_comment', comment_id=comment._id) }}">
+                                                <textarea name="content" style="width:100%;min-height:70px;padding:10px 12px;border:1px solid #d1d5db;">{{ comment.content }}</textarea>
+                                                <input type="hidden" name="lang" value="{{ lang }}">
+                                                <div style="display:flex;gap:8px;margin-top:8px;">
+                                                    <button type="submit" class="btn btn-sm btn-primary" style="padding:6px 14px;">{{ libelle('Save', 'Enregistrer', lang) }}</button>
+                                                    <button type="button" onclick="document.getElementById('edit-form-{{ comment._id }}').style.display='none'" style="background:transparent;border:1px solid #d1d5db;color:#374151;">{{ libelle('Cancel', 'Annuler', lang) }}</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% else %}
+                                <div class="empty-state">
+                                    <i class="fas fa-comment-dots"></i>
+                                    <p>{{ libelle('No comments yet.', 'Aucun commentaire pour le moment.', lang) }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- ─── Technical Data ──────────────────────── -->
+                        <span class="section-anchor" id="section-technical-data"></span>
+                        <div class="section-card">
+                            <div class="section-header">
+                                <span class="section-icon section-icon-tech"><i class="fas fa-code"></i></span>
+                                <h2>{{ libelle('Technical Data', 'Données techniques', lang) }}</h2>
+                            </div>
+                            <div class="section-body">
+                                <div class="tech-grid">
+                                    <div class="tech-item">
+                                        <span class="tech-item-label">ID</span>
+                                        <span class="tech-item-value">{{ medicine._id }}</span>
+                                    </div>
+                                    <div class="tech-item">
+                                        <span class="tech-item-label">{{ libelle('Language', 'Langue', lang) }}</span>
+                                        <span class="tech-item-value">{{ medicine.language if medicine.get('language') else 'fr' }}</span>
+                                    </div>
+                                    {% if medicine.get('url') %}
+                                    <div class="tech-item">
+                                        <span class="tech-item-label">{{ libelle('Source URL', 'URL source', lang) }}</span>
+                                        <span class="tech-item-value"><a href="{{ medicine['url'] }}" target="_blank" style="color:#4f46e5;">{{ medicine['url'] }}</a></span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="source-attribution source-attribution-centered mt-4">
+                                    <a href="{{ SOURCE_URLS.get('ANSM', {}).get('url', '#') }}" target="_blank" class="source-link">
+                                        <i class="fas fa-{{ SOURCE_URLS.get('ANSM', {}).get('icon', 'file-alt') }}"></i> {{ SOURCE_URLS.get('ANSM', {}).get('name', 'ANSM') }}
+                                    </a>
+                                    <p class="source-credit">{{ libelle('Source of this content', 'Source de ce contenu', lang) }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div><!-- /.medicine-main -->
+                </div><!-- /.medicine-layout -->
+            </div>
+        </section>
+    </main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/dist/vis-network.min.js"></script>
+<script>
+(function() {
+    const favoriteBtn = document.getElementById('favorite-btn');
+    const favoriteIcon = document.getElementById('favorite-icon');
+    const favoriteText = document.getElementById('favorite-text');
+    const userConnected = {% if g.user %}true{% else %}false{% endif %};
+    const currentLang = localStorage.getItem('posologyai_lang') || 'fr';
+    const isEnglish = currentLang === 'en';
+
+    // ── Collapsible sections ──────────────────────────
+    document.querySelectorAll('[data-collapsible]').forEach(function(card) {
+        var content = card.querySelector('.collapsible-content');
+        var toggle = card.querySelector('.collapsible-toggle');
+        var fade = card.querySelector('.collapsible-fade');
+        if (!content || !toggle) return;
+        if (content.scrollHeight <= 300) {
+            toggle.style.display = 'none';
+            if (fade) fade.style.display = 'none';
+            return;
+        }
+        toggle.addEventListener('click', function() {
+            var expanded = content.classList.toggle('expanded');
+            if (fade) fade.classList.toggle('hidden-fade');
+            toggle.textContent = expanded
+                ? (isEnglish ? 'Show less' : 'Afficher moins')
+                : (isEnglish ? 'Show more' : 'Afficher plus');
+        });
+    });
+
+    // ── Favorite toggle ──────────────────────────────
+    if (favoriteBtn) {
+        favoriteBtn.addEventListener('click', function() {
+            if (!userConnected) {
+                window.location.href = "{{ url_for('users.login') }}?next={{ request.path }}";
+                return;
+            }
+            fetch('/api/toggle-favorite/{{ medicine._id }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    favoriteBtn.setAttribute('aria-pressed', data.is_favorite ? 'true' : 'false');
+                    if (data.is_favorite) {
+                        favoriteIcon.className = 'heart-icon fas fa-heart favorited';
+                        favoriteText.textContent = isEnglish ? 'Remove from favorites' : 'Retirer des favoris';
+                    } else {
+                        favoriteIcon.className = 'heart-icon far fa-heart not-favorited';
+                        favoriteText.textContent = isEnglish ? 'Add to favorites' : 'Ajouter aux favoris';
+                    }
+                }
+            })
+            .catch(function(err) { console.error('Favorite error:', err); });
+        });
+    }
+
+    // ── Smooth scroll nav links (header offset + re-align) ──
+    var pendingScrollTarget = null;
+    function headerHeight() {
+        var header = document.querySelector('header');
+        return header ? header.offsetHeight : 64;
+    }
+    function alignToTarget(target) {
+        if (!target) return;
+        var top = target.getBoundingClientRect().top + window.pageYOffset - headerHeight() - 16;
+        window.scrollTo({ top: top, behavior: 'smooth' });
+    }
+    function scheduleAlign(target) {
+        pendingScrollTarget = target;
+        alignToTarget(target);
+        window.addEventListener('scrollend', function() {
+            if (pendingScrollTarget) {
+                alignToTarget(pendingScrollTarget);
+                pendingScrollTarget = null;
+            }
+        }, { once: true });
+        setTimeout(function() { cancelPendingAlign(); }, 2500);
+    }
+    function cancelPendingAlign() { pendingScrollTarget = null; }
+    window.addEventListener('wheel', cancelPendingAlign, { passive: true });
+    window.addEventListener('touchstart', cancelPendingAlign, { passive: true });
+    window.addEventListener('keydown', cancelPendingAlign);
+    // Groupe repliable du document reglementaire. `hidden` plutot qu un
+    // display:none en CSS : l attribut retire aussi les entrees de l ordre de
+    // tabulation et de l arbre d accessibilite, ce qu une classe ne fait pas.
+    document.querySelectorAll('.nav-groupe-bouton').forEach(function(bouton) {
+        bouton.addEventListener('click', function() {
+            var liste = document.getElementById(bouton.getAttribute('aria-controls'));
+            if (!liste) return;
+            var ouvert = bouton.getAttribute('aria-expanded') === 'true';
+            bouton.setAttribute('aria-expanded', ouvert ? 'false' : 'true');
+            liste.hidden = ouvert;
+        });
+    });
+
+    document.querySelectorAll('.nav-link').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            var targetId = this.getAttribute('href');
+            if (targetId && targetId.startsWith('#')) {
+                e.preventDefault();
+                var target = document.querySelector(targetId);
+                if (target) scheduleAlign(target);
+            }
+        });
+    });
+
+    // ── Scroll spy ──────────────────────────────────────
+    var sections = document.querySelectorAll('.section-anchor');
+    var navLinks = document.querySelectorAll('.nav-link');
+    var scrollSpyThrottle = null;
+    function updateActiveNav() {
+        var scrollY = window.pageYOffset;
+        var header = document.querySelector('header');
+        var headerH = header ? header.offsetHeight : 64;
+        var currentId = '';
+        sections.forEach(function(sec) {
+            var top = sec.getBoundingClientRect().top + window.pageYOffset;
+            if (scrollY >= top - headerH - 80) {
+                currentId = sec.getAttribute('id');
+            }
+        });
+        navLinks.forEach(function(link) {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + currentId) {
+                link.classList.add('active');
+            }
+        });
+    }
+    window.addEventListener('scroll', function() {
+        if (!scrollSpyThrottle) {
+            scrollSpyThrottle = setTimeout(function() {
+                updateActiveNav();
+                scrollSpyThrottle = null;
+            }, 100);
+        }
+    }, { passive: true });
+    updateActiveNav();
+
+    // ── AI Summary polling ────────────────────────────
+    var aiLoading = document.getElementById('ai-loading');
+    if (aiLoading) {
+        var attempts = 0, maxAttempts = 10;
+        var statusEl = aiLoading.querySelector('p');
+        function checkSummary() {
+            attempts++;
+            if (attempts <= maxAttempts) {
+                if (statusEl) statusEl.textContent = isEnglish ? 'Generating... (' + attempts + '/' + maxAttempts + ')' : 'Génération en cours... (' + attempts + '/' + maxAttempts + ')';
+                fetch('/api/medicine-summary/{{ medicine._id }}?lang=' + currentLang)
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.summary) {
+                        var disclaimer = isEnglish ? 'This summary is automatically generated and may contain inaccuracies. Always consult a healthcare professional.' : 'Ce résumé est généré automatiquement et pourrait contenir des imprécisions. Consultez toujours un professionnel de santé.';
+                        var modelText = isEnglish ? 'Model used:' : 'Modèle utilisé:';
+                        aiLoading.innerHTML = '<div class="ai-summary-content">' + data.summary +
+                            '<div class="ai-disclaimer"><i class="fas fa-info-circle"></i> ' + disclaimer +
+                            '<span class="ai-model">' + modelText + ' mistral-small-latest</span></div></div>';
+                        if (pendingScrollTarget) alignToTarget(pendingScrollTarget);
+                    } else if (attempts < maxAttempts) {
+                        setTimeout(checkSummary, 5000);
+                    } else {
+                        if (statusEl) { statusEl.textContent = isEnglish ? 'Generation timeout.' : 'Délai de génération dépassé.'; }
+                    }
+                })
+                .catch(function() {
+                    if (attempts < maxAttempts) setTimeout(checkSummary, 5000);
+                });
+            }
+        }
+        setTimeout(checkSummary, 1000);
+    }
+
+    // ── Interactions ──────────────────────────────────
+    function loadInteractions() {
+        var loadingDiv = document.getElementById('interactions-loading');
+        var contentDiv = document.getElementById('interactions-content');
+        if (!loadingDiv) return;
+
+        fetch('/api/medicine-interactions/{{ medicine._id }}?lang=' + currentLang)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success && data.interactions && data.interactions.length > 0) {
+                var shown = data.displayed_count || data.interactions.length;
+                var subs = (data.substances || []).join(', ');
+                var warningText = isEnglish
+                    ? '<strong>⚠ Warning:</strong> ' + subs + ' interacts with ' + data.total_count + ' other substance(s).'
+                    : '<strong>⚠ Attention :</strong> ' + subs + ' interagit avec ' + data.total_count + ' autre(s) substance(s).';
+                if (data.total_count > shown) {
+                    warningText += isEnglish
+                        ? ' The ' + shown + ' most widely marketed are listed below.'
+                        : ' Les ' + shown + ' les plus répandues sont listées ci-dessous.';
+                }
+                var html = '<div class="interactions-summary-box">' + warningText + '</div>';
+                html += '<p class="interactions-disclaimer"><i class="fas fa-info-circle"></i> ' + (isEnglish
+                    ? 'This list comes from DrugBank data, not from a French regulatory source. It carries no severity level: do not read the order below as a ranking of risk. Verify each interaction in the official SmPC before prescribing.'
+                    : "Cette liste provient des données DrugBank, non d'une source réglementaire française. Elle ne porte aucun niveau de gravité : l'ordre ci-dessous ne hiérarchise pas le risque. Vérifiez chaque interaction dans le RCP officiel avant toute prescription.") +
+                    ' <a href="https://base-donnees-publique.medicaments.gouv.fr/" target="_blank" rel="noopener">' + (isEnglish ? 'Open the official database' : 'Ouvrir la base officielle') + '</a></p>';
+                // Trois etats, et non plus deux : tout traduit, rien, ou une
+                // partie. Annoncer « les libelles sont en anglais » quand ils
+                // sont tous en francais serait aussi faux que l inverse.
+                if (!isEnglish && data.description_lang === 'en') {
+                    html += '<p class="interactions-disclaimer"><i class="fas fa-language"></i> Les libellés ci-dessous sont ceux de DrugBank, en anglais, reproduits sans traduction.</p>';
+                } else if (!isEnglish && data.description_lang === 'mixte') {
+                    html += '<p class="interactions-disclaimer"><i class="fas fa-language"></i> Énoncés traduits depuis DrugBank par substitution — les noms de substance restent ceux de la source. ' +
+                        data.untranslated_count + ' énoncé(s) sur ' + data.displayed_count + ' n\'ont pas de traduction et restent en anglais.</p>';
+                } else if (!isEnglish) {
+                    html += '<p class="interactions-disclaimer"><i class="fas fa-language"></i> Énoncés traduits depuis DrugBank par substitution dans des phrases types. Les noms de substance restent ceux de la source, sans traduction.</p>';
+                }
+                // Cent fiches d'interaction d'un bloc, c'est un mur : la liste
+                // n'est pas hierarchisee par le risque — DrugBank ne porte
+                // aucune gravite — donc rien ne dit au lecteur ou s arreter.
+                // Vingt tiennent dans un ecran ; la suite se demande.
+                var cartes = data.interactions.map(function(inter) {
+                    var nb = inter.medicine_count || 0;
+                    var lien = '/search?substance=' + encodeURIComponent(inter.substance) + '&lang=' + currentLang;
+                    var compte = nb > 0
+                        ? ' <a href="' + lien + '">' + (isEnglish
+                            ? nb + ' medicine(s) concerned' : nb + ' médicament(s) concerné(s)') + '</a>'
+                        : '';
+                    // En francais on prefere la traduction quand elle existe ;
+                    // sinon l anglais, signale par `lang` pour que les
+                    // lecteurs d ecran changent de voix au lieu de prononcer
+                    // l anglais avec les regles francaises.
+                    var enonce = (!isEnglish && inter.description_fr) ? inter.description_fr : inter.description;
+                    var langEnonce = (!isEnglish && !inter.description_fr) ? ' lang="en"' : '';
+                    return '<div class="interaction-card">' +
+                        '<div class="interaction-card-title">' + (isEnglish ? 'With: ' : 'Avec : ') + inter.substance + '</div>' +
+                        (enonce
+                            ? '<div class="interaction-description"' + langEnonce + '>' + enonce + '</div>'
+                            : '') +
+                        (compte ? '<div class="interaction-meta">' + compte + '</div>' : '') +
+                        '</div>';
+                });
+
+                var PAR_LOT = 20;
+                var affichees = 0;
+                contentDiv.innerHTML = html +
+                    '<div id="interactions-liste"></div>' +
+                    '<button type="button" id="interactions-suite" class="collapsible-toggle" hidden></button>';
+                var liste = document.getElementById('interactions-liste');
+                var bouton = document.getElementById('interactions-suite');
+
+                function afficherLot() {
+                    var lot = cartes.slice(affichees, affichees + PAR_LOT);
+                    liste.insertAdjacentHTML('beforeend', lot.join(''));
+                    affichees += lot.length;
+                    var reste = cartes.length - affichees;
+                    if (reste > 0) {
+                        bouton.hidden = false;
+                        bouton.textContent = isEnglish
+                            ? 'Show ' + Math.min(reste, PAR_LOT) + ' more (' + reste + ' remaining)'
+                            : 'Afficher ' + Math.min(reste, PAR_LOT) + ' de plus (' + reste + ' restantes)';
+                    } else {
+                        bouton.hidden = true;
+                    }
+                }
+                bouton.addEventListener('click', afficherLot);
+                afficherLot();
+                loadingDiv.style.display = 'none';
+            } else {
+                // Une lacune ne doit jamais s'afficher comme une absence de
+                // risque : seul `none` est une information, les autres états
+                // disent que la donnée manque.
+                var box;
+                if (data.status === 'none') {
+                    box = { icon: 'fa-check-circle', color: '#059669', text: isEnglish
+                        ? 'This medication is matched to DrugBank, which lists no interaction for it. Absence from this source is not a guarantee of safety.'
+                        : "Ce médicament est apparié à DrugBank, qui ne lui recense aucune interaction. L'absence dans cette source ne vaut pas garantie d'innocuité." };
+                } else if (data.status === 'not_matched') {
+                    box = { icon: 'fa-question-circle', color: '#d97706', text: isEnglish
+                        ? 'Interactions not analysed: this medication could not be matched to the DrugBank database. No conclusion can be drawn from this section.'
+                        : "Interactions non analysées : ce médicament n'a pas pu être apparié à la base DrugBank. Cette rubrique ne permet aucune conclusion." };
+                } else {
+                    box = { icon: 'fa-exclamation-triangle', color: '#d97706', text: isEnglish
+                        ? 'Interaction data not available for this medication. This is a gap in our database, not an absence of risk.'
+                        : "Données d'interaction indisponibles pour ce médicament. Il s'agit d'une lacune de notre base, non d'une absence de risque." };
+                }
+                loadingDiv.innerHTML = '<div class="empty-state"><i class="fas ' + box.icon + '" style="color:' + box.color + ';"></i><p>' + box.text + '</p></div>';
+            }
+        })
+        .catch(function() {
+            var errText = isEnglish ? 'Error loading interactions.' : 'Erreur lors du chargement.';
+            loadingDiv.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle" style="color:#dc2626;"></i><p>' + errText + '</p></div>';
+        });
+    }
+    loadInteractions();
+
+    // ── Alternatives ──────────────────────────────────
+    function loadAlternatives() {
+        var loadingEl = document.getElementById('alternatives-loading');
+        var contentEl = document.getElementById('alternatives-content');
+        if (!contentEl) return;
+
+        fetch('/api/medicine-alternatives/{{ medicine._id }}?lang=' + currentLang)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success && data.alternatives && data.alternatives.length > 0) {
+                var html = '<div class="sources-grid">';
+                data.alternatives.forEach(function(alt) {
+                    var forme = alt.forme || '';
+                    var labo = alt.laboratoire || '';
+                    var substances = alt.substances ? alt.substances.join(', ') : '';
+                    var url = alt.id ? '/medicine/' + alt.id + '?lang=' + currentLang : '#';
+                    html += '<a href="' + url + '" class="source-card" style="cursor:pointer;">' +
+                        '<div class="source-card-top">' +
+                            '<div class="source-card-icon" style="background:#f0fdf4;color:#16a34a;"><i class="fas fa-pills"></i></div>' +
+                            '<h4>' + alt.title.substring(0, 45) + '</h4>' +
+                        '</div>' +
+                        (forme ? '<p><strong>' + (isEnglish ? 'Form: ' : 'Forme: ') + '</strong>' + forme + '</p>' : '') +
+                        (labo ? '<p><strong>' + (isEnglish ? 'Lab: ' : 'Labo: ') + '</strong>' + labo + '</p>' : '') +
+                        (substances ? '<p style="font-size:0.7rem;color:#9ca3af;">' + substances + '</p>' : '') +
+                        '<span class="source-card-btn">' + (isEnglish ? 'View' : 'Voir') + '</span></a>';
+                });
+                html += '</div>';
+                contentEl.innerHTML = html;
+                if (loadingEl) loadingEl.style.display = 'none';
+            } else {
+                if (loadingEl) {
+                    loadingEl.innerHTML = '<div class="empty-state"><i class="fas fa-check-circle" style="color:#059669;"></i><p>' + (isEnglish ? 'No alternatives found.' : 'Aucune alternative trouvée.') + '</p></div>';
+                }
+            }
+        })
+        .catch(function() {
+            if (loadingEl) {
+                loadingEl.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle" style="color:#dc2626;"></i><p>' + (isEnglish ? 'Error loading alternatives.' : 'Erreur de chargement.') + '</p></div>';
+            }
+        });
+    }
+    loadAlternatives();
+
+    // ── Medical Sources ───────────────────────────────
+    function loadMedicalSources() {
+        var container = document.getElementById('medical-sources-container');
+        if (!container) return;
+        function sourceIcon(type) {
+            var t = (type || '').toLowerCase();
+            if (t.indexOf('ansm') !== -1) return 'fa-shield-alt';
+            if (t.indexOf('has') !== -1) return 'fa-heartbeat';
+            if (t.indexOf('theriaque') !== -1 || t.indexOf('ther') !== -1) return 'fa-book-medical';
+            if (t.indexOf('drugbank') !== -1) return 'fa-flask';
+            if (t.indexOf('ema') !== -1) return 'fa-globe-europe';
+            if (t.indexOf('fda') !== -1) return 'fa-flag-usa';
+            if (t.indexOf('afmps') !== -1) return 'fa-shield-alt';
+            return 'fa-external-link-alt';
+        }
+        function sourceColor(type) {
+            var t = (type || '').toLowerCase();
+            if (t.indexOf('ansm') !== -1) return '#4f46e5';
+            if (t.indexOf('has') !== -1) return '#059669';
+            if (t.indexOf('theriaque') !== -1 || t.indexOf('ther') !== -1) return '#0891b2';
+            if (t.indexOf('drugbank') !== -1) return '#d97706';
+            if (t.indexOf('ema') !== -1) return '#2563eb';
+            if (t.indexOf('fda') !== -1) return '#dc2626';
+            return '#6b7280';
+        }
+        fetch('/api/medicine-sources/{{ medicine._id }}?lang=' + currentLang)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success && data.sources) {
+                var html = '<div class="sources-grid">';
+                data.sources.forEach(function(source) {
+                    var visitText = isEnglish ? 'Visit source' : 'Visiter la source';
+                    var icon = sourceIcon(source.type);
+                    var bgColor = sourceColor(source.type);
+                    html += '<a href="' + source.url + '" target="_blank" rel="noopener" class="source-card">' +
+                        '<div class="source-card-top">' +
+                            '<div class="source-card-icon" style="background:' + bgColor + '11;color:' + bgColor + ';"><i class="fas ' + icon + '"></i></div>' +
+                            '<h4>' + source.type + '</h4>' +
+                        '</div>' +
+                        '<p>' + (source.description || '') + '</p>' +
+                        '<span class="source-card-btn">' + visitText + '</span></a>';
+                });
+                html += '</div>';
+                container.innerHTML = html;
+            } else {
+                var noSrcText = isEnglish ? 'No sources available.' : 'Aucune source disponible.';
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-info-circle"></i><p>' + noSrcText + '</p></div>';
+            }
+        })
+        .catch(function() {
+            var errText = isEnglish ? 'Error loading sources.' : 'Erreur de chargement.';
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle" style="color:#dc2626;"></i><p>' + errText + '</p></div>';
+        });
+    }
+    loadMedicalSources();
+
+    // ── Knowledge Graph ──────────────────────────────
+    function loadKnowledgeGraph() {
+        var loadingEl = document.getElementById('graph-loading');
+        var container = document.getElementById('graph-container');
+        var legendEl = document.getElementById('graph-legend');
+        if (!container) return;
+
+        fetch('/api/medicine-graph/{{ medicine._id }}?lang=' + currentLang)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success && data.graph && data.graph.nodes && data.graph.nodes.length > 1) {
+                var g = data.graph;
+                // ── Palette ──
+                var PALETTE = {
+                    current:      { bg: '#4f46e5', border: '#3730a3', label: '#1e1b4b' },
+                    ingredient:   { bg: '#0d9488', border: '#0f766e', label: '#134e4a' },
+                    alternative:  { bg: '#6366f1', border: '#4f46e5', label: '#1e1b4b' },
+                    interaction:  { bg: '#e11d48', border: '#be123c', label: '#4c0519' },
+                    effect:       { bg: '#d97706', border: '#b45309', label: '#451a03' }
+                };
+
+                // ── Groups ──
+                var groups = {};
+                Object.keys(PALETTE).forEach(function(k) {
+                    var p = PALETTE[k];
+                    var size = k === 'current' ? 28 : (k === 'ingredient' ? 22 : 18);
+                    groups[k] = {
+                        shape: 'dot', size: size,
+                        color: { background: p.bg, border: p.border,
+                                 highlight: { background: p.bg, border: p.border } },
+                        font: { size: k === 'current' ? 13 : (k === 'ingredient' ? 12 : 11),
+                                color: '#374151', face: 'system-ui, -apple-system, sans-serif',
+                                weight: k === 'current' ? '700' : '500' },
+                        borderWidth: k === 'current' ? 3 : 2,
+                        shadow: { enabled: true, size: k === 'current' ? 6 : 3, x: 0, y: 2,
+                                  color: 'rgba(0,0,0,0.08)' }
+                    };
+                });
+
+                // ── Nodes ──
+                var nodes = new vis.DataSet(g.nodes.map(function(n) {
+                    var cfg = groups[n.group] || groups.interaction;
+                    return Object.assign({ id: n.id, label: n.label, title: n.title }, cfg);
+                }));
+
+                // ── Edges ──
+                var edges = new vis.DataSet(g.edges.map(function(e) {
+                    var ec = e.color || '#9ca3af';
+                    return {
+                        from: e.from, to: e.to, label: e.label || '',
+                        color: { color: ec, opacity: 0.65, highlight: '#4f46e5', hover: '#6366f1' },
+                        font: { size: 9, color: '#6b7280', face: 'system-ui, -apple-system, sans-serif',
+                                strokeWidth: 2, strokeColor: '#ffffff', align: 'middle' },
+                        width: e.dashes ? 1.2 : 2,
+                        dashes: e.dashes || false,
+                        title: e.title || '',
+                        smooth: { type: 'curvedCW', roundness: 0.1 },
+                        arrows: { to: { enabled: true, scaleFactor: 0.5 } },
+                        arrowStrikethrough: false,
+                        hoverWidth: 2.5
+                    };
+                }));
+
+                // ── Options ──
+                var options = {
+                    physics: {
+                        solver: 'forceAtlas2Based',
+                        forceAtlas2Based: { gravitationalConstant: -40, centralGravity: 0.01,
+                                            springLength: 180, springConstant: 0.02, damping: 0.4 },
+                        stabilization: { iterations: 200, updateInterval: 50, onlyDynamicEdges: true }
+                    },
+                    interaction: {
+                        hover: true, tooltipDelay: 120,
+                        navigationButtons: true, keyboard: { enabled: true },
+                        zoomView: true, dragView: true,
+                        selectable: false,
+                        hoverConnectedEdges: false
+                    },
+                    layout: { improvedLayout: true, randomSeed: 7 },
+                    nodes: { margin: 10, scaling: { label: { enabled: false } } },
+                    edges: { smooth: true },
+                    configure: { enabled: false }
+                };
+
+                // ── Render ──
+                var network = new vis.Network(container, { nodes: nodes, edges: edges }, options);
+                network.on('stabilizationIterationsDone', function() {
+                    container.style.opacity = '1';
+                });
+                container.style.opacity = '0';
+                container.style.transition = 'opacity 0.5s ease';
+                container.style.display = 'block';
+                if (legendEl) legendEl.style.display = 'flex';
+                if (loadingEl) loadingEl.style.display = 'none';
+            } else {
+                if (loadingEl) {
+                    loadingEl.innerHTML = '<div class="empty-state"><i class="fas fa-project-diagram" style="color:#9ca3af;"></i><p>' + (isEnglish ? 'No graph data available.' : 'Aucune donnée graphe disponible.') + '</p></div>';
+                }
+            }
+        })
+        .catch(function() {
+            if (loadingEl) {
+                loadingEl.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle" style="color:#dc2626;"></i><p>' + (isEnglish ? 'Error loading graph.' : 'Erreur de chargement du graphe.') + '</p></div>';
+            }
+        });
+    }
+    loadKnowledgeGraph();
+
+    // ── Language redirect ─────────────────────────────
+    var urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('lang') !== currentLang) {
+        var newUrl = new URL(window.location.href);
+        newUrl.searchParams.set('lang', currentLang);
+        window.location.href = newUrl.toString();
+    }
+})();
+</script>
+</body>
+</html>

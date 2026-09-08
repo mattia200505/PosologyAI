@@ -1,0 +1,186 @@
+/* ══════════════════════════════════════════════════════════════════
+   La bande de tête immersive, et l'entrée des panneaux.
+
+   Deux pages la portent — le tableau de bord et le menu de
+   prescription — et l'accueil en fait autant avec sa photographie.
+   Elle était écrite dans la feuille du tableau de bord ; l'y laisser
+   aurait obligé la seconde page à la recopier, et deux copies d'un
+   même effet divergent à la première retouche.
+
+   Autonome : aucune variable, aucune dépendance à une autre feuille.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── La bande ────────────────────────────────────────────────────────
+   Les deux pages qui l'emploient portaient un aplat : un dégradé bleu
+   nuit figé, occupant le premier tiers de l'écran pour deux lignes de
+   texte, et rien qui lui réponde.
+
+   Elle reprend la composition de l'accueil : une bande sombre, et ce
+   qui suit qui monte dessus par en dessous. Ce qui décolle la bande
+   n'est pas un trait de séparation mais une ombre franche — la règle
+   de `.ct` sur l'accueil.
+
+   Le fond est peint, pas photographié. Ces pages parlent d'un graphe
+   et d'un raisonnement ; une constellation lente y répond mieux qu'une
+   image de laboratoire, et rien n'est chargé depuis l'extérieur. */
+.hero-nuit {
+  position: relative;
+  overflow: hidden;
+  padding: 74px 0 116px;
+  color: #fff;
+  background: #1e1b4b;
+}
+
+/* Trois voiles qui dérivent, très lentement. C'est le seul mouvement
+   continu de la page ; au-delà, il distrairait de ce qu'on vient lire. */
+.hero-nuit::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background:
+    radial-gradient(ellipse 40% 46% at 18% 26%, rgba(99, 102, 241, 0.72), transparent 62%),
+    radial-gradient(ellipse 36% 40% at 78% 18%, rgba(56, 189, 248, 0.36), transparent 64%),
+    radial-gradient(ellipse 48% 44% at 62% 84%, rgba(129, 140, 248, 0.44), transparent 66%);
+  animation: hero-aurore 26s ease-in-out infinite alternate;
+}
+
+@keyframes hero-aurore {
+  from { transform: translate3d(-3%, -2%, 0) scale(1); }
+  to   { transform: translate3d(4%, 3%, 0) scale(1.12); }
+}
+
+/* La constellation : le sujet de la page, dit par le fond. Deux trames
+   de points décalées, qui glissent l'une sur l'autre. */
+.hero-nuit::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.5) 1px, transparent 1.4px),
+    radial-gradient(circle at center, rgba(199, 210, 254, 0.34) 1px, transparent 1.4px);
+  background-size: 46px 46px, 92px 92px;
+  background-position: 0 0, 23px 23px;
+  animation: hero-constellation 44s linear infinite;
+  opacity: 0.5;
+  mask-image: linear-gradient(to bottom, #000 0%, transparent 88%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 88%);
+}
+
+@keyframes hero-constellation {
+  to { background-position: 92px 46px, -92px 115px; }
+}
+
+
+/* ══ L'entrée ════════════════════════════════════════════════════════
+   Les panneaux montent d'un cran en arrivant dans le champ, décalés les
+   uns des autres. Le même geste que sur l'accueil, et la même réserve :
+   la classe `vu` est posée par le script, et si le script ne tourne pas,
+   ou si le mouvement est refusé, tout est visible d'emblée. */
+.entree {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.62s ease, transform 0.62s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.entree.vu { opacity: 1; transform: none; }
+
+/* ── Le surtitre ─────────────────────────────────────────────────────
+   Une pastille de verre sur le sombre, plutôt qu'une ligne de texte
+   qui s'y perdrait. */
+.hero-sur {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 16px;
+  padding: 6px 15px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #e0e7ff;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* ── Réserves ────────────────────────────────────────────────────────
+   Le mouvement continu s'arrête s'il est refusé, et l'entrée se pose
+   d'emblée : un panneau resté à `opacity: 0` faute d'observateur serait
+   du contenu perdu, pas un effet raté. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-nuit::before,
+  .hero-nuit::after { animation: none; }
+  .entree { opacity: 1; transform: none; transition: none; }
+}
+
+/* ══ Variante : une photographie sous voile ═══════════════════════════
+   Se pose EN PLUS de `hero-nuit`, pas à sa place. Les pages qui ne la
+   demandent pas gardent la bande peinte.
+
+   Le fond peint - voiles indigo qui dérivent, constellation de points -
+   cède la place à une vraie photographie sous un voile, le motif que la
+   page d'accueil emploie déjà pour sa section de clôture.
+
+   La page appelante fournit l'image et le voile :
+
+       <section class="hero-nuit hero-photo">
+         <img class="hero-photo-image" src="..." alt="" aria-hidden="true"
+              loading="eager" decoding="async" fetchpriority="high">
+         <div class="hero-photo-voile" aria-hidden="true"></div>
+         ...son contenu...
+
+   Le voile fait le contraste, pas l'image. Il a été éclairci du
+   graphite vers un bleu franc ; le contrat est donc recalculé, sur le
+   cas le pire à chaque arrêt du dégradé : un pixel blanc pur dessous.
+
+       arrêt 0 %,   bleu profond    titre 12,4:1   texte pâle  8,2:1
+       arrêt 46 %,  bleu franc      titre  7,9:1   texte pâle  5,5:1
+       arrêt 100 %, indigo          titre  8,1:1   texte pâle  5,7:1
+       le même, sous la lueur       titre  7,1:1   texte pâle  5,0:1
+
+   Le point le plus clair de la bande tient donc 7,1:1 pour le titre et
+   5,0:1 pour le texte le plus pâle, contre 4,5:1 exigés en AA. La marge
+   s'est réduite en éclaircissant : ne pas monter le bleu davantage sans
+   refaire ce calcul. La photographie, elle, peut changer ou ne pas se
+   charger sans que rien ne devienne illisible. */
+.hero-photo {
+  /* Le fond sous l'image, visible si elle ne se charge pas. Bleu comme
+     le voile : un graphite derrière un voile bleu se verrait. */
+  background: #172554;
+}
+
+/* Les deux calques peints de la bande commune sont éteints : la photo
+   et son voile les remplacent. */
+.hero-photo::before,
+.hero-photo::after { content: none; }
+
+.hero-photo-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Désaturée : l'image porte la texture, pas la couleur. L'accent de
+     l'application reste la seule couleur de la page. */
+  filter: grayscale(0.55);
+}
+
+.hero-photo-voile {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(120deg,
+      rgba(23, 37, 84, 0.94) 0%,      /* bleu profond */
+      rgba(30, 58, 138, 0.90) 46%,    /* bleu franc */
+      rgba(49, 46, 129, 0.88) 100%),  /* vire vers l'indigo de la marque */
+    radial-gradient(ellipse 70% 150% at 88% 50%, rgba(99, 102, 241, 0.22), transparent 68%);
+}
+
+/* Le contenu repasse au-dessus des deux calques. `.container` couvre le
+   menu de prescription et la page ordonnance, `.dash-header` le tableau
+   de bord. */
+.hero-photo > .dash-header,
+.hero-photo > .container,
+.hero-photo > .search-container { position: relative; z-index: 1; }

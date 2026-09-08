@@ -1,0 +1,202 @@
+{#
+   La barre de navigation du site, et la seule.
+
+   Deux barres coexistaient : la pilule flottante de la page d'accueil,
+   écrite dans son gabarit, et le bandeau collant de `header.html` que
+   les douze autres pages incluaient. Elles n'avaient ni la même forme,
+   ni les mêmes entrées — passer de l'accueil à n'importe quelle page
+   changeait de repère.
+
+   C'est la pilule qui reste, avec ce que le bandeau portait en plus et
+   qu'elle n'avait pas : le sous-menu des trois modes de recherche, le
+   sélecteur de langue et le menu utilisateur. Rien n'a été retiré.
+
+   Ses styles sont dans `static/css/nav.css`, que la page appelante doit
+   charger. Elle est `position: fixed` : `.nv-place`, juste après, rend
+   la hauteur qu'elle ne prend pas dans le flux.
+
+   Une variable facultative, passée par `{% with %}` :
+
+       active_page   la page courante, pour marquer son lien
+
+   Elle était déjà lue par l'ancien en-tête, sur deux entrées seulement.
+#}
+<header class="nv">
+    <a class="nv-marque" href="/">
+        <span class="nv-pastille" aria-hidden="true"><i class="fas fa-capsules"></i></span>
+        <span>PosologyAI</span>
+    </a>
+
+    <nav class="nv-liens" aria-label="Navigation principale" data-i18n-aria="nav_main_label">
+        <a href="/dashboard"
+           class="{% if active_page == 'dashboard' %}nv-actif{% endif %}" data-i18n="nav_dashboard">Tableau de bord</a>
+
+        {# Trois entrées séparées encombreraient la barre ; un lien unique
+           rendrait la recherche vectorielle et la recherche IA
+           introuvables. Le tiroir garde les trois accessibles. #}
+        <div class="nv-groupe" data-groupe="recherche"
+             {% if active_page in ('search', 'vector', 'ai') %}data-actif="oui"{% endif %}>
+            <button type="button" aria-haspopup="true" aria-expanded="false"
+                    aria-controls="nvTiroirRecherche">
+                <span data-i18n="nav_search">Rechercher</span>
+                <i class="fas fa-chevron-down nv-chevron" aria-hidden="true"></i>
+            </button>
+            <div class="nv-tiroir" id="nvTiroirRecherche">
+                <a href="/search">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                    <span>
+                        <span class="nv-tiroir-titre" data-i18n="nav_search_classic">Recherche classique</span>
+                        <span class="nv-tiroir-note" data-i18n="nav_search_classic_desc">Par nom, substance, laboratoire</span>
+                    </span>
+                </a>
+                <a href="/vector-search">
+                    <i class="fas fa-project-diagram" aria-hidden="true"></i>
+                    <span>
+                        <span class="nv-tiroir-titre" data-i18n="nav_search_vector">Recherche vectorielle</span>
+                        <span class="nv-tiroir-note" data-i18n="nav_search_vector_desc">Recherche sémantique avancée</span>
+                    </span>
+                </a>
+                <a href="/ai-search">
+                    <i class="fas fa-brain" aria-hidden="true"></i>
+                    <span>
+                        <span class="nv-tiroir-titre" data-i18n="nav_search_ai">Recherche IA</span>
+                        <span class="nv-tiroir-note" data-i18n="nav_search_ai_desc">Langage naturel</span>
+                    </span>
+                </a>
+            </div>
+        </div>
+
+        <a href="/api/prescription/menu"
+           class="{% if active_page == 'prescription' %}nv-actif{% endif %}" data-i18n="nav_prescription">Prescription</a>
+
+        {# Entrée distincte de « Prescription », et non un sous-menu : les
+           deux écrans vont en sens inverse. Celui-là part des symptômes
+           pour proposer un traitement, celui-ci part d'une ordonnance
+           écrite pour la vérifier. Les confondre dans un même menu ferait
+           prendre l'un pour l'autre. #}
+        <a href="/ordonnance"
+           class="{% if active_page == 'ordonnance' %}nv-actif{% endif %}" data-i18n="nav_ordonnance">Ordonnance</a>
+
+        {# « Infrastructure » — /databases — a été retiré de la barre. La
+           route et la page existent toujours ; elles n'ont simplement plus
+           d'entrée dans la navigation principale. #}
+        <a href="/a-propos"
+           class="{% if active_page == 'a_propos' %}nv-actif{% endif %}" data-i18n="nav_about">À propos</a>
+    </nav>
+
+    <div class="nv-outils">
+        {# Injecté par `translations.js`. #}
+        <div id="langSwitcherContainer"></div>
+
+        {% if g.user %}
+        <div class="nv-compte" data-groupe="compte">
+            <button class="nv-avatar" type="button" aria-haspopup="true"
+                    aria-expanded="false" aria-label="Menu utilisateur" data-i18n-aria="nav_user_menu">
+                {% if g.user.first_name %}
+                    {{ g.user.first_name[0] }}{{ g.user.last_name[0] if g.user.last_name else '' }}
+                {% else %}
+                    <i class="fas fa-user" aria-hidden="true"></i>
+                {% endif %}
+            </button>
+            <div class="nv-compte-tiroir">
+                <a href="{{ url_for('users.profile') }}" data-i18n="nav_profile">Mon profil</a>
+                <a href="{{ url_for('users.favorites') }}" data-i18n="nav_favorites">Mes favoris</a>
+                {% if g.user.role >= 4 %}
+                <div class="nv-separateur"></div>
+                <a href="{{ url_for('users.admin_users') }}" data-i18n="nav_admin">Administration</a>
+                {% endif %}
+                <div class="nv-separateur"></div>
+                <a href="{{ url_for('users.logout') }}" data-i18n="nav_logout">Déconnexion</a>
+            </div>
+        </div>
+        {% else %}
+        <a class="nv-connexion" href="{{ url_for('users.login') }}">
+            <i class="fas fa-sign-in-alt" aria-hidden="true"></i>
+            <span data-i18n="nav_login">Connexion</span>
+        </a>
+        {% endif %}
+    </div>
+
+    <button class="nv-burger" type="button" aria-label="Afficher la navigation" data-i18n-aria="nav_show"
+            aria-expanded="false">
+        <i class="fas fa-bars" aria-hidden="true"></i>
+    </button>
+</header>
+
+{# La barre flotte : cette cale rend la hauteur qu'elle ne prend pas.
+   Sur l'accueil — `body.essai` — le hero est déjà composé pour passer
+   dessous, et la cale y vaut zéro. #}
+<div class="nv-place" aria-hidden="true"></div>
+
+<script src="{{ url_for('static', filename='js/translations.js') }}"></script>
+
+<script>
+(function () {
+    'use strict';
+
+    var barre = document.querySelector('.nv');
+    if (!barre) return;
+
+    // Les tiroirs — recherche, compte — s'ouvrent au clic et se ferment
+    // partout ailleurs. Un seul à la fois : deux tiroirs ouverts se
+    // chevaucheraient.
+    var groupes = [].slice.call(barre.querySelectorAll('[data-groupe]'));
+
+    function fermerTout(sauf) {
+        groupes.forEach(function (g) {
+            if (g === sauf) return;
+            g.removeAttribute('data-ouvert');
+            var b = g.querySelector('button');
+            if (b) b.setAttribute('aria-expanded', 'false');
+        });
+    }
+
+    groupes.forEach(function (groupe) {
+        var bouton = groupe.querySelector('button');
+        if (!bouton) return;
+        bouton.addEventListener('click', function (evenement) {
+            evenement.stopPropagation();
+            var ouvert = groupe.getAttribute('data-ouvert') === 'oui';
+            fermerTout(groupe);
+            if (ouvert) {
+                groupe.removeAttribute('data-ouvert');
+            } else {
+                groupe.setAttribute('data-ouvert', 'oui');
+            }
+            bouton.setAttribute('aria-expanded', ouvert ? 'false' : 'true');
+        });
+    });
+
+    document.addEventListener('click', function (evenement) {
+        if (!barre.contains(evenement.target)) fermerTout(null);
+    });
+
+    document.addEventListener('keydown', function (evenement) {
+        if (evenement.key === 'Escape') fermerTout(null);
+    });
+
+    // Le repli mobile.
+    var burger = barre.querySelector('.nv-burger');
+    if (burger) {
+        burger.addEventListener('click', function () {
+            var ouvert = barre.classList.toggle('nv-ouverte');
+            burger.setAttribute('aria-expanded', ouvert ? 'true' : 'false');
+        });
+    }
+
+    // La barre se densifie une fois qu'on a quitté le haut de la page.
+    //
+    // L'accueil posait sa propre sentinelle dans son script ; la barre
+    // étant maintenant partout, elle emporte la sienne. `IntersectionObserver`
+    // manquant, la barre reste simplement dans son état clair.
+    if ('IntersectionObserver' in window) {
+        var sentinelle = document.createElement('div');
+        sentinelle.style.cssText =
+            'position:absolute;top:0;height:64px;width:1px;pointer-events:none';
+        document.body.prepend(sentinelle);
+        new IntersectionObserver(function (entrees) {
+            barre.classList.toggle('nv-pose', !entrees[0].isIntersecting);
+        }).observe(sentinelle);
+    }
+})();
+</script>

@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PosologyAI • Prescription par diagnostic</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/prescription.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    {% with active_page='prescription' %}
+    {% include 'components/header.html' %}
+    {% endwith %}
+
+    <main>
+        <section class="assistant-section">
+            <div class="container">
+                <div class="page-header">
+                    <a href="/api/prescription/menu"><i class="fas fa-arrow-left"></i> <span data-i18n="menu_prescription" data-i18n-en="Prescription Menu">Menu Prescription</span></a>
+                </div>
+
+                <!-- L'avertissement médical est retiré : l'application est
+                     réservée aux professionnels de santé, à qui il n'apprenait
+                     rien. Il avait déjà quitté l'écran de l'assistant ; la même
+                     règle s'applique ici. -->
+
+                <div class="diag-layout">
+                    <!-- Info box -->
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <h3 data-i18n="instructions_title" data-i18n-en="How to use this feature?">Comment utiliser cette fonctionnalité ?</h3>
+                            <p data-i18n="instructions_text" data-i18n-en="Enter the patient's medical diagnosis and the AI will analyze our database of medicines to suggest the most appropriate treatments with detailed explanations.">
+                                Entrez le diagnostic médical du patient et l'IA analysera notre base de données de médicaments pour vous suggérer les traitements les plus appropriés avec des explications détaillées.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Form -->
+                    <div class="diag-form-card">
+                        <h2><i class="fas fa-diagnoses"></i> <span data-i18n="medical_diagnosis" data-i18n-en="Medical Diagnosis">Hypothèse clinique à valider</span></h2>
+
+                        <form id="diagnosticForm">
+                            <!-- Patient info -->
+                            <div class="section-title"><i class="fas fa-user-md"></i> <span data-i18n="patient_info" data-i18n-en="Patient Information">Informations patient</span></div>
+
+                            <div class="form-group">
+                                <label for="patientName"><i class="fas fa-user"></i> <span data-i18n="patient_name" data-i18n-en="Patient Name">Nom du patient</span> <span data-i18n="optional" data-i18n-en="(optional)">(optionnel)</span></label>
+                                <input type="text" id="patientName" class="form-control" data-i18n-placeholder="patient_name_placeholder" placeholder="Ex: Jean Dupont" data-i18n-en-placeholder="e.g. John Smith">
+                            </div>
+
+                            <div class="form-row-3">
+                                <div class="form-group">
+                                    <label for="age"><i class="fas fa-birthday-cake"></i> <span data-i18n="age" data-i18n-en="Age">Âge</span></label>
+                                    <input type="number" id="age" name="age" min="0" max="150" class="form-control" data-i18n-placeholder="age_placeholder" placeholder="Ex: 45" data-i18n-en-placeholder="e.g. 45">
+                                </div>
+                                <div class="form-group">
+                                    <label for="taille"><i class="fas fa-ruler-vertical"></i> <span data-i18n="height" data-i18n-en="Height (cm)">Taille (cm)</span></label>
+                                    <input type="number" id="taille" name="taille" min="0" max="250" class="form-control" data-i18n-placeholder="height_placeholder" placeholder="Ex: 170" data-i18n-en-placeholder="e.g. 170">
+                                </div>
+                                <div class="form-group">
+                                    <label for="poids"><i class="fas fa-weight"></i> <span data-i18n="weight" data-i18n-en="Weight (kg)">Poids (kg)</span></label>
+                                    <input type="number" id="poids" name="poids" min="0" max="300" class="form-control" data-i18n-placeholder="weight_placeholder" placeholder="Ex: 75" data-i18n-en-placeholder="e.g. 75">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="sexe"><i class="fas fa-venus-mars"></i> <span data-i18n="gender" data-i18n-en="Gender">Sexe</span></label>
+                                <select id="sexe" name="sexe" class="form-control">
+                                    <option value="" data-i18n="gender_unspecified" data-i18n-en="Unspecified">Non spécifié</option>
+                                    <option value="M" data-i18n="gender_male" data-i18n-en="Man">Homme</option>
+                                    <option value="F" data-i18n="gender_female" data-i18n-en="Women">Femme</option>
+                                    <option value="A" data-i18n="gender_other" data-i18n-en="Other">Autre</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="antecedents"><i class="fas fa-history"></i> <span data-i18n="medical_history" data-i18n-en="Medical History">Antécédents médicaux</span></label>
+                                <textarea id="antecedents" name="antecedents" rows="3" class="form-control" data-i18n-placeholder="medical_history_placeholder" placeholder="Ex: Diabète de type 2, hypertension, allergies connues..." data-i18n-en-placeholder="e.g. Type 2 diabetes, hypertension, known allergies..."></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="medicaments_actuels"><i class="fas fa-pills"></i> <span data-i18n="current_medications" data-i18n-en="Current Medications">Médicaments actuels</span></label>
+                                <textarea id="medicaments_actuels" name="medicaments_actuels" rows="3" class="form-control" data-i18n-placeholder="current_medications_placeholder" placeholder="Ex: Metformine 850mg, Ramipril 10mg..." data-i18n-en-placeholder="e.g. Metformin 850mg, Ramipril 10mg..."></textarea>
+                            </div>
+
+                            <!-- Résultats biologiques, tous facultatifs.
+                                 Un antécédent est un mot, un résultat est un
+                                 nombre : « maladie rénale chronique » ne dit
+                                 pas si la metformine est déconseillée ou
+                                 interdite, un DFG à 28 le dit. Laissés vides,
+                                 ils ne déclenchent rien — c'est ce qui permet
+                                 de les proposer sans alourdir les cas
+                                 simples. -->
+                            <details class="bloc-biologie">
+                                <summary><i class="fas fa-vial"></i> <span data-i18n="bio_titre">Résultats biologiques</span> <span class="bio-facultatif" data-i18n="bio_facultatif">(facultatif)</span></summary>
+                                <p class="bio-aide" data-i18n="bio_aide">Renseignés, ces résultats deviennent des contraintes : ils écartent les médicaments contre-indiqués et signalent les traitements en cours à reconsidérer.</p>
+                                <div class="form-row bio-grille">
+                                    <div class="form-group">
+                                        <label for="dfg"><span data-i18n="bio_dfg">DFG</span> <span class="bio-unite">mL/min/1,73&nbsp;m²</span></label>
+                                        <input type="number" id="dfg" name="dfg" min="0" max="200" step="1" class="form-control" placeholder="Ex : 28">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="kaliemie"><span data-i18n="bio_kaliemie">Kaliémie</span> <span class="bio-unite">mmol/L</span></label>
+                                        <input type="number" id="kaliemie" name="kaliemie" min="0" max="12" step="0.1" class="form-control" placeholder="Ex : 5,8">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="natremie"><span data-i18n="bio_natremie">Natrémie</span> <span class="bio-unite">mmol/L</span></label>
+                                        <input type="number" id="natremie" name="natremie" min="90" max="180" step="1" class="form-control" placeholder="Ex : 128">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="transaminases"><span data-i18n="bio_transaminases">Transaminases</span> <span class="bio-unite">U/L</span></label>
+                                        <input type="number" id="transaminases" name="transaminases" min="0" max="5000" step="1" class="form-control" placeholder="Ex : 145">
+                                    </div>
+                                </div>
+                                <!-- Les constantes, mêmes champs et mêmes clés que
+                                     sur l'assistant : les deux écrans passent par
+                                     la même chaîne de contrôles, et une clé qui
+                                     divergerait ferait qu'une règle s'appliquerait
+                                     d'un côté seulement. -->
+                                <p class="bio-aide bio-sous-titre" data-i18n="bio_constantes">Constantes</p>
+                                <div class="form-row bio-grille">
+                                    <div class="form-group">
+                                        <label for="systolique"><span data-i18n="bio_systolique">PA systolique</span> <span class="bio-unite">mmHg</span></label>
+                                        <input type="number" id="systolique" name="systolique" min="40" max="300" step="1" class="form-control" placeholder="Ex : 96">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="diastolique"><span data-i18n="bio_diastolique">PA diastolique</span> <span class="bio-unite">mmHg</span></label>
+                                        <input type="number" id="diastolique" name="diastolique" min="20" max="200" step="1" class="form-control" placeholder="Ex : 58">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="frequence_cardiaque"><span data-i18n="bio_frequence">Fréquence cardiaque</span> <span class="bio-unite">bpm</span></label>
+                                        <input type="number" id="frequence_cardiaque" name="frequence_cardiaque" min="20" max="250" step="1" class="form-control" placeholder="Ex : 48">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="fevg"><span data-i18n="bio_fevg">FEVG</span> <span class="bio-unite">%</span></label>
+                                        <input type="number" id="fevg" name="fevg" min="5" max="90" step="1" class="form-control" placeholder="Ex : 30">
+                                    </div>
+                                </div>
+                            </details>
+
+                            <!-- Diagnostic -->
+                            <div class="section-title mt-lg"><i class="fas fa-clipboard-list"></i> <span data-i18n="medical_diagnosis" data-i18n-en="Medical Diagnosis">Hypothèse clinique</span></div>
+
+                            <div class="form-group">
+                                <label for="diagnostic"><span data-i18n="diagnosis" data-i18n-en="Diagnosis">Hypothèse clinique</span> <span class="text-danger">*</span></label>
+                                <textarea id="diagnostic" rows="5" required class="form-control" data-i18n-placeholder="diagnostic_placeholder" placeholder="Ex: Gastro-entérite aiguë avec déshydratation modérée. Patient présente des vomissements et diarrhées depuis 24h..." data-i18n-en-placeholder="e.g. Acute gastroenteritis with moderate dehydration. Patient has had vomiting and diarrhea for 24h..."></textarea>
+                                <p class="form-hint" data-i18n="diagnostic_tip" data-i18n-en="Be precise: include the pathology, severity, and main symptoms.">Soyez précis : incluez la pathologie, la sévérité et les symptômes principaux.</p>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" id="analyzeBtn" class="btn-primary">
+                                    <i class="fas fa-brain"></i> <span data-i18n="analyze_button" data-i18n-en="Analyze and Suggest Medicines">Analyser et suggérer les médicaments</span>
+                                </button>
+                                <button type="reset" id="resetBtn" class="btn-secondary">
+                                    <i class="fas fa-redo"></i> <span data-i18n="reset_button" data-i18n-en="Reset">Réinitialiser</span>
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Loading -->
+                        <div id="loadingIndicator" class="loading-indicator hidden mt-lg">
+                            <div class="spinner spinner-lg"></div>
+                            <p data-i18n="analyzing" data-i18n-en="Analysis in progress with AI...">Analyse en cours avec l'IA...</p>
+                            <p class="text-sm text-tertiary" data-i18n="analyzing_details" data-i18n-en="Searching medicines and interactions">Recherche dans les médicaments et interactions</p>
+                            <div class="loading-badges">
+                                <span class="loading-badge blue"><i class="fas fa-database"></i> Qdrant <span data-i18n="vectorial" data-i18n-en="(Vectorial)">(Vectoriel)</span></span>
+                                <span class="loading-badge green"><i class="fas fa-leaf"></i> MongoDB <span data-i18n="data" data-i18n-en="(Data)">(Données)</span></span>
+                                <span class="loading-badge purple"><i class="fas fa-project-diagram"></i> Neo4j <span data-i18n="relations" data-i18n-en="(Relations)">(Relations)</span></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Résultats.
+                         Mêmes panneaux, même ordre et mêmes classes que
+                         l'assistant de prescription : les deux écrans rendent
+                         la même réponse, et passer de l'un à l'autre ne doit
+                         pas demander de réapprendre où regarder. Les classes
+                         `result-section` et `resume-patient` portent aussi le
+                         matériau de verre, qui s'applique sous
+                         `analyse-faite`. -->
+                    <div id="resultsSection" class="results-column hidden">
+                        <div id="resultPatient" class="resume-patient hidden"></div>
+
+                        <div id="suggestionsSection" class="result-section suggestions-section hidden">
+                            <h3><i class="fas fa-capsules"></i> <span data-i18n="suggested_medications" data-i18n-en="Suggested Medications">Médicaments suggérés</span></h3>
+                            <div id="suggestionsContainer"></div>
+                        </div>
+
+                        <div id="ecartesSection" class="result-section ecartes-section hidden">
+                            <h3><i class="fas fa-ban"></i> <span data-i18n="ecartes_title" data-i18n-en="Ruled out, and why">Médicaments écartés</span></h3>
+                            <div id="ecartesContainer"></div>
+                        </div>
+
+                        <div id="alertsSection" class="result-section alerts-section hidden">
+                            <h3><i class="fas fa-exclamation-triangle"></i> <span data-i18n="interactions_title" data-i18n-en="Interaction check">Contrôle des interactions</span></h3>
+                            <div id="alertsContainer"></div>
+                        </div>
+
+                        <div id="summarySection" class="result-section hidden">
+                            <h3><i class="fas fa-lightbulb"></i> <span data-i18n="prescription_summary" data-i18n-en="Prescription Summary">Résumé de la prescription</span></h3>
+                            <div id="summaryContent"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    {% with now=now|default({"year": 2025}) %}
+    {% include 'components/footer.html' %}
+    {% endwith %}
+
+    <!-- L'affichage des resultats est commun aux deux ecrans de prescription :
+         meme reponse, meme rendu. Charge avant le script de la page, qui
+         l'appelle. -->
+    <script src="{{ url_for('static', filename='js/prescription_resultats.js') }}"></script>
+    <script>
+        // Les resultats biologiques, tous facultatifs. Un champ vide n'est pas
+        // transmis : ne rien savoir n'est pas un resultat, et le serveur ne
+        // doit pas prendre une chaine vide pour une mesure.
+        function mesuresBiologiques() {
+            var mesures = {};
+            ['dfg', 'kaliemie', 'natremie', 'transaminases',
+             'systolique', 'diastolique', 'frequence_cardiaque',
+             'fevg'].forEach(function (cle) {
+                var champ = document.getElementById(cle);
+                if (champ && champ.value !== '') mesures[cle] = champ.value;
+            });
+            return mesures;
+        }
+
+        const API_BASE_URL = window.location.origin;
+        const diagnosticForm = document.getElementById('diagnosticForm');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const resultsSection = document.getElementById('resultsSection');
+        const summaryContent = document.getElementById('summaryContent');
+
+        diagnosticForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const diagnostic = document.getElementById('diagnostic').value.trim();
+            const patientName = document.getElementById('patientName').value.trim();
+            const age = document.getElementById('age').value;
+            const taille = document.getElementById('taille').value;
+            const poids = document.getElementById('poids').value;
+            const sexe = document.getElementById('sexe').value;
+            const antecedents = document.getElementById('antecedents').value.trim();
+            const medicamentsActuels = document.getElementById('medicaments_actuels').value.trim();
+
+            if (!diagnostic) {
+                var lang = localStorage.getItem(window.CLE_LANGUE || 'posologyai_lang') || 'fr';
+                alert(lang === 'fr' ? 'Veuillez entrer un diagnostic m\u00e9dical' : 'Please enter a medical diagnosis');
+                return;
+            }
+
+            loadingIndicator.classList.remove('hidden');
+            resultsSection.classList.add('hidden');
+
+            try {
+                var userLang = localStorage.getItem(window.CLE_LANGUE || 'posologyai_lang') || 'fr';
+                var response = await fetch(API_BASE_URL + '/api/diagnostic-prescription/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        diagnostic: diagnostic,
+                        patient_name: patientName,
+                        age: age,
+                        taille: taille,
+                        poids: poids,
+                        sexe: sexe,
+                        antecedents: antecedents,
+                        medicaments_actuels: medicamentsActuels,
+                        lang: userLang,
+                        ...mesuresBiologiques()
+                    })
+                });
+                if (!response.ok) throw new Error('Erreur serveur');
+                var result = await response.json();
+                displayResults(result);
+            } catch (error) {
+                console.error('Erreur:', error);
+                var lang = localStorage.getItem(window.CLE_LANGUE || 'posologyai_lang') || 'fr';
+                alert(lang === 'fr' ? 'Une erreur est survenue lors de l\'analyse. Veuillez r\u00e9essayer.' : 'An error occurred during analysis. Please try again.');
+            } finally {
+                loadingIndicator.classList.add('hidden');
+            }
+        });
+
+        // L'affichage passe par les fonctions communes aux deux ecrans :
+        // displaySuggestions, displayEcartes et displayAlerts. Cet ecran
+        // n'affichait ni les contre-indications, ni les medicaments ecartes,
+        // ni l'etat du controle d'interactions, et il n'echappait aucune
+        // valeur. Il en affiche desormais autant que l'assistant, et de la
+        // meme facon.
+        function displayResults(data) {
+            var champs = lireFormulaire();
+
+            // Chacun a son propre filet : une erreur dans un panneau ne doit
+            // pas empecher les autres de s'afficher.
+            try { afficherResumePatient(champs); }
+            catch (err) { console.error('bandeau patient :', err); }
+            try { replierFormulaire(); }
+            catch (err) { console.error('repli du formulaire :', err); }
+
+            try { displaySuggestions(data.medications, data.interactions, data); }
+            catch (err) { console.error('medicaments proposes :', err); }
+            try { displayEcartes(data); }
+            catch (err) { console.error('medicaments ecartes :', err); }
+            try { displayAlerts(data); }
+            catch (err) { console.error('controle des interactions :', err); }
+
+            // Aucun medicament : le dire dans le panneau plutot que de le
+            // laisser vide. Quand tout a ete ecarte par un antecedent, c'est
+            // le panneau des ecartes qui porte l'explication.
+            if (!data.medications || !data.medications.length) {
+                var container = document.getElementById('suggestionsContainer');
+                var message = (data.contraintes_etat === 'tout_ecarte')
+                    ? 'Tous les m\u00e9dicaments envisag\u00e9s ont \u00e9t\u00e9 \u00e9cart\u00e9s par les '
+                      + 'ant\u00e9c\u00e9dents du patient. Voir le panneau ci-dessous.'
+                    : 'Aucun m\u00e9dicament trouv\u00e9 pour ce diagnostic.';
+                container.innerHTML = '<p class="alert-etat">' + echapper(message) + '</p>';
+                document.getElementById('suggestionsSection').classList.remove('hidden');
+            }
+
+            if (data.summary) {
+                summaryContent.innerHTML = '<p class="summary-text">'
+                    + echapper(data.summary) + '</p>';
+                document.getElementById('summarySection').classList.remove('hidden');
+            } else {
+                document.getElementById('summarySection').classList.add('hidden');
+            }
+
+            resultsSection.classList.remove('hidden');
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function lireFormulaire() {
+            function valeur(id) {
+                var el = document.getElementById(id);
+                return el ? el.value.trim() : '';
+            }
+            return {
+                nom: valeur('patientName'),
+                age: valeur('age'),
+                taille: valeur('taille'),
+                poids: valeur('poids'),
+                sexe: valeur('sexe'),
+                motif: valeur('diagnostic'),
+                medicaments_actuels: valeur('medicaments_actuels')
+            };
+        }
+
+        // Les resultats apparaissaient sans rappeler de qui il s'agit : sur un
+        // ecran partage, rien ne rattachait le compte rendu a un patient.
+        // Meme bandeau que l'assistant, au mot pres — sauf le motif, qui est
+        // ici le diagnostic saisi et non les symptomes.
+        function afficherResumePatient(f) {
+            var bandeau = document.getElementById('resultPatient');
+            if (!bandeau) return;
+
+            var traits = [];
+            if (f.age) traits.push(f.age + ' ans');
+            var sexe = document.getElementById('sexe');
+            if (sexe && sexe.value) traits.push(sexe.options[sexe.selectedIndex].text);
+            if (f.taille) traits.push(f.taille + ' cm');
+            if (f.poids) traits.push(f.poids + ' kg');
+
+            var traitements = (f.medicaments_actuels || '')
+                .split(/[,;.\n]+/).map(function (t) { return t.trim(); }).filter(Boolean);
+            var motif = (f.motif || '').replace(/\s+/g, ' ').trim();
+
+            bandeau.innerHTML =
+                '<div class="rp-identite">'
+                + '<span class="rp-nom">' + echapper(f.nom || 'Patient') + '</span>'
+                + (traits.length ? '<span class="rp-traits">' + echapper(traits.join(' \u00b7 ')) + '</span>' : '')
+                + '</div>'
+                + (motif ? '<p class="rp-motif">' + echapper(
+                    motif.length > 130 ? motif.slice(0, 130) + '\u2026' : motif) + '</p>' : '')
+                + '<div class="rp-pied">'
+                + '<span class="rp-mesures">'
+                + '<strong>' + traitements.length + '</strong> traitement(s) en cours'
+                + '<span class="rp-sep" aria-hidden="true">\u00b7</span>'
+                + 'analyse de ' + new Date().toLocaleTimeString('fr-FR',
+                    { hour: '2-digit', minute: '2-digit' })
+                + '</span>'
+                + '<button type="button" id="formRouvrir" class="btn-secondaire-mince">'
+                + '<i class="fas fa-pen" aria-hidden="true"></i> Modifier</button>'
+                + '</div>';
+            bandeau.classList.remove('hidden');
+
+            // Le bouton est reconstruit a chaque analyse : l'ecouteur se pose
+            // ici, et non une fois pour toutes au chargement.
+            var rouvrir = bandeau.querySelector('#formRouvrir');
+            if (rouvrir) {
+                rouvrir.addEventListener('click', function () {
+                    deplierFormulaire();
+                    bandeau.classList.add('hidden');
+                });
+            }
+        }
+
+        // Le formulaire occupait toute la colonne alors qu'il a fini son
+        // office : il disparait, son resume est dans le bandeau patient, et le
+        // bouton « Modifier » le rouvre.
+        function replierFormulaire() {
+            basculerFormulaire(true);
+        }
+
+        function deplierFormulaire() {
+            basculerFormulaire(false);
+        }
+
+        function basculerFormulaire(replie) {
+            var grille = document.querySelector('.diag-layout');
+            var carte = document.querySelector('.diag-form-card');
+            var aide = document.querySelector('.info-box');
+            [[grille, 'analyse-faite'], [carte, 'repliee'], [aide, 'repliee']]
+                .forEach(function (paire) {
+                    if (!paire[0]) return;
+                    if (replie) paire[0].classList.add(paire[1]);
+                    else paire[0].classList.remove(paire[1]);
+                });
+        }
+
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            resultsSection.classList.add('hidden');
+            ['suggestionsSection', 'ecartesSection', 'alertsSection',
+             'summarySection', 'resultPatient'].forEach(function (id) {
+                var el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+            deplierFormulaire();
+        });
+
+        // Translation
+        if ((localStorage.getItem(window.CLE_LANGUE || 'posologyai_lang') || 'fr') === 'en') {
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelectorAll('[data-i18n-en]').forEach(function(el) {
+                    el.textContent = el.getAttribute('data-i18n-en');
+                });
+                document.querySelectorAll('input[data-i18n-en-placeholder], textarea[data-i18n-en-placeholder]').forEach(function(el) {
+                    el.placeholder = el.getAttribute('data-i18n-en-placeholder');
+                });
+                var sel = document.getElementById('sexe');
+                if (sel) {
+                    sel.querySelectorAll('option').forEach(function(opt) {
+                        if (opt.hasAttribute('data-i18n-en')) opt.textContent = opt.getAttribute('data-i18n-en');
+                    });
+                }
+            });
+        }
+
+
+    </script>
+
+    {#
+       Le widget de traduction Google a ete retire d'ici.
+
+       Il chargeait un script tiers, puis simulait un clic sur l'option
+       anglaise apres une seconde d'attente, pour retraduire la page
+       par-dessus le systeme maison. Trois defauts : il n'agissait qu'en
+       anglais, il dependait d'un service exterieur a chaque visite, et
+       il se battait avec `translations.js` sur les memes noeuds.
+
+       La traduction passe desormais par les tables statiques de
+       `static/js/translations.js`, en memoire, sans reseau.
+    #}
+</body>
+</html>

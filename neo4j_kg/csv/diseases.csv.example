@@ -1,0 +1,5 @@
+name,symptoms,category,icd10_code,description,source,confidence_score
+Hypertension artérielle,Céphalées vertiges acouphènes,Cardiovasculaire,I10,Élévation chronique pression artérielle,HAS,99
+Diabète type 2,Polyurie polydipsie fatigue,Métabolique,E11,Hyperglycémie chronique par insulinorésistance,HAS,99
+Douleur aiguë,Douleur localisée diffuse,Neurologique,R52,Douleur associée à lésion tissulaire,INRS,98
+Infection bactérienne,Fièvre inflammation douleur,Infectieux,A49,Infection par bactéries pathogènes,OMS,99

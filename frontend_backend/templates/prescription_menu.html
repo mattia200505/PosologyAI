@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PosologyAI • Aide à la prescription</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/hero.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/prescription.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    {% with active_page='prescription' %}
+    {% include 'components/header.html' %}
+    {% endwith %}
+
+    <main>
+        <section class="prescription-menu hero-nuit hero-photo">
+        {% with photo = 'photo-1631217868264-e5b90bb7e133' %}
+        {% include 'components/hero_photo.html' %}
+        {% endwith %}
+            <div class="menu-wrapper">
+                <div class="menu-header">
+                    {# Le surtitre situe l'ecran avant que le titre ne le
+                       nomme, comme sur le tableau de bord et l'accueil. #}
+                    <p class="hero-sur"><i class="fas fa-stethoscope" aria-hidden="true"></i> <span data-i18n="feature_prescription">Aide à la prescription</span></p>
+                    <h1 data-i18n="prescription_help_title" data-i18n-en="Medical Prescription Help">Aide à la prescription médicale</h1>
+                    <p data-i18n="prescription_help_subtitle" data-i18n-en="Choose the type of assistance you need">Choisissez le type d'assistance dont vous avez besoin</p>
+                </div>
+                <!-- L'avertissement médical est retiré : l'application est
+                     réservée aux professionnels de santé, à qui il n'apprenait
+                     rien. Il avait déjà quitté l'écran de l'assistant ; la même
+                     règle s'applique ici. -->
+                <div class="menu-grid">
+                    <a href="/api/prescription/assistant" class="menu-card entree">
+                        <p class="menu-card-etat" data-i18n="path_state_no_diagnosis" data-i18n-en="No diagnosis yet">Diagnostic non posé</p>
+                        <div class="menu-card-tete">
+                            <span class="menu-card-icon"><i class="fas fa-user-md" aria-hidden="true"></i></span>
+                            <h3 data-i18n="diagnostic_help_title" data-i18n-en="Diagnostic assistance">Aide au diagnostic</h3>
+                        </div>
+                        <p data-i18n="diagnostic_help_desc" data-i18n-en="No diagnosis yet. You describe the patient's symptoms and context; the tool proposes a clinical hypothesis to validate, then medications.">Le diagnostic n'est pas encore posé. Vous décrivez les symptômes et le contexte du patient ; l'outil propose une hypothèse clinique à valider, puis des médicaments.</p>
+                        <ul class="menu-features">
+                            <li><i class="fas fa-check-circle"></i> <span data-i18n="diagnostic_feature_1" data-i18n-en="Entry of patient symptoms and context">Saisie des symptômes et du contexte du patient</span></li>
+                            <li><i class="fas fa-check-circle"></i> <span data-i18n="diagnostic_feature_2" data-i18n-en="Clinical hypothesis proposed, to be validated">Hypothèse clinique proposée, à valider</span></li>
+                            <li><i class="fas fa-check-circle"></i> <span data-i18n="diagnostic_feature_3" data-i18n-en="Related alerts and recommendations">Alertes et recommandations associées</span></li>
+                            <li><i class="fas fa-check-circle"></i> <span data-i18n="diagnostic_feature_4" data-i18n-en="Prescription generation">Génération d'une ordonnance</span></li>
+                        </ul>
+                        <div class="menu-card-btn"><i class="fas fa-microscope"></i> <span data-i18n="start_diagnostic" data-i18n-en="Start diagnostic">Commencer le diagnostic</span></div>
+                    </a>
+                    <a href="/api/diagnostic-prescription/view" class="menu-card entree">
+                        <p class="menu-card-etat" data-i18n="path_state_diagnosis" data-i18n-en="Diagnosis already made">Diagnostic déjà posé</p>
+                        <div class="menu-card-tete">
+                            <span class="menu-card-icon"><i class="fas fa-prescription" aria-hidden="true"></i></span>
+                            <h3 data-i18n="prescription_by_diagnostic_title" data-i18n-en="Prescription by diagnosis">Prescription par diagnostic</h3>
+                        </div>
+                        <p data-i18n="prescription_by_diagnostic_desc" data-i18n-en="The diagnosis is already made. You enter it as is; the tool proposes matching medications and flags interactions between those you keep.">Le diagnostic est déjà posé. Vous l'entrez tel quel ; l'outil propose les médicaments correspondants et signale les interactions entre ceux que vous retenez.</p>
+                        <ul class="menu-features">
+                            <li><i class="fas fa-check-circle"></i> <span data-i18n="prescription_feature_1" data-i18n-en="Direct entry of the clinical hypothesis">Saisie directe de l'hypothèse clinique</span></li>
+                            <li><i class="fas fa-check-circle"></i> <span data-i18n="prescription_feature_2" data-i18n-en="Medications suggested from the database">Médicaments suggérés depuis la base</span></li>
+                            <li><i class="fas fa-check-circle"></i> <span data-i18n="prescription_feature_3" data-i18n-en="Interactions flagged between the medications kept">Interactions signalées entre les médicaments retenus</span></li>
+                            <li><i class="fas fa-check-circle"></i> <span data-i18n="prescription_feature_4" data-i18n-en="History and current treatments taken into account">Antécédents et traitements en cours pris en compte</span></li>
+                        </ul>
+                        <div class="menu-card-btn"><i class="fas fa-pills"></i> <span data-i18n="prescribe_medications" data-i18n-en="Prescribe medications">Prescrire des médicaments</span></div>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    {% with now=now|default({"year": 2025}) %}
+    {% include 'components/footer.html' %}
+    {% endwith %}
+
+    <script>
+    // ── L'entrée des deux cartes ─────────────────────────────────────
+    //
+    // Le même geste que sur le tableau de bord et l'accueil, et la même
+    // réserve : sans observateur, ou si le mouvement est refusé, les
+    // cartes sont visibles d'emblée. Un panneau resté transparent faute
+    // de script serait du contenu perdu — ici, les deux seuls chemins que
+    // la page propose.
+    (function () {
+        var cartes = [].slice.call(document.querySelectorAll('.entree'));
+        var reduit = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduit || !('IntersectionObserver' in window)) {
+            cartes.forEach(function (c) { c.classList.add('vu'); });
+            return;
+        }
+        var observateur = new IntersectionObserver(function (entrees) {
+            entrees.forEach(function (e) {
+                if (!e.isIntersecting) return;
+                e.target.classList.add('vu');
+                observateur.unobserve(e.target);
+            });
+        }, { threshold: 0.2 });
+        cartes.forEach(function (c) { observateur.observe(c); });
+    })();
+    </script>
+
+    {#
+       La bascule locale a ete retiree.
+
+       Elle lisait `data-i18n-en` et n'agissait donc qu'en anglais ; en
+       toute autre langue elle ecrivait `el.getAttribute('data-i18n')`,
+       c'est-a-dire **le nom de la cle** dans la page. Elle s'executait a
+       l'analyse, avant `translations.js`, si bien que la page affichait
+       brievement `diagnostic_help_title` avant d'etre corrigee.
+
+       Le moteur central lit les memes attributs `data-i18n`, dans les
+       trois langues, depuis ses tables.
+    #}
+    {#
+       Le widget de traduction Google a ete retire d'ici.
+
+       Il chargeait un script tiers, puis simulait un clic sur l'option
+       anglaise apres une seconde d'attente, pour retraduire la page
+       par-dessus le systeme maison. Trois defauts : il n'agissait qu'en
+       anglais, il dependait d'un service exterieur a chaque visite, et
+       il se battait avec `translations.js` sur les memes noeuds.
+
+       La traduction passe desormais par les tables statiques de
+       `static/js/translations.js`, en memoire, sans reseau.
+    #}
+</body>
+</html>

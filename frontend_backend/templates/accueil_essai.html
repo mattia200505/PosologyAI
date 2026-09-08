@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PosologyAI • Base de données médicamenteuse</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/nav.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/accueil_essai.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chatbot.css') }}">
+</head>
+<body class="essai">
+    {#
+       La page d'accueil du site, servie sur `/`.
+
+       Elle a d'abord vécu sur `/accueil-essai`, en parallèle de l'ancienne,
+       pour que les deux se comparent côte à côte. L'essai ayant été retenu,
+       c'est elle que `/` sert désormais ; l'ancienne reste jointe sur
+       `/accueil-classique`, le temps qu'on soit sûr de ne rien y regretter.
+       Le `noindex` que portait l'essai est tombé avec ce statut : un doublon
+       d'accueil référencé nuisait aux deux, la page de tête doit l'être.
+
+       Les contenus sont ceux de l'ancienne page, repris mot pour mot : ce qui
+       a changé est la forme, pas le propos. Seul le découpage diffère, et
+       l'ordre dans lequel les sections se présentent.
+
+       Base neutre graphite, indigo du thème employé comme accent sur de
+       petites surfaces seulement (§4.2 du skill).
+    #}
+
+    {# La barre du site. Elle vivait ici en clair ; les douze autres
+       pages en avaient une autre. Elles n'en ont plus qu'une. #}
+    {% with active_page = 'accueil' %}
+    {% include 'components/nav.html' %}
+    {% endwith %}
+
+    <main>
+        <!-- ══ 1. Hero en deux moitiés ════════════════════════════ -->
+        {#
+           Le hero occupait toute la largeur en aplat indigo : trop de bleu
+           d'un coup, et rien à regarder. Il se scinde en deux moitiés — le
+           texte sur fond clair, une photographie pleine hauteur en face.
+           L'indigo ne subsiste que sur le voile de l'image et les boutons.
+
+           C'est le « split hero » du vocabulaire du skill (§10), et sa
+           règle anti-centrage : au-delà de VARIANCE 4, le hero centré est
+           écarté au profit d'une composition asymétrique (§4.3).
+        #}
+        <section class="hr">
+            <div class="hr-gauche">
+                <div class="hr-contenu">
+                    <p class="hr-sur"><i class="fas fa-shield-alt" aria-hidden="true"></i> <span data-i18n="trusted_medical_db">Base de données médicale de confiance</span></p>
+                    <h1 class="hr-titre">
+                        <span data-i18n="hero_title_line1">Votre santé,</span><br><em data-i18n="hero_title_line2">éclairée par la donnée</em>
+                    </h1>
+                    <p class="hr-chapeau" data-i18n="acc_hero_sub">
+                        Accédez à des milliers de fiches médicamenteuses, analysez les
+                        interactions et obtenez des synthèses intelligentes en un clic.
+                    </p>
+                    <form class="hr-recherche" action="/search" method="GET" role="search">
+                        <label class="sr-only" for="hr-champ" data-i18n="search_placeholder">Nom, substance active, laboratoire</label>
+                        <input type="text" id="hr-champ" name="search"
+                               placeholder="Nom, substance active, laboratoire..." data-i18n-placeholder="search_placeholder" autocomplete="off">
+                        <button type="submit"><span data-i18n="nav_search">Rechercher</span><i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+                    </form>
+                    {#
+                       Suggestions tirées du catalogue, pas choisies à la main :
+                       les substances actives les plus portées par les fiches.
+                       Elles remplissent le bas de la colonne et donnent une
+                       première prise à qui ne sait pas quoi chercher.
+                    #}
+                    <div class="hr-pistes">
+                        <span class="hr-pistes-titre" data-i18n="acc_exemples">Par exemple</span>
+                        {% for nom in substances_frequentes %}
+                        <a href="/search?search={{ nom|urlencode }}">{{ nom }}</a>
+                        {% endfor %}
+                    </div>
+
+                    <p class="hr-aide" data-i18n="hero_modes_hint">Recherche exacte par défaut&nbsp;; la similarité et l'assistant se choisissent sur la page de résultats.</p>
+
+                    <div class="hr-sources">
+                        <span data-i18n="sources">Sources</span>
+                        <a href="https://base-donnees-publique.medicaments.gouv.fr/" target="_blank" rel="noopener">ANSM</a>
+                        <a href="https://www.ema.europa.eu/en/medicines" target="_blank" rel="noopener">EMA</a>
+                        <a href="https://go.drugbank.com/" target="_blank" rel="noopener">DrugBank</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hr-droite">
+                <img class="hr-photo"
+                     src="https://images.unsplash.com/photo-1471864190281-a93a3070b6de?auto=format&fit=crop&w=1400&q=80"
+                     alt="" aria-hidden="true" loading="eager" decoding="async">
+                <div class="hr-teinte" aria-hidden="true"></div>
+
+                {# Le panneau flotte sur la photographie et porte de vraies
+                   données : les substances que le graphe relie le plus. #}
+                <aside class="hr-panneau" aria-label="Substances les plus connectées">
+                    <p class="hr-panneau-titre" data-i18n="acc_plus_connectees">Les plus connectées du graphe</p>
+                    <ol class="hr-classement">
+                        {% for nom in substances_liees[:6] %}
+                        <li>
+                            <span class="hr-rang">{{ '%02d'|format(loop.index) }}</span>
+                            <a href="/search?search={{ nom|urlencode }}">{{ nom }}</a>
+                        </li>
+                        {% endfor %}
+                    </ol>
+                    <a class="hr-panneau-lien" href="/dashboard"><span data-i18n="acc_voir_graphe">Voir le graphe entier</span> <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                </aside>
+            </div>
+        </section>
+
+        <!-- ══ 2. Chiffres ════════════════════════════════════════ -->
+        <section class="ct">
+            <div class="wrap">
+                <div class="ct-grille">
+                    <div class="ct-item" data-cible="{{ fiches }}"><span class="ct-val">0</span><span class="ct-lib" data-i18n="medicaments">Médicaments</span></div>
+                    <div class="ct-item" data-cible="{{ substances }}"><span class="ct-val">0</span><span class="ct-lib" data-i18n="acc_substances">Substances actives</span></div>
+                    <div class="ct-item" data-cible="{{ laboratoires }}"><span class="ct-val">0</span><span class="ct-lib" data-i18n="laboratoires">Laboratoires</span></div>
+                    <div class="ct-item" data-cible="{{ interactions }}"><span class="ct-val">0</span><span class="ct-lib" data-i18n="interactions">Interactions</span></div>
+                    <div class="ct-item ct-fixe"><span class="ct-val">24/7</span><span class="ct-lib" data-i18n="acc_accessibilite">Accessibilité</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ══ 3. Fonctionnement, trois étapes ════════════════════ -->
+        <section class="pr">
+            <div class="wrap">
+                <div class="pr-tete">
+                    <p class="es-eyebrow" data-i18n="acc_fonctionnement">Fonctionnement</p>
+                    <h2 data-i18n="acc_info_diagnostic">De l'information au diagnostic</h2>
+                    <p class="pr-intro" data-i18n="acc_trois_etapes">Une approche structurée en trois étapes pour une utilisation médicale rigoureuse et fiable.</p>
+                </div>
+                <ol class="pr-etapes">
+                    <li>
+                        <span class="pr-num">1</span>
+                        <h3 data-i18n="acc_etape1">Saisie des informations</h3>
+                        <p data-i18n="acc_etape1_txt">Entrez le nom d'un médicament, une substance active ou un laboratoire. Le moteur de recherche trouve instantanément les résultats les plus pertinents parmi des milliers de fiches.</p>
+                    </li>
+                    <li>
+                        <span class="pr-num">2</span>
+                        <h3 data-i18n="acc_etape2">Analyse par intelligence artificielle</h3>
+                        <p data-i18n="acc_etape2_txt">Des résumés clairs et structurés : indications, posologie, effets secondaires, interactions médicamenteuses et précautions d'emploi.</p>
+                    </li>
+                    <li>
+                        <span class="pr-num">3</span>
+                        <h3 data-i18n="acc_etape3">Visualisation des résultats</h3>
+                        <p data-i18n="acc_etape3_txt">Des fiches détaillées avec une hiérarchie claire, des données chiffrées, les interactions recensées et les sources d'origine.</p>
+                    </li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- ══ 4. Ce que contient une fiche ═══════════════════════ -->
+        <section class="rs">
+            <div class="wrap rs-grille">
+                <div class="rs-texte">
+                    {# Titre en deux moitiés, donc deux clés : le moteur remplace
+                       le contenu d'un élément entier, il lui faut un porteur par
+                       fragment à traduire. Le span ajouté est inerte pour la mise
+                       en forme — les règles CSS visent h2 et h2 em. #}
+                    <h2><span data-i18n="acc_resultats_clairs">Des résultats clairs</span> <em data-i18n="acc_et_structures">et structurés</em></h2>
+                    <p data-i18n="acc_fiche_txt">Chaque fiche présente les informations essentielles de manière organisée, pour une lecture rapide et fiable.</p>
+                    <dl class="rs-liste">
+                        <div><dt data-i18n="acc_ci">Contre-indications</dt><dd data-i18n="acc_ci_txt">Remontées en tête, texte du RCP sans reformulation.</dd></div>
+                        <div><dt data-i18n="interactions">Interactions</dt><dd data-i18n="acc_inter_txt">Recensées et traduites, sans classement de gravité : la source n'en publie aucun.</dd></div>
+                        <div><dt data-i18n="acc_monographie">Monographie</dt><dd data-i18n="acc_monographie_txt">Intégrale, dans son ordre réglementaire, après ce qui sert à décider.</dd></div>
+                        <div><dt data-i18n="acc_formule">Formule topologique</dt><dd>{{ '{:,}'.format(structures).replace(',', ' ') }} <span data-i18n="acc_formule_txt">molécules dessinées à partir de leur structure chimique.</span></dd></div>
+                    </dl>
+                </div>
+                <figure class="rs-visuel">
+                    <img src="{{ url_for('structure_svg', cle=molecule_cle) }}"
+                         alt="Formule topologique de {{ molecule_nom }}" loading="lazy" decoding="async">
+                    <figcaption>{{ molecule_nom }}</figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <!-- ══ 5. Bandeau défilant ════════════════════════════════ -->
+        <section class="mq" aria-label="Substances les plus connectées">
+            <div class="mq-piste" aria-hidden="true">
+                {% for tour in range(2) %}{% for nom in substances_liees %}<span>{{ nom }}</span><i>◆</i>{% endfor %}{% endfor %}
+            </div>
+        </section>
+
+        <!-- ══ 6. Fonctionnalités : onglets ═══════════════════════ -->
+        {#
+           Troisième forme pour cette section. La grille de tuiles puis
+           l'index n'ont pas convaincu ; ici l'interaction change, pas
+           seulement la disposition : cinq onglets, un panneau à la fois,
+           avec sa description longue et son visuel.
+
+           Sans JavaScript, les cinq panneaux s'affichent à la suite :
+           l'attribut `hidden` est posé par le script, jamais dans le
+           gabarit servi. Une fonction ne doit pas dépendre d'un script
+           pour être lisible.
+        #}
+        <section class="on">
+            <div class="wrap">
+                <div class="on-tete">
+                    <h2><span data-i18n="acc_tout_ce_dont">Tout ce dont</span> <em data-i18n="acc_vous_avez_besoin">vous avez besoin</em></h2>
+                    <p data-i18n="acc_cinq_facons">Cinq façons d'aborder le même catalogue.</p>
+                </div>
+
+                <div class="on-barre" role="tablist" aria-label="Fonctionnalités">
+                        <button type="button" role="tab" id="ong-recherche" aria-controls="pan-recherche"
+                                aria-selected="true" tabindex="0" data-i18n="acc_multicriteres">Recherche multicritères</button>
+                        <button type="button" role="tab" id="ong-ordonnance" aria-controls="pan-ordonnance"
+                                aria-selected="false" tabindex="-1" data-i18n="acc_verif_ordonnance">Vérification d'ordonnance</button>
+                        <button type="button" role="tab" id="ong-prescription" aria-controls="pan-prescription"
+                                aria-selected="false" tabindex="-1" data-i18n="feature_prescription">Aide à la prescription</button>
+                        <button type="button" role="tab" id="ong-semantique" aria-controls="pan-semantique"
+                                aria-selected="false" tabindex="-1" data-i18n="acc_semantique">Recherche sémantique</button>
+                        <button type="button" role="tab" id="ong-resumes" aria-controls="pan-resumes"
+                                aria-selected="false" tabindex="-1" data-i18n="acc_resumes">Résumés intelligents</button>
+                </div>
+
+                <div class="on-panneaux">
+                    <div class="on-panneau" role="tabpanel" id="pan-recherche" aria-labelledby="ong-recherche">
+                        <div class="on-texte">
+                            <h3 data-i18n="acc_multicriteres">Recherche multicritères</h3>
+                            <p data-i18n="acc_multicriteres_txt">Filtrez par substance active, forme, laboratoire, dosage, voie d'administration, statut de commercialisation et famille thérapeutique. Les résultats se classent par pertinence, sur un index qui porte sur ce que le médicament est, non sur ce que sa notice mentionne.</p>
+                            {# Le libellé est porté par un span : la clé posée sur
+                               le lien lui-même emporterait la flèche avec le texte. #}
+                            <a class="on-lien" href="/search"><span data-i18n="acc_ouvrir">Ouvrir</span> <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                        </div>
+                        <figure class="on-visuel"><img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=900&q=80" alt="" aria-hidden="true" loading="lazy" decoding="async"></figure>
+                    </div>
+                    <div class="on-panneau" role="tabpanel" id="pan-ordonnance" aria-labelledby="ong-ordonnance">
+                        <div class="on-texte">
+                            <h3 data-i18n="acc_verif_ordonnance">Vérification d'ordonnance</h3>
+                            <p data-i18n="acc_verif_txt">Composez la liste d'une ordonnance : l'écran croise les doublons de substance active, les interactions entre les lignes, les contre-indications de chaque médicament et les alertes de surveillance renforcée. Aucun modèle de langage n'intervient.</p>
+                            <a class="on-lien" href="/ordonnance"><span data-i18n="acc_ouvrir">Ouvrir</span> <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                        </div>
+                        <figure class="on-visuel on-visuel-molecule"><img src="{{ url_for('structure_svg', cle=molecule_cle) }}" alt="Formule topologique de {{ molecule_nom }}" loading="lazy" decoding="async"></figure>
+                    </div>
+                    <div class="on-panneau" role="tabpanel" id="pan-prescription" aria-labelledby="ong-prescription">
+                        <div class="on-texte">
+                            <h3 data-i18n="feature_prescription">Aide à la prescription</h3>
+                            <p data-i18n="acc_prescription_txt">À partir de symptômes, de l'âge et des antécédents, des pistes de traitement assorties de leurs interactions avec les médicaments déjà pris. Les suggestions restent des suggestions : le RCP officiel fait foi.</p>
+                            <a class="on-lien" href="/api/prescription/menu"><span data-i18n="acc_ouvrir">Ouvrir</span> <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                        </div>
+                        <figure class="on-visuel"><img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=900&q=80" alt="" aria-hidden="true" loading="lazy" decoding="async"></figure>
+                    </div>
+                    <div class="on-panneau" role="tabpanel" id="pan-semantique" aria-labelledby="ong-semantique">
+                        <div class="on-texte">
+                            <h3 data-i18n="acc_semantique">Recherche sémantique</h3>
+                            <p data-i18n="acc_semantique_txt">Le moteur vectoriel compare le sens de la requête à celui des fiches, et non ses mots. Il retrouve donc une spécialité décrite approximativement, ou par son indication plutôt que par son nom.</p>
+                            <a class="on-lien" href="/vector-search"><span data-i18n="acc_ouvrir">Ouvrir</span> <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                        </div>
+                        <figure class="on-visuel"><img src="https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&w=900&q=80" alt="" aria-hidden="true" loading="lazy" decoding="async"></figure>
+                    </div>
+                    <div class="on-panneau" role="tabpanel" id="pan-resumes" aria-labelledby="ong-resumes">
+                        <div class="on-texte">
+                            <h3 data-i18n="acc_resumes">Résumés intelligents</h3>
+                            <p data-i18n="acc_resumes_txt">Reformulation de la requête puis synthèse établie à partir du résumé des caractéristiques du produit. Les interactions sont listées sans hiérarchie de gravité : la source n'en publie aucune.</p>
+                            <a class="on-lien" href="/ai-search"><span data-i18n="acc_ouvrir">Ouvrir</span> <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                        </div>
+                        <figure class="on-visuel"><img src="https://images.unsplash.com/photo-1573883430697-4c3479aae6b9?auto=format&fit=crop&w=900&q=80" alt="" aria-hidden="true" loading="lazy" decoding="async"></figure>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ══ 7. Confiance, quatre engagements ═══════════════════ -->
+        <section class="tr">
+            <div class="wrap">
+                <div class="tr-grille">
+                    <div class="tr-item">
+                        <i class="fas fa-shield-alt" aria-hidden="true"></i>
+                        <h3 data-i18n="trust_data">Données fiables</h3>
+                        <p data-i18n="acc_sources_txt">Sources officielles : ANSM, Agence européenne des médicaments, DrugBank.</p>
+                    </div>
+                    <div class="tr-item">
+                        <i class="fas fa-lock" aria-hidden="true"></i>
+                        <h3 data-i18n="trust_privacy">Confidentialité</h3>
+                        <p data-i18n="acc_privacy_txt">Vos données sont protégées et jamais partagées.</p>
+                    </div>
+                    <div class="tr-item">
+                        <i class="fas fa-graduation-cap" aria-hidden="true"></i>
+                        <h3 data-i18n="acc_cadre">Cadre académique</h3>
+                        <p data-i18n="acc_cadre_txt">Projet universitaire sous supervision pédagogique.</p>
+                    </div>
+                    <div class="tr-item">
+                        <i class="fas fa-database" aria-hidden="true"></i>
+                        <h3 data-i18n="trust_comprehensive">Base exhaustive</h3>
+                        <p>{{ '{:,}'.format(fiches).replace(',', ' ') }} <span data-i18n="acc_stat_med_et">médicaments et</span> {{ '{:,}'.format(substances).replace(',', ' ') }} <span data-i18n="acc_stat_sub">substances actives.</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ══ 8. Clôture : bandeau photographique ════════════════ -->
+        {#
+           La clôture était un aplat indigo avec un titre et un champ perdus
+           au milieu. Elle devient un bandeau photographique : l'image occupe
+           toute la largeur, le voile la calme, et la recherche s'y détache en
+           grand.
+
+           La page s'ouvre et se ferme donc sur une photographie, mais dans
+           deux dispositions différentes — moitié d'écran à l'ouverture,
+           pleine largeur centrée à la fermeture. Le skill interdit la
+           répétition d'une famille de mise en page (§4.7), pas le rappel
+           d'un matériau.
+        #}
+        <section class="cl">
+            <img class="cl-photo"
+                 src="https://images.unsplash.com/photo-1587854692152-cbe660dbde88?auto=format&fit=crop&w=1800&q=80"
+                 alt="" aria-hidden="true" loading="lazy" decoding="async">
+            <div class="cl-voile" aria-hidden="true"></div>
+
+            <div class="wrap cl-inner">
+                <p class="cl-sur" data-i18n="acc_projet">PosologyAI, projet académique</p>
+                <h2><span data-i18n="acc_cl_titre1">Un nom de médicament,</span><br><em data-i18n="acc_cl_titre2">et tout ce qu'on en sait.</em></h2>
+
+                <form class="cl-recherche" action="/search" method="GET" role="search">
+                    <label class="sr-only" for="cl-champ" data-i18n="search_placeholder">Nom, substance active, laboratoire</label>
+                    <input type="text" id="cl-champ" name="search" placeholder="Nom, substance active, laboratoire..." data-i18n-placeholder="search_placeholder" autocomplete="off">
+                    <button type="submit"><span data-i18n="nav_search">Rechercher</span><i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+                </form>
+
+                {# Trois raccourcis vers ce qui n'est pas une recherche par
+                   nom : le champ ne mène qu'à une seule des quatre entrées. #}
+                <div class="cl-raccourcis">
+                    <a href="/ordonnance"><i class="fas fa-clipboard-check" aria-hidden="true"></i> <span data-i18n="acc_verifier_ordonnance">Vérifier une ordonnance</span></a>
+                    <a href="/api/prescription/menu"><i class="fas fa-stethoscope" aria-hidden="true"></i> <span data-i18n="feature_prescription">Aide à la prescription</span></a>
+                    <a href="/a-propos"><i class="fas fa-info-circle" aria-hidden="true"></i> <span data-i18n="acc_comment_construit">Comment c'est construit</span></a>
+                </div>
+
+                <p class="cl-note" data-i18n="acc_sae">Développé dans le cadre de la SAE5.01. Les fiches renvoient vers les sources officielles, qui font foi.</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+    (function () {
+        var reduit = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        var cibles = document.querySelectorAll('.on-panneau, .rs-grille > *, .ct-item, .hr-panneau, .pr-etapes li, .tr-item');
+        if (reduit || !('IntersectionObserver' in window)) {
+            cibles.forEach(function (c) { c.classList.add('vu'); });
+        } else {
+            var obs = new IntersectionObserver(function (es) {
+                es.forEach(function (e) {
+                    if (e.isIntersecting) { e.target.classList.add('vu'); obs.unobserve(e.target); }
+                });
+            }, { threshold: 0.15 });
+            cibles.forEach(function (c) { obs.observe(c); });
+        }
+
+        // La valeur finale est dans data-cible : si le script ne tourne pas,
+        // ou si le mouvement est réduit, le nombre exact reste affiché.
+        function compter(el) {
+            var cible = parseInt(el.dataset.cible, 10) || 0;
+            var out = el.querySelector('.ct-val');
+            if (reduit) { out.textContent = cible.toLocaleString('fr-FR'); return; }
+            var t0 = performance.now(), duree = 1300;
+            function pas(t) {
+                var p = Math.min((t - t0) / duree, 1);
+                out.textContent = Math.round(cible * (1 - Math.pow(1 - p, 3))).toLocaleString('fr-FR');
+                if (p < 1) requestAnimationFrame(pas);
+            }
+            requestAnimationFrame(pas);
+        }
+        var cpt = document.querySelectorAll('.ct-item[data-cible]');
+        if (!('IntersectionObserver' in window)) { cpt.forEach(compter); }
+        else {
+            var oc = new IntersectionObserver(function (es) {
+                es.forEach(function (e) { if (e.isIntersecting) { compter(e.target); oc.unobserve(e.target); } });
+            }, { threshold: 0.4 });
+            cpt.forEach(function (c) { oc.observe(c); });
+        }
+
+        // Le projecteur qui suivait le curseur visait les tuiles du bento.
+        // Celui-ci a cédé la place à un index, dont chaque ligne se signale
+        // par son propre survol : le code est retiré plutôt que redirigé,
+        // deux effets de survol sur la même cible se gêneraient.
+
+        // La sentinelle qui posait la barre au defilement est partie avec
+        // elle, dans `components/nav.html` : la barre etant desormais sur
+        // toutes les pages, elle emporte son propre comportement. En laisser
+        // une copie ici en aurait fait deux, sur la meme barre.
+
+        // ── Onglets ────────────────────────────────────────────────
+        // Le gabarit sert les cinq panneaux visibles ; le script prend la
+        // main et n'en laisse qu'un. Sans JavaScript, la section reste
+        // entierement lisible, simplement plus longue.
+        var barre = document.querySelector('.on-barre');
+        if (barre) {
+            var onglets = Array.prototype.slice.call(barre.querySelectorAll('[role="tab"]'));
+            function activer(indice) {
+                onglets.forEach(function (o, i) {
+                    var actif = i === indice;
+                    o.setAttribute('aria-selected', actif ? 'true' : 'false');
+                    o.tabIndex = actif ? 0 : -1;
+                    document.getElementById(o.getAttribute('aria-controls')).hidden = !actif;
+                });
+            }
+            onglets.forEach(function (o, i) {
+                o.addEventListener('click', function () { activer(i); });
+                o.addEventListener('keydown', function (e) {
+                    // Flèches, Origine et Fin : ce que l'on attend d'une barre
+                    // d'onglets au clavier.
+                    var d = {ArrowRight: 1, ArrowLeft: -1, Home: -i, End: onglets.length - 1 - i}[e.key];
+                    if (d === undefined) return;
+                    e.preventDefault();
+                    var suivant = (i + d + onglets.length) % onglets.length;
+                    activer(suivant);
+                    onglets[suivant].focus();
+                });
+            });
+            activer(0);
+        }
+
+        // Le repli mobile est lui aussi passe dans le composant.
+    })();
+    </script>
+
+    {# L'assistant, son bouton et son script : composant partage avec l'autre
+       accueil. Les chiffres de la phrase d'accueil sont ceux que la page
+       affiche deja dans ses compteurs — les memes, pas d'autres. #}
+    {% with cb_fiches = fiches, cb_interactions = interactions %}
+    {% include 'components/chatbot.html' %}
+    {% endwith %}
+</body>
+</html>

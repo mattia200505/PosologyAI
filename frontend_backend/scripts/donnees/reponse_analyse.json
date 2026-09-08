@@ -1,0 +1,897 @@
+{
+  "biologie_relevee": [],
+  "contraintes_appliquees": [
+    {
+      "antecedent": "insuffisance rénale",
+      "motif": "Néphrotoxicité des anti-inflammatoires non stéroïdiens ; risque d'acidose lactique sous metformine."
+    }
+  ],
+  "contraintes_etat": "appliquees",
+  "diagnostic": "**Diagnostic principal probable:**\nLombalgie commune mécanique — Confiance : 85%\nDouleur mécanique post-effort, calmée au repos, sans signes d’alerte (fièvre, trouble sphinctérien). Contexte de port de charge et raideur matinale évocateurs d’une atteinte musculo-ligamentaire ou discale lombaire basse.\n\n**Diagnostics différentiels:**\n[Lombalgie symptomatique d’une pathologie rachidienne sous-jacente (ex. hernie discale) — Probabilité : 10% — Douleur persistante malgré le repos ou irradiation radiculaire nécessiterait une imagerie]\n[Spondylodiscite infectieuse — Probabilité : 3% — Absence de fièvre et contexte mécanique rendent ce diagnostic peu probable, mais à évoquer en cas d’aggravation ou de signes inflammatoires persistants]\n[Pathologie rénale (colique néphrétique) — Probabilité : 2% — Douleur unilatérale, irradiation inguinale ou hématurie absentes ici]\n\n**Conclusion et conduite à tenir:**\nPrise en charge symptomatique : antalgiques de palier 1 (paracétamol) ± AINS (si pas de contre-indication rénine/HTA), kinésithérapie (renforcement musculaire, étirements) et conseils d’hygiène de vie. Surveillance clinique : rechercher signes de gravité (déficit neurologique, fièvre, aggravation). Pas d’imagerie initiale sauf persistance >4-6 semaines ou apparition de signes d’alerte.",
+  "ecartes_par_etage": [
+    {
+      "etage": "antecedent",
+      "libelle": "Antécédents et biologie",
+      "nombre": 2
+    },
+    {
+      "etage": "seuil",
+      "libelle": "Pertinence",
+      "nombre": 6
+    }
+  ],
+  "interactions": [
+    {
+      "description": "Le risque ou la gravité de l'hyperkaliémie peut être augmenté lors de l'association de Ramipril et de Dantrolene.",
+      "medicine1": "Ramipril 10 mg (Ramipril)",
+      "medicine2": "DANTRIUM 25 mg, gélule (Dantrolene)",
+      "symptoms": [],
+      "traduit": true
+    },
+    {
+      "description": "Le risque ou la gravité de l'hyperkaliémie peut être augmenté lors de l'association de Ramipril et de Dantrolene.",
+      "medicine1": "Ramipril 10 mg (Ramipril)",
+      "medicine2": "DANTRIUM 100 mg, gélule (Dantrolene)",
+      "symptoms": [],
+      "traduit": true
+    },
+    {
+      "description": "Le risque ou la gravité des effets indésirables peut être augmenté lors de l'association de Baclofen et de Ramipril.",
+      "medicine1": "Ramipril 10 mg (Ramipril)",
+      "medicine2": "BACLOFENE EG 10 mg, comprimé sécable (Baclofen)",
+      "symptoms": [],
+      "traduit": true
+    },
+    {
+      "description": "L'efficacité thérapeutique de Metformin peut être diminuée en association avec Baclofen.",
+      "medicine1": "Metformine 850 mg (Metformin)",
+      "medicine2": "BACLOFENE EG 10 mg, comprimé sécable (Baclofen)",
+      "symptoms": [],
+      "traduit": true
+    },
+    {
+      "description": "Le risque ou la gravité des effets indésirables peut être augmenté lors de l'association d'Acetaminophen et de Warfarin.",
+      "medicine1": "Warfarine 5 mg (Warfarin)",
+      "medicine2": "PRONTALGINE, comprimé (Acetaminophen)",
+      "symptoms": [],
+      "traduit": true
+    },
+    {
+      "description": "Le risque ou la gravité des effets indésirables peut être augmenté lors de l'association d'Acetaminophen et de Warfarin.",
+      "medicine1": "Warfarine 5 mg (Warfarin)",
+      "medicine2": "FERVEX ADULTES FRAMBOISE, granulés pour solution buvable en sachet (Acetaminophen)",
+      "symptoms": [],
+      "traduit": true
+    },
+    {
+      "description": "Baclofen peut diminuer la vitesse d'élimination de Warfarin, ce qui peut en élever la concentration sérique.",
+      "medicine1": "Warfarine 5 mg (Warfarin)",
+      "medicine2": "BACLOFENE EG 10 mg, comprimé sécable (Baclofen)",
+      "symptoms": [],
+      "traduit": true
+    }
+  ],
+  "interactions_etat": "trouvees",
+  "medicaments_ecartes": [
+    {
+      "alertes": [],
+      "classes_libelles": {
+        "M01": "Anti-inflammatoires et antirhumatismaux",
+        "M02": "Topiques pour douleurs articulaires et musculaires"
+      },
+      "condition": "classe M01",
+      "contre_indications": [
+        {
+          "phrase": "Insuffisance rénale sévère.",
+          "terme": "insuffisance rénale légère"
+        }
+      ],
+      "declassements": [],
+      "duration": "",
+      "ecarte_par": {
+        "antecedent": "insuffisance rénale",
+        "cible": "ketoprofene",
+        "motif": "Néphrotoxicité des anti-inflammatoires non stéroïdiens ; risque d'acidose lactique sous metformine."
+      },
+      "etage_ecart": "antecedent",
+      "fiche_id": "69347bd4f198d5d3ccbebac8",
+      "forme": "Gélule",
+      "groupes_atc": [
+        "M01"
+      ],
+      "id": "69347bd4f198d5d3ccbebac8",
+      "indication": "Pour le traitement symptomatique de la polyarthrite rhumatoïde aiguë et chronique, de l'arthrose, de la spondylarthrite ankylosante, de la dysménorrhée primaire et des douleurs légères à modérées associées aux traumatismes musculo-tendineux (entorses et foulures), postopératoires (y compris la chirurgie dentaire) ou post-partum.",
+      "indication_traduite": true,
+      "justification": "Pertinent pour: classe M01",
+      "laboratoire": "SANOFI WINTHROP INDUSTRIE",
+      "lien": "/medicine/69347bd4f198d5d3ccbebac8",
+      "motif_ecart": "Néphrotoxicité des anti-inflammatoires non stéroïdiens ; risque d'acidose lactique sous metformine.",
+      "origine": "classe_atc",
+      "pertinence": 60,
+      "posologie": "Selon prescription médicale",
+      "rang": "alternative",
+      "representative": "",
+      "substance": "Kétoprofène",
+      "substance_annoncee": "",
+      "substances": [
+        "Kétoprofène"
+      ],
+      "title": "PROFENID 50 mg, gélule"
+    },
+    {
+      "alertes": [],
+      "classes_libelles": {
+        "M01": "Anti-inflammatoires et antirhumatismaux",
+        "M02": "Topiques pour douleurs articulaires et musculaires"
+      },
+      "condition": "classe M01",
+      "contre_indications": [
+        {
+          "phrase": "Insuffisance rénale sévère.",
+          "terme": "insuffisance rénale légère"
+        }
+      ],
+      "declassements": [],
+      "duration": "",
+      "ecarte_par": {
+        "antecedent": "insuffisance rénale",
+        "cible": "ketoprofene",
+        "motif": "Néphrotoxicité des anti-inflammatoires non stéroïdiens ; risque d'acidose lactique sous metformine."
+      },
+      "etage_ecart": "antecedent",
+      "fiche_id": "693480b9f198d5d3ccbec0ea",
+      "forme": "Comprimé",
+      "groupes_atc": [
+        "M01"
+      ],
+      "id": "693480b9f198d5d3ccbec0ea",
+      "indication": "Pour le traitement symptomatique de la polyarthrite rhumatoïde aiguë et chronique, de l'arthrose, de la spondylarthrite ankylosante, de la dysménorrhée primaire et des douleurs légères à modérées associées aux traumatismes musculo-tendineux (entorses et foulures), postopératoires (y compris la chirurgie dentaire) ou post-partum.",
+      "indication_traduite": true,
+      "justification": "Pertinent pour: classe M01",
+      "laboratoire": "SANOFI WINTHROP INDUSTRIE",
+      "lien": "/medicine/693480b9f198d5d3ccbec0ea",
+      "motif_ecart": "Néphrotoxicité des anti-inflammatoires non stéroïdiens ; risque d'acidose lactique sous metformine.",
+      "origine": "classe_atc",
+      "pertinence": 60,
+      "posologie": "Selon prescription médicale",
+      "rang": "alternative",
+      "representative": "",
+      "substance": "Kétoprofène",
+      "substance_annoncee": "",
+      "substances": [
+        "Kétoprofène"
+      ],
+      "title": "TOPREC 25 mg, comprimé"
+    },
+    {
+      "alertes": [],
+      "classes_libelles": {},
+      "condition": "",
+      "contre_indications": [],
+      "declassements": [],
+      "duration": "",
+      "etage_ecart": "seuil",
+      "fiche_id": "6934766af198d5d3ccbeb398",
+      "forme": "Crème",
+      "groupes_atc": [],
+      "id": "6934766af198d5d3ccbeb398",
+      "indication": "",
+      "indication_traduite": false,
+      "justification": "Aucun lien thérapeutique direct avec les symptômes",
+      "laboratoire": "COOPERATION PHARMACEUTIQUE FRANCAISE",
+      "lien": "/medicine/6934766af198d5d3ccbeb398",
+      "motif_ecart": "Note de 0 sur 100, sous le seuil de 40 : aucun lien thérapeutique établi.",
+      "origine": "similarite",
+      "pertinence": 0,
+      "posologie": "Selon prescription médicale",
+      "rang": "alternative",
+      "representative": "",
+      "sous_le_seuil": 40,
+      "substance": "Salicylate de glycol",
+      "substance_annoncee": "",
+      "substances": [
+        "Salicylate de glycol"
+      ],
+      "title": "LUMBALGINE, crème"
+    },
+    {
+      "alertes": [],
+      "classes_libelles": {},
+      "condition": "",
+      "contre_indications": [],
+      "declassements": [],
+      "duration": "",
+      "etage_ecart": "seuil",
+      "fiche_id": "69348275f198d5d3ccbec325",
+      "forme": "Poudre orale en sachet",
+      "groupes_atc": [],
+      "id": "69348275f198d5d3ccbec325",
+      "indication": "",
+      "indication_traduite": false,
+      "justification": "Aucun lien thérapeutique direct avec les symptômes",
+      "laboratoire": "VIATRIS MEDICAL",
+      "lien": "/medicine/69348275f198d5d3ccbec325",
+      "motif_ecart": "Note de 0 sur 100, sous le seuil de 40 : aucun lien thérapeutique établi.",
+      "origine": "similarite",
+      "pertinence": 0,
+      "posologie": "Selon prescription médicale",
+      "rang": "alternative",
+      "representative": "",
+      "sous_le_seuil": 40,
+      "substance": "Séné",
+      "substance_annoncee": "",
+      "substances": [
+        "Séné"
+      ],
+      "title": "X-PREP, poudre orale en sachet"
+    },
+    {
+      "alertes": [],
+      "classes_libelles": {
+        "A07": "Antidiarrhéiques et anti-inflammatoires intestinaux"
+      },
+      "condition": "soulagement",
+      "contre_indications": [],
+      "declassements": [],
+      "duration": "",
+      "etage_ecart": "seuil",
+      "fiche_id": "69347ed1f198d5d3ccbebe72",
+      "forme": "Poudre pour suspension buvable en sachet",
+      "groupes_atc": [
+        "A07"
+      ],
+      "id": "69347ed1f198d5d3ccbebe72",
+      "indication": "",
+      "indication_traduite": false,
+      "justification": "Aucun lien thérapeutique direct avec les symptômes",
+      "laboratoire": "MAYOLY PHARMA FRANCE",
+      "lien": "/medicine/69347ed1f198d5d3ccbebe72",
+      "motif_ecart": "Note de 0 sur 100, sous le seuil de 40 : aucun lien thérapeutique établi.",
+      "origine": "similarite",
+      "pertinence": 0,
+      "posologie": "Selon prescription médicale",
+      "rang": "adjuvant",
+      "representative": "",
+      "sous_le_seuil": 40,
+      "substance": "Diosmectite",
+      "substance_annoncee": "",
+      "substances": [
+        "Diosmectite"
+      ],
+      "title": "SMECTA 3 g FRAISE, poudre pour suspension buvable en sachet"
+    },
+    {
+      "alertes": [],
+      "classes_libelles": {
+        "C01": "Thérapeutique cardiaque",
+        "M01": "Anti-inflammatoires et antirhumatismaux",
+        "M02": "Topiques pour douleurs articulaires et musculaires",
+        "S01": "Médicaments ophtalmologiques"
+      },
+      "condition": "classe M01",
+      "contre_indications": [
+        {
+          "phrase": "insuffisance rénale sévère, ·",
+          "terme": "insuffisance rénale légère"
+        }
+      ],
+      "declassements": [],
+      "duration": "",
+      "etage_ecart": "seuil",
+      "fiche_id": "6934734af198d5d3ccbeafde",
+      "forme": "Gélule",
+      "groupes_atc": [
+        "M01"
+      ],
+      "id": "6934734af198d5d3ccbeafde",
+      "indication": "L'indométacine orale est indiquée pour la prise en charge symptomatique de la polyarthrite rhumatoïde modérée à sévère, y compris les poussées aiguës de maladie chronique, la spondylarthrite ankylosante modérée à sévère, l'arthrose modérée à sévère, l'épaule douloureuse aiguë (bursite et/ou tendinite) et l'arthrite goutteuse aiguë.[A177871,L6778]...",
+      "indication_traduite": true,
+      "justification": "Pertinent pour: classe M01",
+      "laboratoire": "H.A.C. PHARMA",
+      "lien": "/medicine/6934734af198d5d3ccbeafde",
+      "motif_ecart": "Note de 20 sur 100, sous le seuil de 40 après pénalité de sécurité.",
+      "origine": "classe_atc",
+      "penalites": [
+        "contre-indication relevée au RCP (−40)"
+      ],
+      "pertinence": 20,
+      "posologie": "Selon prescription médicale",
+      "rang": "alternative",
+      "representative": "",
+      "sous_le_seuil": 40,
+      "substance": "Indométacine",
+      "substance_annoncee": "",
+      "substances": [
+        "Indométacine"
+      ],
+      "title": "INDOCID 25 mg, gélule"
+    },
+    {
+      "alertes": [],
+      "classes_libelles": {
+        "M01": "Anti-inflammatoires et antirhumatismaux",
+        "N01": "Anesthésiques"
+      },
+      "condition": "classe M01",
+      "contre_indications": [
+        {
+          "phrase": "insuffisance rénale sévère non dialysée ;",
+          "terme": "insuffisance rénale légère"
+        }
+      ],
+      "declassements": [],
+      "duration": "",
+      "etage_ecart": "seuil",
+      "fiche_id": "6934777af198d5d3ccbeb52e",
+      "forme": "Comprimé",
+      "groupes_atc": [
+        "M01"
+      ],
+      "id": "6934777af198d5d3ccbeb52e",
+      "indication": "Le Méloxicam seul est indiqué dans : - le traitement symptomatique de l'arthrite et de l'arthrose. [L11398] - l'évolution pauciarticulaire et polyarticulaire de la polyarthrite rhumatoïde juvénile (JRA) chez les patients âgés de 2 ans ou plus. [L11398] - la prise en charge des douleurs modérées à sévères, seules ou en association avec...",
+      "indication_traduite": true,
+      "justification": "Pertinent pour: classe M01",
+      "laboratoire": "BOEHRINGER INGELHEIM FRANCE",
+      "lien": "/medicine/6934777af198d5d3ccbeb52e",
+      "motif_ecart": "Note de 20 sur 100, sous le seuil de 40 après pénalité de sécurité.",
+      "origine": "classe_atc",
+      "penalites": [
+        "contre-indication relevée au RCP (−40)"
+      ],
+      "pertinence": 20,
+      "posologie": "Selon prescription médicale",
+      "rang": "alternative",
+      "representative": "",
+      "sous_le_seuil": 40,
+      "substance": "méloxicam",
+      "substance_annoncee": "",
+      "substances": [
+        "méloxicam"
+      ],
+      "title": "MOBIC 7,5 mg, comprimé"
+    },
+    {
+      "alertes": [],
+      "classes_libelles": {
+        "M01": "Anti-inflammatoires et antirhumatismaux"
+      },
+      "condition": "classe M01",
+      "contre_indications": [
+        {
+          "phrase": "insuffisance rénale sévère ;",
+          "terme": "insuffisance rénale légère"
+        }
+      ],
+      "declassements": [],
+      "duration": "",
+      "etage_ecart": "seuil",
+      "fiche_id": "69347b46f198d5d3ccbeba13",
+      "forme": "Gélule",
+      "groupes_atc": [
+        "M01"
+      ],
+      "id": "69347b46f198d5d3ccbeba13",
+      "indication": "Pour le traitement de la polyarthrite rhumatoïde, de l'arthrose, de la dysménorrhée et de la douleur, de l'inflammation et de la fièvre légères à modérées.",
+      "indication_traduite": true,
+      "justification": "Pertinent pour: classe M01",
+      "laboratoire": "PFIZER HOLDING FRANCE",
+      "lien": "/medicine/69347b46f198d5d3ccbeba13",
+      "motif_ecart": "Note de 20 sur 100, sous le seuil de 40 après pénalité de sécurité.",
+      "origine": "classe_atc",
+      "penalites": [
+        "contre-indication relevée au RCP (−40)"
+      ],
+      "pertinence": 20,
+      "posologie": "Selon prescription médicale",
+      "rang": "alternative",
+      "representative": "",
+      "sous_le_seuil": 40,
+      "substance": "Acide méfénamique",
+      "substance_annoncee": "",
+      "substances": [
+        "Acide méfénamique"
+      ],
+      "title": "PONSTYL 250 mg, gélule"
+    }
+  ],
+  "medications": [
+    {
+      "alertes": [],
+      "classes_libelles": {
+        "M01": "Anti-inflammatoires et antirhumatismaux"
+      },
+      "condition": "classe M01",
+      "contre_indications": [],
+      "declassements": [],
+      "duration": "",
+      "fiche_id": "693466d5f198d5d3ccbea0e1",
+      "forme": "Gélule",
+      "groupes_atc": [
+        "M01"
+      ],
+      "id": "693466d5f198d5d3ccbea0e1",
+      "indication": "Pour le traitement de l'arthrose touchant la hanche ou le genou [L780].",
+      "indication_traduite": true,
+      "justification": "Pertinent pour: classe M01",
+      "laboratoire": "ETHYX PHARMACEUTICALS",
+      "lien": "/medicine/693466d5f198d5d3ccbea0e1",
+      "origine": "classe_atc",
+      "pertinence": 60,
+      "posologie": "Selon prescription médicale",
+      "rang": "premiere_intention",
+      "representative": "",
+      "substance": "Diacéréine",
+      "substance_annoncee": "",
+      "substances": [
+        "Diacéréine"
+      ],
+      "title": "ART 50 mg, gélule"
+    },
+    {
+      "alertes": [],
+      "classes_libelles": {
+        "M03": "Myorelaxants"
+      },
+      "condition": "classe M03",
+      "contre_indications": [],
+      "declassements": [],
+      "duration": "",
+      "fiche_id": "69347767f198d5d3ccbeb511",
+      "forme": "Gélule",
+      "groupes_atc": [
+        "M03"
+      ],
+      "id": "69347767f198d5d3ccbeb511",
+      "indication": "Le thiocolchicoside est un médicament relaxant des muscles squelettiques utilisé dans le traitement des troubles orthopédiques, traumatiques et rhumatologiques [L1661]. Il est indiqué comme médicament adjuvant dans le traitement des contractures musculaires douloureuses et est indiqué en pathologie aiguë de la colonne vertébrale, chez les adultes et adolescents de 16 ans et plus...",
+      "indication_traduite": true,
+      "justification": "Pertinent pour: classe M03",
+      "laboratoire": "LABORATORIO FARMACEUTICO SIT S.r.l.",
+      "lien": "/medicine/69347767f198d5d3ccbeb511",
+      "origine": "classe_atc",
+      "pertinence": 60,
+      "posologie": "Selon prescription médicale",
+      "rang": "premiere_intention",
+      "representative": "",
+      "substance": "Thiocolchicoside",
+      "substance_annoncee": "",
+      "substances": [
+        "Thiocolchicoside"
+      ],
+      "title": "MIOREL 4 mg, gélule"
+    },
+    {
+      "alertes": [],
+      "classes_libelles": {
+        "N02": "Analgésiques",
+        "R05": "Médicaments du rhume et de la toux"
+      },
+      "condition": "classe N02",
+      "contre_indications": [],
+      "declassements": [],
+      "duration": "",
+      "fiche_id": "69347b3cf198d5d3ccbeba04",
+      "forme": "Sirop",
+      "groupes_atc": [
+        "N02"
+      ],
+      "id": "69347b3cf198d5d3ccbeba04",
+      "indication": "Le sulfate de codéine est une forme de ce médicament couramment utilisée. Il est disponible sous forme de comprimés [étiquette FDA] et indiqué pour le soulagement des douleurs légères à modérément sévères, lorsque l'utilisation d'un analgésique opioïde est appropriée [étiquette FDA]. La forme solution est utilisée seule ou combinée dans un sirop avec d'autres médicaments et est...",
+      "indication_traduite": true,
+      "justification": "Pertinent pour: classe N02, codéine",
+      "laboratoire": "PIERRE FABRE MEDICAMENT",
+      "lien": "/medicine/69347b3cf198d5d3ccbeba04",
+      "origine": "classe_atc",
+      "pertinence": 100,
+      "posologie": "Selon prescription médicale",
+      "rang": "alternative",
+      "representative": "",
+      "substance": "Codéine",
+      "substance_annoncee": "",
+      "substances": [
+        "Codéine"
+      ],
+      "title": "POLERY ADULTES, sirop"
+    },
+    {
+      "alertes": [],
+      "classes_libelles": {
+        "N02": "Analgésiques"
+      },
+      "condition": "classe N02",
+      "contre_indications": [],
+      "declassements": [],
+      "duration": "",
+      "fiche_id": "69347be5f198d5d3ccbebadd",
+      "forme": "Comprimé",
+      "groupes_atc": [
+        "N02"
+      ],
+      "id": "69347be5f198d5d3ccbebadd",
+      "indication": "En général, l'acétaminophène est utilisé pour traiter la douleur légère à modérée et réduire la fièvre.[F4124] Il est disponible en vente libre sous diverses formes, les plus courantes étant les formes orales. L'_injection_ d'acétaminophène est indiquée pour la gestion de la douleur légère à modérée, la gestion de la douleur modérée à sévère...",
+      "indication_traduite": true,
+      "justification": "Pertinent pour: paracétamol, classe N02",
+      "laboratoire": "MAYOLY PHARMA FRANCE",
+      "lien": "/medicine/69347be5f198d5d3ccbebadd",
+      "origine": "classe_atc",
+      "penalites": [
+        "interaction avec un traitement en cours (−20)"
+      ],
+      "pertinence": 80,
+      "posologie": "Selon prescription médicale",
+      "rang": "alternative",
+      "representative": "",
+      "substance": "Paracétamol*",
+      "substance_annoncee": "",
+      "substances": [
+        "Paracétamol*"
+      ],
+      "title": "PRONTALGINE, comprimé"
+    },
+    {
+      "alertes": [],
+      "classes_libelles": {
+        "N02": "Analgésiques"
+      },
+      "condition": "classe N02",
+      "contre_indications": [],
+      "declassements": [],
+      "duration": "",
+      "fiche_id": "69347089f198d5d3ccbeac3a",
+      "forme": "Granulés pour solution buvable en sachet",
+      "groupes_atc": [
+        "N02"
+      ],
+      "id": "69347089f198d5d3ccbeac3a",
+      "indication": "En général, l'acétaminophène est utilisé pour traiter la douleur légère à modérée et réduire la fièvre.[F4124] Il est disponible en vente libre sous diverses formes, les plus courantes étant les formes orales. L'_injection_ d'acétaminophène est indiquée pour la gestion de la douleur légère à modérée, la gestion de la douleur modérée à sévère...",
+      "indication_traduite": true,
+      "justification": "Pertinent pour: paracétamol",
+      "laboratoire": "UPSA SAS",
+      "lien": "/medicine/69347089f198d5d3ccbeac3a",
+      "origine": "similarite",
+      "penalites": [
+        "interaction avec un traitement en cours (−20)"
+      ],
+      "pertinence": 80,
+      "posologie": "Selon prescription médicale",
+      "rang": "alternative",
+      "representative": "",
+      "substance": "Paracétamol",
+      "substance_annoncee": "",
+      "substances": [
+        "Paracétamol"
+      ],
+      "title": "FERVEX ADULTES FRAMBOISE, granulés pour solution buvable en sachet"
+    },
+    {
+      "alertes": [],
+      "classes_libelles": {
+        "M03": "Myorelaxants"
+      },
+      "condition": "classe M03",
+      "contre_indications": [],
+      "declassements": [],
+      "duration": "",
+      "fiche_id": "6934766bf198d5d3ccbeb399",
+      "forme": "Comprimé",
+      "groupes_atc": [
+        "M03"
+      ],
+      "id": "6934766bf198d5d3ccbeb399",
+      "indication": "Les comprimés de méthocarbamol et les injections intramusculaires sont indiqués aux États-Unis comme complément au repos, à la physiothérapie et à d'autres mesures pour le soulagement des inconforts associés à des affections musculo-squelettiques aiguës et douloureuses. [Étiquette, L6268] Le méthocarbamol oral en Amérique peut être administré jusqu'à 1 500 mg 4 fois par jour...",
+      "indication_traduite": true,
+      "justification": "Pertinent pour: classe M03",
+      "laboratoire": "LABORATOIRES  JUVISE PHARMACEUTICALS",
+      "lien": "/medicine/6934766bf198d5d3ccbeb399",
+      "origine": "classe_atc",
+      "pertinence": 60,
+      "posologie": "Selon prescription médicale",
+      "rang": "alternative",
+      "representative": "",
+      "substance": "Méthocarbamol",
+      "substance_annoncee": "",
+      "substances": [
+        "Méthocarbamol"
+      ],
+      "title": "LUMIRELAX 500 mg, comprimé"
+    },
+    {
+      "alertes": [],
+      "classes_libelles": {
+        "M03": "Myorelaxants"
+      },
+      "condition": "classe M03",
+      "contre_indications": [],
+      "declassements": [],
+      "duration": "",
+      "fiche_id": "693475ddf198d5d3ccbeb2ed",
+      "forme": "Comprimé sécable",
+      "groupes_atc": [
+        "M03"
+      ],
+      "id": "693475ddf198d5d3ccbeb2ed",
+      "indication": "Le baclofène oral est indiqué pour le traitement de la spasticité résultant de la sclérose en plaques et est particulièrement utile pour le soulagement des spasmes des muscles fléchisseurs et de la douleur, du clonus et de la rigidité musculaire qui l'accompagnent. Il peut également être utilisé pour traiter les patients souffrant de lésions de la moelle épinière et d’autres maladies de la moelle épinière. Le baclofène devrait...",
+      "indication_traduite": true,
+      "justification": "Pertinent pour: classe M03",
+      "laboratoire": "NOVARTIS PHARMA S.A.S.",
+      "lien": "/medicine/693475ddf198d5d3ccbeb2ed",
+      "origine": "classe_atc",
+      "pertinence": 60,
+      "posologie": "Selon prescription médicale",
+      "rang": "alternative",
+      "representative": "",
+      "substance": "Baclofène",
+      "substance_annoncee": "",
+      "substances": [
+        "Baclofène"
+      ],
+      "title": "LIORÉSAL10 mg, comprimé sécable"
+    },
+    {
+      "alertes": [],
+      "classes_libelles": {
+        "N02": "Analgésiques"
+      },
+      "condition": "classe N02",
+      "contre_indications": [],
+      "declassements": [],
+      "duration": "",
+      "fiche_id": "6a79e9ab52dee42737ba1121",
+      "forme": "Comprimé enrobé",
+      "groupes_atc": [
+        "N02"
+      ],
+      "id": "6a79e9ab52dee42737ba1121",
+      "indication": "",
+      "indication_traduite": false,
+      "justification": "Pertinent pour: classe N02",
+      "laboratoire": "BIOCODEX",
+      "lien": "/medicine/6a79e9ab52dee42737ba1121",
+      "origine": "classe_atc",
+      "pertinence": 60,
+      "posologie": "Selon prescription médicale",
+      "rang": "alternative",
+      "representative": "",
+      "substance": "Néfopam",
+      "substance_annoncee": "",
+      "substances": [
+        "Néfopam"
+      ],
+      "title": "ACUPAN, comprimé"
+    },
+    {
+      "alertes": [],
+      "classes_libelles": {
+        "N02": "Analgésiques"
+      },
+      "condition": "classe N02",
+      "contre_indications": [],
+      "declassements": [],
+      "duration": "",
+      "fiche_id": "693479d6f198d5d3ccbeb85e",
+      "forme": "Gélule",
+      "groupes_atc": [
+        "N02"
+      ],
+      "id": "693479d6f198d5d3ccbeb85e",
+      "indication": "L'oxycodone est indiquée pour le traitement des douleurs modérées à sévères.[Étiquette] Il existe également une formulation à libération prolongée indiquée pour les douleurs chroniques modérées à sévères nécessitant des analgésiques opioïdes continus pendant une période prolongée.[Étiquette]",
+      "indication_traduite": true,
+      "justification": "Pertinent pour: classe N02",
+      "laboratoire": "MUNDIPHARMA",
+      "lien": "/medicine/693479d6f198d5d3ccbeb85e",
+      "origine": "classe_atc",
+      "pertinence": 60,
+      "posologie": "Selon prescription médicale",
+      "rang": "alternative",
+      "representative": "",
+      "substance": "Chlorhydrate d'oxycodone",
+      "substance_annoncee": "",
+      "substances": [
+        "Chlorhydrate d'oxycodone"
+      ],
+      "title": "OXYNORM 5 mg, gélule"
+    },
+    {
+      "alertes": [],
+      "classes_libelles": {
+        "N02": "Analgésiques"
+      },
+      "condition": "classe N02",
+      "contre_indications": [],
+      "declassements": [],
+      "duration": "",
+      "fiche_id": "693479d5f198d5d3ccbeb85d",
+      "forme": "Gélule",
+      "groupes_atc": [
+        "N02"
+      ],
+      "id": "693479d5f198d5d3ccbeb85d",
+      "indication": "L'oxycodone est indiquée pour le traitement des douleurs modérées à sévères.[Étiquette] Il existe également une formulation à libération prolongée indiquée pour les douleurs chroniques modérées à sévères nécessitant des analgésiques opioïdes continus pendant une période prolongée.[Étiquette]",
+      "indication_traduite": true,
+      "justification": "Pertinent pour: classe N02",
+      "laboratoire": "MUNDIPHARMA",
+      "lien": "/medicine/693479d5f198d5d3ccbeb85d",
+      "origine": "classe_atc",
+      "pertinence": 60,
+      "posologie": "Selon prescription médicale",
+      "rang": "alternative",
+      "representative": "",
+      "substance": "Chlorhydrate d'oxycodone",
+      "substance_annoncee": "",
+      "substances": [
+        "Chlorhydrate d'oxycodone"
+      ],
+      "title": "OXYNORM 20 mg, gélule"
+    },
+    {
+      "alertes": [],
+      "classes_libelles": {
+        "M03": "Myorelaxants"
+      },
+      "condition": "classe M03",
+      "contre_indications": [],
+      "declassements": [],
+      "duration": "",
+      "fiche_id": "69346bb0f198d5d3ccbea74f",
+      "forme": "Gélule brun-orange clair",
+      "groupes_atc": [
+        "M03"
+      ],
+      "id": "69346bb0f198d5d3ccbea74f",
+      "indication": "À utiliser, en association avec des mesures de soutien appropriées, pour la prise en charge de l'hypermétabolisme fulminant des muscles squelettiques caractéristique des crises d'hyperthermie maligne chez les patients de tous âges. Également utilisé en préopératoire, et parfois en postopératoire, pour prévenir ou atténuer le développement de symptômes cliniques et...",
+      "indication_traduite": true,
+      "justification": "Pertinent pour: classe M03",
+      "laboratoire": "NORGINE B.V.",
+      "lien": "/medicine/69346bb0f198d5d3ccbea74f",
+      "origine": "classe_atc",
+      "penalites": [
+        "interaction avec un traitement en cours (−20)"
+      ],
+      "pertinence": 40,
+      "posologie": "Selon prescription médicale",
+      "rang": "alternative",
+      "representative": "",
+      "substance": "Dantrolène sodique",
+      "substance_annoncee": "",
+      "substances": [
+        "Dantrolène sodique"
+      ],
+      "title": "DANTRIUM 25 mg, gélule"
+    },
+    {
+      "alertes": [],
+      "classes_libelles": {
+        "M03": "Myorelaxants"
+      },
+      "condition": "classe M03",
+      "contre_indications": [],
+      "declassements": [],
+      "duration": "",
+      "fiche_id": "69346baff198d5d3ccbea74e",
+      "forme": "Gélule orange",
+      "groupes_atc": [
+        "M03"
+      ],
+      "id": "69346baff198d5d3ccbea74e",
+      "indication": "À utiliser, en association avec des mesures de soutien appropriées, pour la prise en charge de l'hypermétabolisme fulminant des muscles squelettiques caractéristique des crises d'hyperthermie maligne chez les patients de tous âges. Également utilisé en préopératoire, et parfois en postopératoire, pour prévenir ou atténuer le développement de symptômes cliniques et...",
+      "indication_traduite": true,
+      "justification": "Pertinent pour: classe M03",
+      "laboratoire": "NORGINE B.V.",
+      "lien": "/medicine/69346baff198d5d3ccbea74e",
+      "origine": "classe_atc",
+      "penalites": [
+        "interaction avec un traitement en cours (−20)"
+      ],
+      "pertinence": 40,
+      "posologie": "Selon prescription médicale",
+      "rang": "alternative",
+      "representative": "",
+      "substance": "Dantrolène sodique",
+      "substance_annoncee": "",
+      "substances": [
+        "Dantrolène sodique"
+      ],
+      "title": "DANTRIUM 100 mg, gélule"
+    },
+    {
+      "alertes": [],
+      "classes_libelles": {
+        "M03": "Myorelaxants"
+      },
+      "condition": "classe M03",
+      "contre_indications": [],
+      "declassements": [],
+      "duration": "",
+      "fiche_id": "6934677ef198d5d3ccbea1ce",
+      "forme": "Comprimé blanc, rond, biconvexe avec un diamètre de 5,5 mm et une barre de cassure sur une face",
+      "groupes_atc": [
+        "M03"
+      ],
+      "id": "6934677ef198d5d3ccbea1ce",
+      "indication": "Le baclofène oral est indiqué pour le traitement de la spasticité résultant de la sclérose en plaques et est particulièrement utile pour le soulagement des spasmes des muscles fléchisseurs et de la douleur, du clonus et de la rigidité musculaire qui l'accompagnent. Il peut également être utilisé pour traiter les patients souffrant de lésions de la moelle épinière et d’autres maladies de la moelle épinière. Le baclofène devrait...",
+      "indication_traduite": true,
+      "justification": "Pertinent pour: classe M03",
+      "laboratoire": "eg labo –  LABORATOIRES  EUROGENERICS",
+      "lien": "/medicine/6934677ef198d5d3ccbea1ce",
+      "origine": "classe_atc",
+      "penalites": [
+        "interaction avec un traitement en cours (−20)"
+      ],
+      "pertinence": 40,
+      "posologie": "Selon prescription médicale",
+      "rang": "alternative",
+      "representative": "",
+      "substance": "Baclofène",
+      "substance_annoncee": "",
+      "substances": [
+        "Baclofène"
+      ],
+      "title": "BACLOFENE EG 10 mg, comprimé sécable"
+    },
+    {
+      "alertes": [],
+      "classes_libelles": {
+        "N02": "Analgésiques"
+      },
+      "condition": "soulagement",
+      "contre_indications": [],
+      "declassements": [],
+      "duration": "",
+      "fiche_id": "69347469f198d5d3ccbeb156",
+      "forme": "Gélule",
+      "groupes_atc": [
+        "N02"
+      ],
+      "id": "69347469f198d5d3ccbeb156",
+      "indication": "En général, l'acétaminophène est utilisé pour traiter la douleur légère à modérée et réduire la fièvre.[F4124] Il est disponible en vente libre sous diverses formes, les plus courantes étant les formes orales. L'_injection_ d'acétaminophène est indiquée pour la gestion de la douleur légère à modérée, la gestion de la douleur modérée à sévère...",
+      "indication_traduite": true,
+      "justification": "Pertinent pour: paracétamol, classe N02",
+      "laboratoire": "VIATRIS MEDICAL",
+      "lien": "/medicine/69347469f198d5d3ccbeb156",
+      "origine": "classe_atc",
+      "pertinence": 100,
+      "posologie": "Selon prescription médicale",
+      "rang": "adjuvant",
+      "representative": "",
+      "substance": "Paracétamol",
+      "substance_annoncee": "",
+      "substances": [
+        "Paracétamol"
+      ],
+      "title": "LAMALINE, gélule"
+    }
+  ],
+  "paires_verifiees": 24,
+  "recommendations": [
+    "Surveiller les interactions médicamenteuses identifiées",
+    "Respecter les posologies indiquées pour chaque médicament",
+    "Prendre les médicaments à heures régulières",
+    "Suivre l'évolution des symptômes sur 48-72h",
+    "Consulter en cas d'aggravation ou d'effets indésirables"
+  ],
+  "success": true,
+  "traitements_a_reconsiderer": [
+    {
+      "antecedent": "insuffisance rénale",
+      "cible": "metformine",
+      "motif": "Néphrotoxicité des anti-inflammatoires non stéroïdiens ; risque d'acidose lactique sous metformine.",
+      "niveau": "exclusion",
+      "niveau_libelle": "Contre-indication",
+      "traitement": "Metformine 850 mg"
+    }
+  ],
+  "traitements_non_reconnus": [],
+  "traitements_reconnus": [
+    {
+      "saisie": "Ramipril 10 mg",
+      "substance": "Ramipril"
+    },
+    {
+      "saisie": "Metformine 850 mg",
+      "substance": "Metformin"
+    },
+    {
+      "saisie": "Warfarine 5 mg",
+      "substance": "Warfarin"
+    }
+  ]
+}

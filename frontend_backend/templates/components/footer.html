@@ -1,0 +1,50 @@
+<footer>
+    <style>
+        footer {
+            background-color: var(--surface-secondary);
+            padding: 30px 0;
+            margin-top: 60px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: var(--container);
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+        }
+
+        .footer-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .footer-lien {
+            color: var(--text-secondary);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .footer-lien:hover { color: var(--primary); }
+
+        .footer-iut {
+            margin-top: 10px;
+            color: var(--primary);
+            font-weight: 600;
+        }
+    </style>
+    
+    <div class="footer-content">
+        <div class="footer-text">
+            <p>&copy; {{ now.year }} PosologyAI. <span data-i18n="footer_rights">Tous droits réservés.</span></p>
+            {# Le pied de page plutôt que la barre de navigation : celle-ci est
+               déjà pleine, et « À propos » ne se consulte pas en cours de
+               travail. Le lien porte ce que la page contient, non son
+               intitulé administratif. #}
+            <p><a href="/a-propos" class="footer-lien" data-i18n="footer_databases">Comment cette base est construite, et ce qu'elle refuse d'afficher</a></p>
+            <p data-i18n="footer_educational_only">Ce site est conçu à des fins éducatives uniquement.</p>
+            <p class="footer-iut">IUT-Créteil-Vitry</p>
+        </div>
+    </div>
+</footer>

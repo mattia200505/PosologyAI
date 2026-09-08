@@ -1,0 +1,55 @@
+services:
+  web:
+    build: 
+      context: ..
+      dockerfile: configuration/Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - ../frontend_backend:/app
+    depends_on:
+      - mongo
+      - qdrant
+    command: python app.py
+    environment:
+      - FLASK_ENV=development
+      - MONGO_HOST=mongo
+      - MONGO_PORT=27017
+      - MONGO_DB=medicsearch
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+      - QDRANT_TIMEOUT=30
+
+  mongo:
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo_data:/data/db
+    command: mongod --bind_ip 0.0.0.0 --wiredTigerCacheSizeGB 1 --maxConns 1000
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    restart: always
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    environment:
+      - QDRANT_API_KEY=
+    healthcheck:
+      test: curl -f http://localhost:6333/health || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mongo_data:
+  qdrant_data:

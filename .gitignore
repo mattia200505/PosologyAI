@@ -1,0 +1,43 @@
+# ── Secrets — ne jamais versionner ─────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials*
+
+# ── Environnements virtuels Python ──────────────────────────────
+.venv/
+.venv_new/
+venv/
+**/.venv/
+**/venv/
+
+# ── Dépendances et caches ────────────────────────────────────────
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.egg-info/
+node_modules/
+
+# ── Données et volumes locaux — reconstructibles ou trop lourds ──
+# L'application lit ces données depuis MongoDB/Neo4j/Qdrant au moment de
+# l'exécution, jamais depuis le disque : rien ici n'est perdu en l'excluant.
+data/
+frontend_backend/data/
+frontend_backend/qdrant_storage/
+frontend_backend/ressources/cache_pdf_ema/
+frontend_backend/graphify-out/
+export_base_données/
+drugbank_all_full_database.xml/
+sauvegardes/
+*.out
+*.log
+.lots_journal.jsonl
+
+# ── Divers ────────────────────────────────────────────────────────
+*.tmp
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/

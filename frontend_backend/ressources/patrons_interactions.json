@@ -1,0 +1,3224 @@
+[
+ {
+  "rang": 1,
+  "occurrences": 31113,
+  "couverture": 0.11555,
+  "en": "{a} may decrease the excretion rate of {b} which could result in a higher serum level."
+ },
+ {
+  "rang": 2,
+  "occurrences": 27369,
+  "couverture": 0.21719,
+  "en": "The metabolism of {b} can be decreased when combined with {a}."
+ },
+ {
+  "rang": 3,
+  "occurrences": 25889,
+  "couverture": 0.31333,
+  "en": "The risk or severity of adverse effects can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 4,
+  "occurrences": 19458,
+  "couverture": 0.38559,
+  "en": "The metabolism of {a} can be decreased when combined with {b}."
+ },
+ {
+  "rang": 5,
+  "occurrences": 12955,
+  "couverture": 0.4337,
+  "en": "The serum concentration of {a} can be increased when it is combined with {b}."
+ },
+ {
+  "rang": 6,
+  "occurrences": 11255,
+  "couverture": 0.4755,
+  "en": "The serum concentration of {b} can be increased when it is combined with {a}."
+ },
+ {
+  "rang": 7,
+  "occurrences": 10035,
+  "couverture": 0.51277,
+  "en": "The risk or severity of CNS depression can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 8,
+  "occurrences": 9716,
+  "couverture": 0.54885,
+  "en": "The metabolism of {b} can be increased when combined with {a}."
+ },
+ {
+  "rang": 9,
+  "occurrences": 9012,
+  "couverture": 0.58232,
+  "en": "The metabolism of {a} can be increased when combined with {b}."
+ },
+ {
+  "rang": 10,
+  "occurrences": 8843,
+  "couverture": 0.61516,
+  "en": "{b} may decrease the excretion rate of {a} which could result in a higher serum level."
+ },
+ {
+  "rang": 11,
+  "occurrences": 7892,
+  "couverture": 0.64447,
+  "en": "The therapeutic efficacy of {b} can be decreased when used in combination with {a}."
+ },
+ {
+  "rang": 12,
+  "occurrences": 7812,
+  "couverture": 0.67348,
+  "en": "The risk or severity of QTc prolongation can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 13,
+  "occurrences": 5547,
+  "couverture": 0.69408,
+  "en": "The therapeutic efficacy of {a} can be decreased when used in combination with {b}."
+ },
+ {
+  "rang": 14,
+  "occurrences": 5124,
+  "couverture": 0.71311,
+  "en": "The serum concentration of {a} can be decreased when it is combined with {b}."
+ },
+ {
+  "rang": 15,
+  "occurrences": 3675,
+  "couverture": 0.72676,
+  "en": "The risk or severity of QTc prolongation can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 16,
+  "occurrences": 3421,
+  "couverture": 0.73946,
+  "en": "The risk or severity of methemoglobinemia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 17,
+  "occurrences": 3224,
+  "couverture": 0.75144,
+  "en": "The risk or severity of hypertension can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 18,
+  "occurrences": 3134,
+  "couverture": 0.76308,
+  "en": "The risk or severity of adverse effects can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 19,
+  "occurrences": 2869,
+  "couverture": 0.77373,
+  "en": "The risk or severity of methemoglobinemia can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 20,
+  "occurrences": 2647,
+  "couverture": 0.78356,
+  "en": "{b} may decrease the antihypertensive activities of {a}."
+ },
+ {
+  "rang": 21,
+  "occurrences": 2548,
+  "couverture": 0.79302,
+  "en": "The serum concentration of {b} can be decreased when it is combined with {a}."
+ },
+ {
+  "rang": 22,
+  "occurrences": 2434,
+  "couverture": 0.80206,
+  "en": "{a} may increase the hypotensive activities of {b}."
+ },
+ {
+  "rang": 23,
+  "occurrences": 2328,
+  "couverture": 0.81071,
+  "en": "{a} may decrease the antihypertensive activities of {b}."
+ },
+ {
+  "rang": 24,
+  "occurrences": 2113,
+  "couverture": 0.81855,
+  "en": "The excretion of {a} can be decreased when combined with {b}."
+ },
+ {
+  "rang": 25,
+  "occurrences": 2009,
+  "couverture": 0.82602,
+  "en": "The risk or severity of bleeding can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 26,
+  "occurrences": 1964,
+  "couverture": 0.83331,
+  "en": "The risk or severity of bleeding can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 27,
+  "occurrences": 1706,
+  "couverture": 0.83964,
+  "en": "The risk or severity of myopathy, rhabdomyolysis, and myoglobinuria can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 28,
+  "occurrences": 1615,
+  "couverture": 0.84564,
+  "en": "The risk or severity of hyperkalemia can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 29,
+  "occurrences": 1585,
+  "couverture": 0.85153,
+  "en": "{a} may increase the central nervous system depressant (CNS depressant) activities of {b}."
+ },
+ {
+  "rang": 30,
+  "occurrences": 1556,
+  "couverture": 0.85731,
+  "en": "{b} may increase the excretion rate of {a} which could result in a lower serum level and potentially a reduction in efficacy."
+ },
+ {
+  "rang": 31,
+  "occurrences": 1403,
+  "couverture": 0.86252,
+  "en": "The excretion of {b} can be decreased when combined with {a}."
+ },
+ {
+  "rang": 32,
+  "occurrences": 1310,
+  "couverture": 0.86738,
+  "en": "The risk or severity of hypoglycemia can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 33,
+  "occurrences": 1269,
+  "couverture": 0.8721,
+  "en": "The therapeutic efficacy of {b} can be increased when used in combination with {a}."
+ },
+ {
+  "rang": 34,
+  "occurrences": 1220,
+  "couverture": 0.87663,
+  "en": "{b} may increase the hypotensive activities of {a}."
+ },
+ {
+  "rang": 35,
+  "occurrences": 1205,
+  "couverture": 0.8811,
+  "en": "{b} may increase the central nervous system depressant (CNS depressant) activities of {a}."
+ },
+ {
+  "rang": 36,
+  "occurrences": 1035,
+  "couverture": 0.88494,
+  "en": "The risk or severity of nephrotoxicity can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 37,
+  "occurrences": 1014,
+  "couverture": 0.88871,
+  "en": "{a} may increase the arrhythmogenic activities of {b}."
+ },
+ {
+  "rang": 38,
+  "occurrences": 976,
+  "couverture": 0.89234,
+  "en": "{a} may increase the excretion rate of {b} which could result in a lower serum level and potentially a reduction in efficacy."
+ },
+ {
+  "rang": 39,
+  "occurrences": 761,
+  "couverture": 0.89516,
+  "en": "The therapeutic efficacy of {a} can be increased when used in combination with {b}."
+ },
+ {
+  "rang": 40,
+  "occurrences": 727,
+  "couverture": 0.89786,
+  "en": "The risk or severity of hypoglycemia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 41,
+  "occurrences": 701,
+  "couverture": 0.90046,
+  "en": "{b} may increase the immunosuppressive activities of {a}."
+ },
+ {
+  "rang": 42,
+  "occurrences": 686,
+  "couverture": 0.90301,
+  "en": "{a} may increase the bradycardic activities of {b}."
+ },
+ {
+  "rang": 43,
+  "occurrences": 616,
+  "couverture": 0.9053,
+  "en": "The risk or severity of bleeding and hemorrhage can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 44,
+  "occurrences": 599,
+  "couverture": 0.90752,
+  "en": "The risk or severity of Thrombosis can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 45,
+  "occurrences": 582,
+  "couverture": 0.90969,
+  "en": "The risk or severity of Tachycardia can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 46,
+  "occurrences": 504,
+  "couverture": 0.91156,
+  "en": "{b} can cause a decrease in the absorption of {a} resulting in a reduced serum concentration and potentially a decrease in efficacy."
+ },
+ {
+  "rang": 47,
+  "occurrences": 499,
+  "couverture": 0.91341,
+  "en": "{a} may increase the thrombogenic activities of {b}."
+ },
+ {
+  "rang": 48,
+  "occurrences": 493,
+  "couverture": 0.91524,
+  "en": "{a} can cause a decrease in the absorption of {b} resulting in a reduced serum concentration and potentially a decrease in efficacy."
+ },
+ {
+  "rang": 49,
+  "occurrences": 484,
+  "couverture": 0.91704,
+  "en": "The risk or severity of CNS depression can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 50,
+  "occurrences": 447,
+  "couverture": 0.9187,
+  "en": "{a} may increase the immunosuppressive activities of {b}."
+ },
+ {
+  "rang": 51,
+  "occurrences": 434,
+  "couverture": 0.92031,
+  "en": "The risk or severity of serotonin syndrome can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 52,
+  "occurrences": 424,
+  "couverture": 0.92189,
+  "en": "The risk or severity of bleeding and hemorrhage can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 53,
+  "occurrences": 424,
+  "couverture": 0.92346,
+  "en": "The risk or severity of hyperglycemia can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 54,
+  "occurrences": 384,
+  "couverture": 0.92489,
+  "en": "{b} may increase the bradycardic activities of {a}."
+ },
+ {
+  "rang": 55,
+  "occurrences": 382,
+  "couverture": 0.9263,
+  "en": "The risk or severity of hyperglycemia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 56,
+  "occurrences": 352,
+  "couverture": 0.92761,
+  "en": "{b} may increase the sedative activities of {a}."
+ },
+ {
+  "rang": 57,
+  "occurrences": 339,
+  "couverture": 0.92887,
+  "en": "The risk or severity of hypertension can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 58,
+  "occurrences": 324,
+  "couverture": 0.93007,
+  "en": "{a} may increase the anticoagulant activities of {b}."
+ },
+ {
+  "rang": 59,
+  "occurrences": 296,
+  "couverture": 0.93117,
+  "en": "{b} may increase the QTc-prolonging activities of {a}."
+ },
+ {
+  "rang": 60,
+  "occurrences": 294,
+  "couverture": 0.93227,
+  "en": "The risk or severity of gastrointestinal irritation can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 61,
+  "occurrences": 289,
+  "couverture": 0.93334,
+  "en": "The risk or severity of serotonin syndrome can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 62,
+  "occurrences": 283,
+  "couverture": 0.93439,
+  "en": "The risk or severity of renal failure, hyperkalemia, and hypertension can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 63,
+  "occurrences": 280,
+  "couverture": 0.93543,
+  "en": "{a} may decrease the excretion rate of Florbetapir (18F) which could result in a higher serum level."
+ },
+ {
+  "rang": 64,
+  "occurrences": 273,
+  "couverture": 0.93644,
+  "en": "{a} may decrease the excretion rate of Florbetaben (18F) which could result in a higher serum level."
+ },
+ {
+  "rang": 65,
+  "occurrences": 271,
+  "couverture": 0.93745,
+  "en": "{b} may increase the orthostatic hypotensive activities of {a}."
+ },
+ {
+  "rang": 66,
+  "occurrences": 269,
+  "couverture": 0.93845,
+  "en": "The risk or severity of hypotension can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 67,
+  "occurrences": 264,
+  "couverture": 0.93943,
+  "en": "{b} may increase the thrombogenic activities of {a}."
+ },
+ {
+  "rang": 68,
+  "occurrences": 263,
+  "couverture": 0.94041,
+  "en": "The risk or severity of sedation can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 69,
+  "occurrences": 260,
+  "couverture": 0.94137,
+  "en": "The risk or severity of gastrointestinal bleeding can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 70,
+  "occurrences": 259,
+  "couverture": 0.94233,
+  "en": "The risk or severity of sedation, somnolence, and CNS depression can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 71,
+  "occurrences": 258,
+  "couverture": 0.94329,
+  "en": "The risk or severity of hyperkalemia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 72,
+  "occurrences": 258,
+  "couverture": 0.94425,
+  "en": "{a} may increase the QTc-prolonging activities of {b}."
+ },
+ {
+  "rang": 73,
+  "occurrences": 257,
+  "couverture": 0.9452,
+  "en": "The risk or severity of hypotension can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 74,
+  "occurrences": 255,
+  "couverture": 0.94615,
+  "en": "The risk or severity of gastrointestinal irritation can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 75,
+  "occurrences": 255,
+  "couverture": 0.9471,
+  "en": "{a} may increase the orthostatic hypotensive, hypotensive, and antihypertensive activities of {b}."
+ },
+ {
+  "rang": 76,
+  "occurrences": 251,
+  "couverture": 0.94803,
+  "en": "{b} may increase the hypoglycemic activities of {a}."
+ },
+ {
+  "rang": 77,
+  "occurrences": 243,
+  "couverture": 0.94893,
+  "en": "The risk or severity of gastrointestinal bleeding can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 78,
+  "occurrences": 235,
+  "couverture": 0.94981,
+  "en": "{b} may increase the hyperkalemic activities of {a}."
+ },
+ {
+  "rang": 79,
+  "occurrences": 229,
+  "couverture": 0.95066,
+  "en": "The risk or severity of bradycardia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 80,
+  "occurrences": 229,
+  "couverture": 0.95151,
+  "en": "{a} may increase the hypoglycemic activities of {b}."
+ },
+ {
+  "rang": 81,
+  "occurrences": 227,
+  "couverture": 0.95235,
+  "en": "The metabolism of {b} can be increased when combined with Rifampicin."
+ },
+ {
+  "rang": 82,
+  "occurrences": 223,
+  "couverture": 0.95318,
+  "en": "The risk or severity of renal failure, hyperkalemia, and hypertension can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 83,
+  "occurrences": 220,
+  "couverture": 0.95399,
+  "en": "The risk or severity of angioedema can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 84,
+  "occurrences": 212,
+  "couverture": 0.95478,
+  "en": "{a} may increase the orthostatic hypotensive activities of {b}."
+ },
+ {
+  "rang": 85,
+  "occurrences": 209,
+  "couverture": 0.95556,
+  "en": "The risk or severity of neuropsychiatric effects can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 86,
+  "occurrences": 207,
+  "couverture": 0.95633,
+  "en": "The risk or severity of neutropenia can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 87,
+  "occurrences": 206,
+  "couverture": 0.95709,
+  "en": "The risk or severity of infection can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 88,
+  "occurrences": 204,
+  "couverture": 0.95785,
+  "en": "{a} may increase the neuromuscular blocking activities of {b}."
+ },
+ {
+  "rang": 89,
+  "occurrences": 195,
+  "couverture": 0.95857,
+  "en": "{b} may increase the anticoagulant activities of {a}."
+ },
+ {
+  "rang": 90,
+  "occurrences": 191,
+  "couverture": 0.95928,
+  "en": "{a} may increase the sedative activities of {b}."
+ },
+ {
+  "rang": 91,
+  "occurrences": 190,
+  "couverture": 0.95999,
+  "en": "The risk or severity of infection can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 92,
+  "occurrences": 188,
+  "couverture": 0.96069,
+  "en": "The metabolism of {a} can be increased when combined with Rifampicin."
+ },
+ {
+  "rang": 93,
+  "occurrences": 181,
+  "couverture": 0.96136,
+  "en": "The risk or severity of nephrotoxicity can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 94,
+  "occurrences": 178,
+  "couverture": 0.96202,
+  "en": "The risk or severity of immunosuppression can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 95,
+  "occurrences": 174,
+  "couverture": 0.96267,
+  "en": "{a} may decrease the hypoglycemic activities of {b}."
+ },
+ {
+  "rang": 96,
+  "occurrences": 172,
+  "couverture": 0.9633,
+  "en": "The risk or severity of sedation can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 97,
+  "occurrences": 171,
+  "couverture": 0.96394,
+  "en": "The risk or severity of dehydration can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 98,
+  "occurrences": 170,
+  "couverture": 0.96457,
+  "en": "The risk or severity of hypokalemia can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 99,
+  "occurrences": 168,
+  "couverture": 0.96519,
+  "en": "{a} may increase the neurotoxic activities of {b}."
+ },
+ {
+  "rang": 100,
+  "occurrences": 163,
+  "couverture": 0.9658,
+  "en": "The risk or severity of Thrombosis can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 101,
+  "occurrences": 160,
+  "couverture": 0.96639,
+  "en": "The risk or severity of myelosuppression can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 102,
+  "occurrences": 160,
+  "couverture": 0.96699,
+  "en": "The risk or severity of hypokalemia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 103,
+  "occurrences": 158,
+  "couverture": 0.96758,
+  "en": "{b} may increase the neuromuscular blocking activities of {a}."
+ },
+ {
+  "rang": 104,
+  "occurrences": 156,
+  "couverture": 0.96815,
+  "en": "The risk or severity of hemorrhage can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 105,
+  "occurrences": 148,
+  "couverture": 0.9687,
+  "en": "The risk or severity of neuromuscular blockade can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 106,
+  "occurrences": 146,
+  "couverture": 0.96925,
+  "en": "{a} may increase the antihypertensive activities of {b}."
+ },
+ {
+  "rang": 107,
+  "occurrences": 143,
+  "couverture": 0.96978,
+  "en": "The risk or severity of cardiotoxicity can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 108,
+  "occurrences": 134,
+  "couverture": 0.97028,
+  "en": "The risk or severity of nephrotoxicity and hypocalcemia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 109,
+  "occurrences": 123,
+  "couverture": 0.97073,
+  "en": "The risk or severity of myelosuppression can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 110,
+  "occurrences": 122,
+  "couverture": 0.97119,
+  "en": "{a} may decrease effectiveness of {b} as a diagnostic agent."
+ },
+ {
+  "rang": 111,
+  "occurrences": 121,
+  "couverture": 0.97163,
+  "en": "{b} may increase the antihypertensive activities of {a}."
+ },
+ {
+  "rang": 112,
+  "occurrences": 116,
+  "couverture": 0.97207,
+  "en": "{a} may increase the serotonergic activities of {b}."
+ },
+ {
+  "rang": 113,
+  "occurrences": 116,
+  "couverture": 0.9725,
+  "en": "The risk or severity of sedation and CNS depression can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 114,
+  "occurrences": 112,
+  "couverture": 0.97291,
+  "en": "{b} may increase the serotonergic activities of {a}."
+ },
+ {
+  "rang": 115,
+  "occurrences": 110,
+  "couverture": 0.97332,
+  "en": "{b} may decrease the hypoglycemic activities of {a}."
+ },
+ {
+  "rang": 116,
+  "occurrences": 105,
+  "couverture": 0.97371,
+  "en": "{b} may increase the anticholinergic activities of {a}."
+ },
+ {
+  "rang": 117,
+  "occurrences": 100,
+  "couverture": 0.97408,
+  "en": "The risk or severity of seizure can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 118,
+  "occurrences": 99,
+  "couverture": 0.97445,
+  "en": "{a} may increase the hypertensive and vasoconstricting activities of {b}."
+ },
+ {
+  "rang": 119,
+  "occurrences": 98,
+  "couverture": 0.97481,
+  "en": "{a} may increase the myelosuppressive activities of {b}."
+ },
+ {
+  "rang": 120,
+  "occurrences": 96,
+  "couverture": 0.97517,
+  "en": "{b} may increase the nephrotoxic activities of {a}."
+ },
+ {
+  "rang": 121,
+  "occurrences": 93,
+  "couverture": 0.97552,
+  "en": "The risk or severity of hypotension and orthostatic hypotension can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 122,
+  "occurrences": 91,
+  "couverture": 0.97585,
+  "en": "Salbutamol may decrease the excretion rate of {b} which could result in a higher serum level."
+ },
+ {
+  "rang": 123,
+  "occurrences": 89,
+  "couverture": 0.97618,
+  "en": "{a} may increase the antiplatelet activities of {b}."
+ },
+ {
+  "rang": 124,
+  "occurrences": 87,
+  "couverture": 0.97651,
+  "en": "{a} may decrease the excretion rate of Salbutamol which could result in a higher serum level."
+ },
+ {
+  "rang": 125,
+  "occurrences": 87,
+  "couverture": 0.97683,
+  "en": "The risk or severity of myopathy and weakness can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 126,
+  "occurrences": 87,
+  "couverture": 0.97715,
+  "en": "{a} may increase the hyperkalemic activities of {b}."
+ },
+ {
+  "rang": 127,
+  "occurrences": 85,
+  "couverture": 0.97747,
+  "en": "The risk or severity of hemorrhage can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 128,
+  "occurrences": 83,
+  "couverture": 0.97778,
+  "en": "The risk or severity of orthostatic hypotension and syncope can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 129,
+  "occurrences": 82,
+  "couverture": 0.97808,
+  "en": "The serum concentration of {b} can be decreased when it is combined with Rifampicin."
+ },
+ {
+  "rang": 130,
+  "occurrences": 81,
+  "couverture": 0.97838,
+  "en": "The protein binding of {a} can be decreased when combined with {b}."
+ },
+ {
+  "rang": 131,
+  "occurrences": 79,
+  "couverture": 0.97868,
+  "en": "{b} may increase the arrhythmogenic activities of {a}."
+ },
+ {
+  "rang": 132,
+  "occurrences": 79,
+  "couverture": 0.97897,
+  "en": "The risk or severity of neutropenia and thrombocytopenia can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 133,
+  "occurrences": 79,
+  "couverture": 0.97926,
+  "en": "The risk or severity of elevated intracranial pressure can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 134,
+  "occurrences": 77,
+  "couverture": 0.97955,
+  "en": "The risk or severity of neutropenia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 135,
+  "occurrences": 77,
+  "couverture": 0.97983,
+  "en": "The serum concentration of the active metabolites of {a} can be increased when {a} is used in combination with {b}."
+ },
+ {
+  "rang": 136,
+  "occurrences": 72,
+  "couverture": 0.9801,
+  "en": "The risk or severity of seizure can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 137,
+  "occurrences": 71,
+  "couverture": 0.98037,
+  "en": "The risk or severity of nephrotoxicity and hypocalcemia can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 138,
+  "occurrences": 70,
+  "couverture": 0.98063,
+  "en": "The risk or severity of renal failure, hypotension, and hyperkalemia can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 139,
+  "occurrences": 69,
+  "couverture": 0.98088,
+  "en": "The risk or severity of QTc prolongation can be increased when Salbutamol is combined with {b}."
+ },
+ {
+  "rang": 140,
+  "occurrences": 67,
+  "couverture": 0.98113,
+  "en": "{a} may increase the nephrotoxic activities of {b}."
+ },
+ {
+  "rang": 141,
+  "occurrences": 63,
+  "couverture": 0.98136,
+  "en": "The risk or severity of liver damage can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 142,
+  "occurrences": 62,
+  "couverture": 0.98159,
+  "en": "The risk or severity of Cardiac Arrhythmia can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 143,
+  "occurrences": 61,
+  "couverture": 0.98182,
+  "en": "The risk or severity of hypotension and syncope can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 144,
+  "occurrences": 58,
+  "couverture": 0.98204,
+  "en": "The risk or severity of tendinopathy can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 145,
+  "occurrences": 58,
+  "couverture": 0.98225,
+  "en": "{b} may increase the vasoconstricting activities of {a}."
+ },
+ {
+  "rang": 146,
+  "occurrences": 58,
+  "couverture": 0.98247,
+  "en": "The risk or severity of hypotension and syncope can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 147,
+  "occurrences": 58,
+  "couverture": 0.98268,
+  "en": "{a} may increase the vasoconstricting activities of {b}."
+ },
+ {
+  "rang": 148,
+  "occurrences": 57,
+  "couverture": 0.98289,
+  "en": "The risk or severity of renal failure, hypotension, and hyperkalemia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 149,
+  "occurrences": 56,
+  "couverture": 0.9831,
+  "en": "The risk or severity of sedation, somnolence, and CNS depression can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 150,
+  "occurrences": 56,
+  "couverture": 0.98331,
+  "en": "The risk or severity of dehydration can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 151,
+  "occurrences": 56,
+  "couverture": 0.98352,
+  "en": "{b} may increase the neuroexcitatory activities of {a}."
+ },
+ {
+  "rang": 152,
+  "occurrences": 55,
+  "couverture": 0.98372,
+  "en": "The risk or severity of orthostatic hypotension and dizziness can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 153,
+  "occurrences": 55,
+  "couverture": 0.98393,
+  "en": "{b} may increase the hypertensive activities of {a}."
+ },
+ {
+  "rang": 154,
+  "occurrences": 51,
+  "couverture": 0.98412,
+  "en": "The bioavailability of {a} can be decreased when combined with {b}."
+ },
+ {
+  "rang": 155,
+  "occurrences": 50,
+  "couverture": 0.9843,
+  "en": "The risk or severity of angioedema can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 156,
+  "occurrences": 50,
+  "couverture": 0.98449,
+  "en": "{b} may increase the neurotoxic activities of {a}."
+ },
+ {
+  "rang": 157,
+  "occurrences": 49,
+  "couverture": 0.98467,
+  "en": "{a} may increase the neuroexcitatory activities of {b}."
+ },
+ {
+  "rang": 158,
+  "occurrences": 49,
+  "couverture": 0.98485,
+  "en": "The protein binding of {b} can be decreased when combined with {a}."
+ },
+ {
+  "rang": 159,
+  "occurrences": 48,
+  "couverture": 0.98503,
+  "en": "The risk or severity of thrombocytopenia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 160,
+  "occurrences": 48,
+  "couverture": 0.98521,
+  "en": "The risk or severity of ventricular arrhythmias, bradycardia, and heart block can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 161,
+  "occurrences": 47,
+  "couverture": 0.98538,
+  "en": "The risk or severity of hypotension and CNS depression can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 162,
+  "occurrences": 46,
+  "couverture": 0.98555,
+  "en": "The serum concentration of the active metabolites of {a} can be decreased when {a} is used in combination with {b}."
+ },
+ {
+  "rang": 163,
+  "occurrences": 46,
+  "couverture": 0.98572,
+  "en": "The risk or severity of myopathy and weakness can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 164,
+  "occurrences": 46,
+  "couverture": 0.9859,
+  "en": "{a} may increase the tachycardic activities of {b}."
+ },
+ {
+  "rang": 165,
+  "occurrences": 46,
+  "couverture": 0.98607,
+  "en": "The risk or severity of pseudotumor cerebri can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 166,
+  "occurrences": 45,
+  "couverture": 0.98623,
+  "en": "The risk or severity of bradycardia can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 167,
+  "occurrences": 45,
+  "couverture": 0.9864,
+  "en": "The risk or severity of adverse effects can be decreased when {a} is combined with {b}."
+ },
+ {
+  "rang": 168,
+  "occurrences": 45,
+  "couverture": 0.98657,
+  "en": "The risk or severity of hypertension can be increased when {a} is combined with Salbutamol."
+ },
+ {
+  "rang": 169,
+  "occurrences": 44,
+  "couverture": 0.98673,
+  "en": "The risk or severity of neutropenia and thrombocytopenia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 170,
+  "occurrences": 44,
+  "couverture": 0.98689,
+  "en": "The risk or severity of elevated intracranial pressure can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 171,
+  "occurrences": 44,
+  "couverture": 0.98706,
+  "en": "{a} may decrease the bronchodilatory activities of {b}."
+ },
+ {
+  "rang": 172,
+  "occurrences": 43,
+  "couverture": 0.98722,
+  "en": "The risk or severity of liver damage can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 173,
+  "occurrences": 43,
+  "couverture": 0.98738,
+  "en": "The risk or severity of sedation and somnolence can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 174,
+  "occurrences": 43,
+  "couverture": 0.98754,
+  "en": "{b} may increase the hepatotoxic activities of {a}."
+ },
+ {
+  "rang": 175,
+  "occurrences": 42,
+  "couverture": 0.98769,
+  "en": "The serum concentration of the active metabolites of {b} can be increased when {b} is used in combination with {a}."
+ },
+ {
+  "rang": 176,
+  "occurrences": 42,
+  "couverture": 0.98785,
+  "en": "{b} may decrease the anticoagulant activities of {a}."
+ },
+ {
+  "rang": 177,
+  "occurrences": 42,
+  "couverture": 0.988,
+  "en": "{a} may decrease the anticoagulant activities of {b}."
+ },
+ {
+  "rang": 178,
+  "occurrences": 41,
+  "couverture": 0.98816,
+  "en": "{b} may increase the antiplatelet activities of {a}."
+ },
+ {
+  "rang": 179,
+  "occurrences": 41,
+  "couverture": 0.98831,
+  "en": "The absorption of {b} can be decreased when combined with {a}."
+ },
+ {
+  "rang": 180,
+  "occurrences": 41,
+  "couverture": 0.98846,
+  "en": "The risk or severity of hyponatremia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 181,
+  "occurrences": 41,
+  "couverture": 0.98861,
+  "en": "{b} may increase the gastrointestinal motility reducing activities of {a}."
+ },
+ {
+  "rang": 182,
+  "occurrences": 40,
+  "couverture": 0.98876,
+  "en": "The risk or severity of jaw osteonecrosis and anti-angiogenesis can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 183,
+  "occurrences": 38,
+  "couverture": 0.9889,
+  "en": "The risk or severity of sedation and CNS depression can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 184,
+  "occurrences": 38,
+  "couverture": 0.98904,
+  "en": "The risk or severity of renal failure can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 185,
+  "occurrences": 38,
+  "couverture": 0.98919,
+  "en": "The risk or severity of hyperthermia and oligohydrosis can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 186,
+  "occurrences": 36,
+  "couverture": 0.98932,
+  "en": "The risk or severity of bleeding and bruising can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 187,
+  "occurrences": 36,
+  "couverture": 0.98945,
+  "en": "The risk or severity of hypertension can be decreased when {b} is combined with {a}."
+ },
+ {
+  "rang": 188,
+  "occurrences": 35,
+  "couverture": 0.98958,
+  "en": "The risk or severity of tendinopathy can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 189,
+  "occurrences": 35,
+  "couverture": 0.98971,
+  "en": "The risk or severity of Tachycardia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 190,
+  "occurrences": 34,
+  "couverture": 0.98984,
+  "en": "The serum concentration of {a} can be decreased when it is combined with Rifampicin."
+ },
+ {
+  "rang": 191,
+  "occurrences": 34,
+  "couverture": 0.98997,
+  "en": "The risk or severity of hypertension can be increased when Salbutamol is combined with {b}."
+ },
+ {
+  "rang": 192,
+  "occurrences": 33,
+  "couverture": 0.99009,
+  "en": "The risk or severity of edema formation can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 193,
+  "occurrences": 33,
+  "couverture": 0.99021,
+  "en": "The risk or severity of urinary retention can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 194,
+  "occurrences": 33,
+  "couverture": 0.99033,
+  "en": "The risk or severity of electrolyte imbalance can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 195,
+  "occurrences": 32,
+  "couverture": 0.99045,
+  "en": "{b} may decrease the sedative activities of {a}."
+ },
+ {
+  "rang": 196,
+  "occurrences": 32,
+  "couverture": 0.99057,
+  "en": "{a} may increase the anticholinergic activities of {b}."
+ },
+ {
+  "rang": 197,
+  "occurrences": 32,
+  "couverture": 0.99069,
+  "en": "The excretion of {b} can be increased when combined with {a}."
+ },
+ {
+  "rang": 198,
+  "occurrences": 31,
+  "couverture": 0.9908,
+  "en": "The risk or severity of QTc prolongation can be increased when {a} is combined with Salbutamol."
+ },
+ {
+  "rang": 199,
+  "occurrences": 31,
+  "couverture": 0.99092,
+  "en": "{b} may increase the antipsychotic activities of {a}."
+ },
+ {
+  "rang": 200,
+  "occurrences": 30,
+  "couverture": 0.99103,
+  "en": "{a} can cause an increase in the absorption of {b} resulting in an increased serum concentration and potentially a worsening of adverse effects."
+ },
+ {
+  "rang": 201,
+  "occurrences": 29,
+  "couverture": 0.99114,
+  "en": "The risk or severity of Cardiac Arrhythmia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 202,
+  "occurrences": 29,
+  "couverture": 0.99125,
+  "en": "The risk or severity of QTc prolongation can be increased when Salbutamol is combined with {a}."
+ },
+ {
+  "rang": 203,
+  "occurrences": 29,
+  "couverture": 0.99135,
+  "en": "The risk or severity of reduced gastrointestinal motility can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 204,
+  "occurrences": 28,
+  "couverture": 0.99146,
+  "en": "The excretion of {a} can be increased when combined with {b}."
+ },
+ {
+  "rang": 205,
+  "occurrences": 28,
+  "couverture": 0.99156,
+  "en": "{b} may decrease the bronchodilatory activities of {a}."
+ },
+ {
+  "rang": 206,
+  "occurrences": 28,
+  "couverture": 0.99167,
+  "en": "Florbetaben (18F) may decrease the excretion rate of {b} which could result in a higher serum level."
+ },
+ {
+  "rang": 207,
+  "occurrences": 28,
+  "couverture": 0.99177,
+  "en": "The risk or severity of renal failure can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 208,
+  "occurrences": 28,
+  "couverture": 0.99187,
+  "en": "Florbetapir (18F) may decrease the excretion rate of {b} which could result in a higher serum level."
+ },
+ {
+  "rang": 209,
+  "occurrences": 27,
+  "couverture": 0.99197,
+  "en": "{b} may increase the vasodilatory activities of {a}."
+ },
+ {
+  "rang": 210,
+  "occurrences": 27,
+  "couverture": 0.99207,
+  "en": "The absorption of {a} can be decreased when combined with {b}."
+ },
+ {
+  "rang": 211,
+  "occurrences": 27,
+  "couverture": 0.99218,
+  "en": "{b} can cause an increase in the absorption of {a} resulting in an increased serum concentration and potentially a worsening of adverse effects."
+ },
+ {
+  "rang": 212,
+  "occurrences": 27,
+  "couverture": 0.99228,
+  "en": "The risk or severity of bleeding and bruising can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 213,
+  "occurrences": 27,
+  "couverture": 0.99238,
+  "en": "The risk or severity of hypertension, hyponatremia, and water intoxication can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 214,
+  "occurrences": 27,
+  "couverture": 0.99248,
+  "en": "The risk or severity of hypotension and orthostatic hypotension can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 215,
+  "occurrences": 26,
+  "couverture": 0.99257,
+  "en": "The serum concentration of the active metabolites of {a} can be reduced when {a} is used in combination with {b} resulting in a loss in efficacy."
+ },
+ {
+  "rang": 216,
+  "occurrences": 26,
+  "couverture": 0.99267,
+  "en": "The risk or severity of edema formation can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 217,
+  "occurrences": 26,
+  "couverture": 0.99277,
+  "en": "{b} may increase the vasopressor activities of {a}."
+ },
+ {
+  "rang": 218,
+  "occurrences": 26,
+  "couverture": 0.99286,
+  "en": "The risk or severity of renal failure and hypertension can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 219,
+  "occurrences": 25,
+  "couverture": 0.99296,
+  "en": "The risk or severity of orthostatic hypotension and syncope can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 220,
+  "occurrences": 25,
+  "couverture": 0.99305,
+  "en": "Salbutamol may decrease the antihypertensive activities of {a}."
+ },
+ {
+  "rang": 221,
+  "occurrences": 25,
+  "couverture": 0.99314,
+  "en": "The risk or severity of thromboembolism can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 222,
+  "occurrences": 25,
+  "couverture": 0.99323,
+  "en": "The risk or severity of myopathy and rhabdomyolysis can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 223,
+  "occurrences": 25,
+  "couverture": 0.99333,
+  "en": "The risk or severity of renal failure and hypertension can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 224,
+  "occurrences": 25,
+  "couverture": 0.99342,
+  "en": "The risk or severity of extrapyramidal symptoms can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 225,
+  "occurrences": 24,
+  "couverture": 0.99351,
+  "en": "{b} may increase the hypertensive and vasoconstricting activities of {a}."
+ },
+ {
+  "rang": 226,
+  "occurrences": 23,
+  "couverture": 0.99359,
+  "en": "The serum concentration of the active metabolites of {b} can be reduced when {b} is used in combination with {a} resulting in a loss in efficacy."
+ },
+ {
+  "rang": 227,
+  "occurrences": 23,
+  "couverture": 0.99368,
+  "en": "{a} may increase the antipsychotic activities of {b}."
+ },
+ {
+  "rang": 228,
+  "occurrences": 23,
+  "couverture": 0.99376,
+  "en": "{a} may increase the hepatotoxic activities of {b}."
+ },
+ {
+  "rang": 229,
+  "occurrences": 23,
+  "couverture": 0.99385,
+  "en": "The risk or severity of respiratory depression can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 230,
+  "occurrences": 22,
+  "couverture": 0.99393,
+  "en": "The therapeutic efficacy of Salbutamol can be decreased when used in combination with {a}."
+ },
+ {
+  "rang": 231,
+  "occurrences": 21,
+  "couverture": 0.99401,
+  "en": "The risk or severity of gastrointestinal bleeding and peptic ulcer can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 232,
+  "occurrences": 21,
+  "couverture": 0.99409,
+  "en": "The risk or severity of peripheral neuropathy can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 233,
+  "occurrences": 21,
+  "couverture": 0.99417,
+  "en": "The risk or severity of gastrointestinal ulceration can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 234,
+  "occurrences": 21,
+  "couverture": 0.99424,
+  "en": "The risk or severity of orthostatic hypotension can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 235,
+  "occurrences": 21,
+  "couverture": 0.99432,
+  "en": "The risk or severity of vasospastic reactions can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 236,
+  "occurrences": 21,
+  "couverture": 0.9944,
+  "en": "{b} may increase the photosensitizing activities of {a}."
+ },
+ {
+  "rang": 237,
+  "occurrences": 20,
+  "couverture": 0.99447,
+  "en": "The risk or severity of QTc prolongation can be decreased when {a} is combined with {b}."
+ },
+ {
+  "rang": 238,
+  "occurrences": 20,
+  "couverture": 0.99455,
+  "en": "{b} may increase the analgesic activities of {a}."
+ },
+ {
+  "rang": 239,
+  "occurrences": 20,
+  "couverture": 0.99462,
+  "en": "The risk or severity of respiratory depression can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 240,
+  "occurrences": 20,
+  "couverture": 0.9947,
+  "en": "Salbutamol may decrease the antihypertensive activities of {b}."
+ },
+ {
+  "rang": 241,
+  "occurrences": 19,
+  "couverture": 0.99477,
+  "en": "The risk or severity of gastrointestinal ulceration can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 242,
+  "occurrences": 19,
+  "couverture": 0.99484,
+  "en": "{b} may increase the tachycardic activities of {a}."
+ },
+ {
+  "rang": 243,
+  "occurrences": 19,
+  "couverture": 0.99491,
+  "en": "{b} may decrease effectiveness of {a} as a diagnostic agent."
+ },
+ {
+  "rang": 244,
+  "occurrences": 19,
+  "couverture": 0.99498,
+  "en": "The risk or severity of peripheral neuropathy can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 245,
+  "occurrences": 19,
+  "couverture": 0.99505,
+  "en": "The bioavailability of {b} can be increased when combined with {a}."
+ },
+ {
+  "rang": 246,
+  "occurrences": 19,
+  "couverture": 0.99512,
+  "en": "The therapeutic efficacy of Salbutamol can be decreased when used in combination with {b}."
+ },
+ {
+  "rang": 247,
+  "occurrences": 18,
+  "couverture": 0.99519,
+  "en": "The risk or severity of ulceration can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 248,
+  "occurrences": 18,
+  "couverture": 0.99525,
+  "en": "{a} may decrease the sedative activities of {b}."
+ },
+ {
+  "rang": 249,
+  "occurrences": 17,
+  "couverture": 0.99532,
+  "en": "{b} may increase the diuretic activities of {a}."
+ },
+ {
+  "rang": 250,
+  "occurrences": 17,
+  "couverture": 0.99538,
+  "en": "{a} may increase the vasodilatory activities of {b}."
+ },
+ {
+  "rang": 251,
+  "occurrences": 16,
+  "couverture": 0.99544,
+  "en": "{a} may increase the bronchoconstrictory activities of {b}."
+ },
+ {
+  "rang": 252,
+  "occurrences": 16,
+  "couverture": 0.9955,
+  "en": "{a} may increase the hypertensive activities of {b}."
+ },
+ {
+  "rang": 253,
+  "occurrences": 16,
+  "couverture": 0.99556,
+  "en": "{a} may increase the Change in thyroid function activities of {b}."
+ },
+ {
+  "rang": 254,
+  "occurrences": 16,
+  "couverture": 0.99562,
+  "en": "The risk or severity of orthostatic hypotension and dizziness can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 255,
+  "occurrences": 15,
+  "couverture": 0.99567,
+  "en": "The risk or severity of bleeding and thrombocytopenia can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 256,
+  "occurrences": 15,
+  "couverture": 0.99573,
+  "en": "The risk or severity of electrolyte imbalance can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 257,
+  "occurrences": 15,
+  "couverture": 0.99578,
+  "en": "The risk or severity of QTc prolongation can be decreased when {b} is combined with {a}."
+ },
+ {
+  "rang": 258,
+  "occurrences": 15,
+  "couverture": 0.99584,
+  "en": "The risk or severity of extrapyramidal symptoms can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 259,
+  "occurrences": 15,
+  "couverture": 0.9959,
+  "en": "The risk or severity of myopathy and rhabdomyolysis can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 260,
+  "occurrences": 15,
+  "couverture": 0.99595,
+  "en": "The bioavailability of {b} can be decreased when combined with {a}."
+ },
+ {
+  "rang": 261,
+  "occurrences": 15,
+  "couverture": 0.99601,
+  "en": "{a} may decrease the cardiotoxic activities of {b}."
+ },
+ {
+  "rang": 262,
+  "occurrences": 14,
+  "couverture": 0.99606,
+  "en": "The risk or severity of gastrointestinal ulceration and gastrointestinal irritation can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 263,
+  "occurrences": 14,
+  "couverture": 0.99611,
+  "en": "The risk or severity of immunosuppression can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 264,
+  "occurrences": 14,
+  "couverture": 0.99616,
+  "en": "The risk or severity of Tachycardia and drowsiness can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 265,
+  "occurrences": 14,
+  "couverture": 0.99622,
+  "en": "The risk or severity of pseudotumor cerebri can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 266,
+  "occurrences": 14,
+  "couverture": 0.99627,
+  "en": "The risk or severity of thromboembolism can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 267,
+  "occurrences": 14,
+  "couverture": 0.99632,
+  "en": "{a} may increase the sympathomimetic activities of {b}."
+ },
+ {
+  "rang": 268,
+  "occurrences": 14,
+  "couverture": 0.99637,
+  "en": "{b} may increase the sympathomimetic activities of {a}."
+ },
+ {
+  "rang": 269,
+  "occurrences": 14,
+  "couverture": 0.99642,
+  "en": "The bioavailability of {a} can be increased when combined with {b}."
+ },
+ {
+  "rang": 270,
+  "occurrences": 13,
+  "couverture": 0.99647,
+  "en": "The risk or severity of myopathy can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 271,
+  "occurrences": 12,
+  "couverture": 0.99652,
+  "en": "The risk or severity of hypocalcemia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 272,
+  "occurrences": 12,
+  "couverture": 0.99656,
+  "en": "The risk or severity of lactic acidosis can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 273,
+  "occurrences": 12,
+  "couverture": 0.99661,
+  "en": "The risk or severity of orthostatic hypotension can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 274,
+  "occurrences": 12,
+  "couverture": 0.99665,
+  "en": "{b} may decrease the excretion rate of Salbutamol which could result in a higher serum level."
+ },
+ {
+  "rang": 275,
+  "occurrences": 11,
+  "couverture": 0.99669,
+  "en": "The risk or severity of adverse effects can be decreased when {b} is combined with {a}."
+ },
+ {
+  "rang": 276,
+  "occurrences": 11,
+  "couverture": 0.99673,
+  "en": "Florbetaben (18F) may decrease the excretion rate of {a} which could result in a higher serum level."
+ },
+ {
+  "rang": 277,
+  "occurrences": 11,
+  "couverture": 0.99677,
+  "en": "Florbetapir (18F) may decrease the excretion rate of {a} which could result in a higher serum level."
+ },
+ {
+  "rang": 278,
+  "occurrences": 11,
+  "couverture": 0.99681,
+  "en": "The protein binding of {a} can be increased when combined with {b}."
+ },
+ {
+  "rang": 279,
+  "occurrences": 11,
+  "couverture": 0.99685,
+  "en": "The risk of a hypersensitivity reaction to {a} is increased when it is combined with {b}."
+ },
+ {
+  "rang": 280,
+  "occurrences": 11,
+  "couverture": 0.9969,
+  "en": "The risk or severity of ventricular arrhythmias, bradycardia, and heart block can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 281,
+  "occurrences": 11,
+  "couverture": 0.99694,
+  "en": "{a} may increase the vasopressor activities of {b}."
+ },
+ {
+  "rang": 282,
+  "occurrences": 11,
+  "couverture": 0.99698,
+  "en": "{b} may increase the hypokalemic activities of {a}."
+ },
+ {
+  "rang": 283,
+  "occurrences": 10,
+  "couverture": 0.99701,
+  "en": "{b} may decrease the neuromuscular blocking activities of {a}."
+ },
+ {
+  "rang": 284,
+  "occurrences": 10,
+  "couverture": 0.99705,
+  "en": "{a} may increase the hypokalemic activities of {b}."
+ },
+ {
+  "rang": 285,
+  "occurrences": 10,
+  "couverture": 0.99709,
+  "en": "The risk or severity of hypercalcemia can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 286,
+  "occurrences": 10,
+  "couverture": 0.99713,
+  "en": "The risk or severity of vasospastic reactions can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 287,
+  "occurrences": 10,
+  "couverture": 0.99716,
+  "en": "{b} may increase the myopathic rhabdomyolysis activities of {a}."
+ },
+ {
+  "rang": 288,
+  "occurrences": 10,
+  "couverture": 0.9972,
+  "en": "The risk or severity of Tachycardia can be increased when {a} is combined with Salbutamol."
+ },
+ {
+  "rang": 289,
+  "occurrences": 10,
+  "couverture": 0.99724,
+  "en": "The risk or severity of bradycardia and heart block can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 290,
+  "occurrences": 10,
+  "couverture": 0.99727,
+  "en": "Salbutamol may decrease the excretion rate of {a} which could result in a higher serum level."
+ },
+ {
+  "rang": 291,
+  "occurrences": 10,
+  "couverture": 0.99731,
+  "en": "The risk or severity of hypercalcemia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 292,
+  "occurrences": 10,
+  "couverture": 0.99735,
+  "en": "{b} may decrease the hypertensive activities of {a}."
+ },
+ {
+  "rang": 293,
+  "occurrences": 10,
+  "couverture": 0.99739,
+  "en": "The risk or severity of renal failure and hypotension can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 294,
+  "occurrences": 10,
+  "couverture": 0.99742,
+  "en": "{b} may decrease the nephrotoxic activities of {a}."
+ },
+ {
+  "rang": 295,
+  "occurrences": 9,
+  "couverture": 0.99746,
+  "en": "The risk or severity of hypotension, hyperkalemia, and nephrotoxicity can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 296,
+  "occurrences": 9,
+  "couverture": 0.99749,
+  "en": "The risk or severity of methemoglobinemia can be increased when Rifampicin is combined with {a}."
+ },
+ {
+  "rang": 297,
+  "occurrences": 9,
+  "couverture": 0.99752,
+  "en": "{a} may decrease the neuromuscular blocking activities of {b}."
+ },
+ {
+  "rang": 298,
+  "occurrences": 9,
+  "couverture": 0.99756,
+  "en": "The risk or severity of jaw osteonecrosis and anti-angiogenesis can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 299,
+  "occurrences": 9,
+  "couverture": 0.99759,
+  "en": "The risk or severity of sedation and somnolence can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 300,
+  "occurrences": 8,
+  "couverture": 0.99762,
+  "en": "The risk or severity of pulmonary toxicity can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 301,
+  "occurrences": 8,
+  "couverture": 0.99765,
+  "en": "The risk or severity of myelosuppression, anemia, and severe leukopenia can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 302,
+  "occurrences": 8,
+  "couverture": 0.99768,
+  "en": "{b} may decrease the cardiotoxic activities of {a}."
+ },
+ {
+  "rang": 303,
+  "occurrences": 8,
+  "couverture": 0.99771,
+  "en": "The risk or severity of cytopenia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 304,
+  "occurrences": 8,
+  "couverture": 0.99774,
+  "en": "{a} may increase the excretion rate of Florbetapir (18F) which could result in a lower serum level and potentially a reduction in efficacy."
+ },
+ {
+  "rang": 305,
+  "occurrences": 8,
+  "couverture": 0.99777,
+  "en": "The risk or severity of congestive heart failure and hypotension can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 306,
+  "occurrences": 8,
+  "couverture": 0.9978,
+  "en": "{a} may decrease the nephrotoxic activities of {b}."
+ },
+ {
+  "rang": 307,
+  "occurrences": 8,
+  "couverture": 0.99783,
+  "en": "The serum concentration of the active metabolites of {b} can be decreased when {b} is used in combination with {a}."
+ },
+ {
+  "rang": 308,
+  "occurrences": 8,
+  "couverture": 0.99786,
+  "en": "{a} may increase the opioid antagonism activities of {b}."
+ },
+ {
+  "rang": 309,
+  "occurrences": 7,
+  "couverture": 0.99788,
+  "en": "{a} may increase the cardiodepressant activities of {b}."
+ },
+ {
+  "rang": 310,
+  "occurrences": 7,
+  "couverture": 0.99791,
+  "en": "The risk or severity of hyponatremia can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 311,
+  "occurrences": 7,
+  "couverture": 0.99794,
+  "en": "The risk or severity of serotonin syndrome and seizure can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 312,
+  "occurrences": 7,
+  "couverture": 0.99796,
+  "en": "The risk or severity of renal failure and hypotension can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 313,
+  "occurrences": 7,
+  "couverture": 0.99799,
+  "en": "The risk or severity of hypotension, hyperkalemia, and reduced intravascular volume can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 314,
+  "occurrences": 7,
+  "couverture": 0.99801,
+  "en": "The risk or severity of congestive heart failure and hypotension can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 315,
+  "occurrences": 7,
+  "couverture": 0.99804,
+  "en": "The risk or severity of bleeding and gastrointestinal bleeding can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 316,
+  "occurrences": 7,
+  "couverture": 0.99807,
+  "en": "The risk or severity of urinary retention can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 317,
+  "occurrences": 7,
+  "couverture": 0.99809,
+  "en": "{a} may increase the smooth muscle relaxing activities of {b}."
+ },
+ {
+  "rang": 318,
+  "occurrences": 7,
+  "couverture": 0.99812,
+  "en": "The risk or severity of ototoxicity and nephrotoxicity can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 319,
+  "occurrences": 7,
+  "couverture": 0.99814,
+  "en": "{a} may increase the atrioventricular blocking (AV block) activities of {b}."
+ },
+ {
+  "rang": 320,
+  "occurrences": 7,
+  "couverture": 0.99817,
+  "en": "The risk or severity of methemoglobinemia can be increased when Rifampicin is combined with {b}."
+ },
+ {
+  "rang": 321,
+  "occurrences": 6,
+  "couverture": 0.99819,
+  "en": "The risk or severity of pulmonary toxicity can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 322,
+  "occurrences": 6,
+  "couverture": 0.99821,
+  "en": "The risk or severity of rhabdomyolysis can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 323,
+  "occurrences": 6,
+  "couverture": 0.99824,
+  "en": "The risk or severity of hypertension can be decreased when {a} is combined with {b}."
+ },
+ {
+  "rang": 324,
+  "occurrences": 6,
+  "couverture": 0.99826,
+  "en": "The risk or severity of adverse effects can be increased when Salbutamol is combined with {b}."
+ },
+ {
+  "rang": 325,
+  "occurrences": 6,
+  "couverture": 0.99828,
+  "en": "{b} may increase the alpha-adrenergic activities of {a}."
+ },
+ {
+  "rang": 326,
+  "occurrences": 6,
+  "couverture": 0.9983,
+  "en": "The risk or severity of hypotension and CNS depression can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 327,
+  "occurrences": 6,
+  "couverture": 0.99833,
+  "en": "The risk or severity of hyponatremia and water intoxication can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 328,
+  "occurrences": 6,
+  "couverture": 0.99835,
+  "en": "The risk or severity of CNS depression and hypotonia can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 329,
+  "occurrences": 6,
+  "couverture": 0.99837,
+  "en": "{b} may increase the serotonergic and central nervous system depressant (CNS depressant) activities of {a}."
+ },
+ {
+  "rang": 330,
+  "occurrences": 6,
+  "couverture": 0.99839,
+  "en": "The risk or severity of adverse effects can be increased when {a} is combined with Salbutamol."
+ },
+ {
+  "rang": 331,
+  "occurrences": 6,
+  "couverture": 0.99841,
+  "en": "{b} may decrease the hypotensive activities of {a}."
+ },
+ {
+  "rang": 332,
+  "occurrences": 6,
+  "couverture": 0.99844,
+  "en": "The therapeutic efficacy of {b} can be decreased when used in combination with Rifampicin."
+ },
+ {
+  "rang": 333,
+  "occurrences": 6,
+  "couverture": 0.99846,
+  "en": "The risk or severity of gastrointestinal ulceration and gastrointestinal irritation can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 334,
+  "occurrences": 6,
+  "couverture": 0.99848,
+  "en": "The risk or severity of gastrointestinal bleeding and peptic ulcer can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 335,
+  "occurrences": 6,
+  "couverture": 0.9985,
+  "en": "{b} may decrease the stimulatory activities of {a}."
+ },
+ {
+  "rang": 336,
+  "occurrences": 5,
+  "couverture": 0.99852,
+  "en": "The risk or severity of neuromuscular blockade can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 337,
+  "occurrences": 5,
+  "couverture": 0.99854,
+  "en": "The risk or severity of gastrointestinal bleeding and gastrointestinal ulceration can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 338,
+  "occurrences": 5,
+  "couverture": 0.99856,
+  "en": "The risk or severity of sedation and orthostatic hypotension can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 339,
+  "occurrences": 5,
+  "couverture": 0.99858,
+  "en": "The risk or severity of bronchospasm, shortness of breath, and dyspnea can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 340,
+  "occurrences": 5,
+  "couverture": 0.9986,
+  "en": "The risk or severity of myopathy, rhabdomyolysis, and myoglobinuria can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 341,
+  "occurrences": 5,
+  "couverture": 0.99861,
+  "en": "The therapeutic efficacy of {a} can be decreased when used in combination with Rifampicin."
+ },
+ {
+  "rang": 342,
+  "occurrences": 5,
+  "couverture": 0.99863,
+  "en": "The risk or severity of Tachycardia can be increased when Salbutamol is combined with {b}."
+ },
+ {
+  "rang": 343,
+  "occurrences": 5,
+  "couverture": 0.99865,
+  "en": "The risk or severity of hypertension can be increased when {b} is combined with Salbutamol."
+ },
+ {
+  "rang": 344,
+  "occurrences": 5,
+  "couverture": 0.99867,
+  "en": "The risk or severity of QTc prolongation, torsade de pointes, and cardiotoxicity can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 345,
+  "occurrences": 5,
+  "couverture": 0.99869,
+  "en": "The risk or severity of Tachycardia and drowsiness can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 346,
+  "occurrences": 5,
+  "couverture": 0.99871,
+  "en": "The risk or severity of ototoxicity and nephrotoxicity can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 347,
+  "occurrences": 5,
+  "couverture": 0.99873,
+  "en": "The metabolism of {b} can be decreased when combined with Rifampicin."
+ },
+ {
+  "rang": 348,
+  "occurrences": 5,
+  "couverture": 0.99874,
+  "en": "{b} can cause a decrease in the absorption of Rifampicin resulting in a reduced serum concentration and potentially a decrease in efficacy."
+ },
+ {
+  "rang": 349,
+  "occurrences": 5,
+  "couverture": 0.99876,
+  "en": "{b} may increase the myelosuppressive activities of {a}."
+ },
+ {
+  "rang": 350,
+  "occurrences": 5,
+  "couverture": 0.99878,
+  "en": "The risk or severity of Cardiac Arrhythmia and CNS stimulation can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 351,
+  "occurrences": 5,
+  "couverture": 0.9988,
+  "en": "The risk or severity of hypotension and priapism can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 352,
+  "occurrences": 4,
+  "couverture": 0.99882,
+  "en": "{a} may increase the hypolipidaemic activities of {b}."
+ },
+ {
+  "rang": 353,
+  "occurrences": 4,
+  "couverture": 0.99883,
+  "en": "The risk or severity of thrombocytopenia can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 354,
+  "occurrences": 4,
+  "couverture": 0.99885,
+  "en": "{a} can cause a decrease in the absorption of Rifampicin resulting in a reduced serum concentration and potentially a decrease in efficacy."
+ },
+ {
+  "rang": 355,
+  "occurrences": 4,
+  "couverture": 0.99886,
+  "en": "The risk or severity of heart failure can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 356,
+  "occurrences": 4,
+  "couverture": 0.99887,
+  "en": "The risk or severity of QTc prolongation and torsade de pointes can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 357,
+  "occurrences": 4,
+  "couverture": 0.99889,
+  "en": "The risk or severity of electrolyte abnormality can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 358,
+  "occurrences": 4,
+  "couverture": 0.9989,
+  "en": "{b} may decrease the excretion rate of Florbetaben (18F) which could result in a higher serum level."
+ },
+ {
+  "rang": 359,
+  "occurrences": 4,
+  "couverture": 0.99892,
+  "en": "The therapeutic efficacy of {b} can be decreased when used in combination with Salbutamol."
+ },
+ {
+  "rang": 360,
+  "occurrences": 4,
+  "couverture": 0.99893,
+  "en": "The risk or severity of rhabdomyolysis, myoglobinuria, and elevated creatine kinase (CPK) can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 361,
+  "occurrences": 4,
+  "couverture": 0.99895,
+  "en": "The risk or severity of QTc prolongation and ventricular arrhythmias can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 362,
+  "occurrences": 4,
+  "couverture": 0.99896,
+  "en": "The risk or severity of hypokalemia can be increased when Salbutamol is combined with {a}."
+ },
+ {
+  "rang": 363,
+  "occurrences": 4,
+  "couverture": 0.99898,
+  "en": "The risk or severity of myocardial depression can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 364,
+  "occurrences": 4,
+  "couverture": 0.99899,
+  "en": "The serum concentration of desmethyl{a}, an active metabolite of {a}, can be increased when used in combination with {b}."
+ },
+ {
+  "rang": 365,
+  "occurrences": 4,
+  "couverture": 0.99901,
+  "en": "The risk or severity of ventricular arrhythmias and Cardiac Arrhythmia can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 366,
+  "occurrences": 4,
+  "couverture": 0.99902,
+  "en": "{b} may increase the hypercalcemic activities of {a}."
+ },
+ {
+  "rang": 367,
+  "occurrences": 4,
+  "couverture": 0.99904,
+  "en": "{a} may increase the hypertensive and vasoconstricting activities of Salbutamol."
+ },
+ {
+  "rang": 368,
+  "occurrences": 4,
+  "couverture": 0.99905,
+  "en": "The risk or severity of confusion, irritability, and sleep disorders can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 369,
+  "occurrences": 4,
+  "couverture": 0.99907,
+  "en": "{a} may increase the Pseudotumor Cerebri activities of {b}."
+ },
+ {
+  "rang": 370,
+  "occurrences": 4,
+  "couverture": 0.99908,
+  "en": "The risk or severity of sedation and orthostatic hypotension can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 371,
+  "occurrences": 4,
+  "couverture": 0.9991,
+  "en": "The risk or severity of increased transaminases can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 372,
+  "occurrences": 4,
+  "couverture": 0.99911,
+  "en": "{b} may decrease the excretion rate of Florbetapir (18F) which could result in a higher serum level."
+ },
+ {
+  "rang": 373,
+  "occurrences": 3,
+  "couverture": 0.99912,
+  "en": "{b} may decrease the antiplatelet activities of {a}."
+ },
+ {
+  "rang": 374,
+  "occurrences": 3,
+  "couverture": 0.99913,
+  "en": "The therapeutic efficacy of {a} can be decreased when used in combination with Salbutamol."
+ },
+ {
+  "rang": 375,
+  "occurrences": 3,
+  "couverture": 0.99915,
+  "en": "The risk or severity of congestive heart failure, bleeding, hypotension, and Tachycardia can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 376,
+  "occurrences": 3,
+  "couverture": 0.99916,
+  "en": "The risk or severity of infection and neutropenia can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 377,
+  "occurrences": 3,
+  "couverture": 0.99917,
+  "en": "The protein binding of {b} can be increased when combined with {a}."
+ },
+ {
+  "rang": 378,
+  "occurrences": 3,
+  "couverture": 0.99918,
+  "en": "{a} may decrease the hypertensive activities of {b}."
+ },
+ {
+  "rang": 379,
+  "occurrences": 3,
+  "couverture": 0.99919,
+  "en": "The risk or severity of reduced gastrointestinal motility can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 380,
+  "occurrences": 3,
+  "couverture": 0.9992,
+  "en": "The risk of a hypersensitivity reaction to {b} is increased when it is combined with {a}."
+ },
+ {
+  "rang": 381,
+  "occurrences": 3,
+  "couverture": 0.99921,
+  "en": "{b} may increase the opioid antagonism activities of {a}."
+ },
+ {
+  "rang": 382,
+  "occurrences": 3,
+  "couverture": 0.99922,
+  "en": "The risk or severity of cardiovascular complications can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 383,
+  "occurrences": 3,
+  "couverture": 0.99923,
+  "en": "{b} may increase the ototoxic activities of {a}."
+ },
+ {
+  "rang": 384,
+  "occurrences": 3,
+  "couverture": 0.99925,
+  "en": "The risk or severity of QTc prolongation, torsade de pointes, and cardiotoxicity can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 385,
+  "occurrences": 3,
+  "couverture": 0.99926,
+  "en": "The risk or severity of hypocalcemia can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 386,
+  "occurrences": 3,
+  "couverture": 0.99927,
+  "en": "The risk or severity of QTc prolongation and torsade de pointes can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 387,
+  "occurrences": 3,
+  "couverture": 0.99928,
+  "en": "The risk or severity of cardiovascular complications can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 388,
+  "occurrences": 3,
+  "couverture": 0.99929,
+  "en": "{a} may increase the diuretic activities of {b}."
+ },
+ {
+  "rang": 389,
+  "occurrences": 3,
+  "couverture": 0.9993,
+  "en": "The risk or severity of liver enzyme elevations can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 390,
+  "occurrences": 3,
+  "couverture": 0.99931,
+  "en": "{b} may increase the excretion rate of Florbetapir (18F) which could result in a lower serum level and potentially a reduction in efficacy."
+ },
+ {
+  "rang": 391,
+  "occurrences": 3,
+  "couverture": 0.99932,
+  "en": "The risk or severity of metabolic acidosis can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 392,
+  "occurrences": 2,
+  "couverture": 0.99933,
+  "en": "The serum concentration of {b}, an active metabolite of {b}, can be increased when used in combination with {a}."
+ },
+ {
+  "rang": 393,
+  "occurrences": 2,
+  "couverture": 0.99934,
+  "en": "The risk or severity of hypotension and hyperkalemia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 394,
+  "occurrences": 2,
+  "couverture": 0.99935,
+  "en": "The serum concentration of R406, an active metabolite of {b}, can be increased when used in combination with {a}."
+ },
+ {
+  "rang": 395,
+  "occurrences": 2,
+  "couverture": 0.99935,
+  "en": "The serum concentration of desmethyl{b}, an active metabolite of {b}, can be increased when used in combination with {a}."
+ },
+ {
+  "rang": 396,
+  "occurrences": 2,
+  "couverture": 0.99936,
+  "en": "The risk or severity of hyperthermia and oligohydrosis can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 397,
+  "occurrences": 2,
+  "couverture": 0.99937,
+  "en": "The risk or severity of myopathy can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 398,
+  "occurrences": 2,
+  "couverture": 0.99938,
+  "en": "{b} may increase the bronchoconstrictory activities of {a}."
+ },
+ {
+  "rang": 399,
+  "occurrences": 2,
+  "couverture": 0.99938,
+  "en": "{a} may increase the tachycardic activities of Salbutamol."
+ },
+ {
+  "rang": 400,
+  "occurrences": 2,
+  "couverture": 0.99939,
+  "en": "{b} may increase the hypotensive and vasodilatory activities of {a}."
+ },
+ {
+  "rang": 401,
+  "occurrences": 2,
+  "couverture": 0.9994,
+  "en": "{b} may increase the orthostatic hypotensive and hypotensive activities of {a}."
+ },
+ {
+  "rang": 402,
+  "occurrences": 2,
+  "couverture": 0.99941,
+  "en": "Salbutamol may increase the QTc-prolonging activities of {b}."
+ },
+ {
+  "rang": 403,
+  "occurrences": 2,
+  "couverture": 0.99941,
+  "en": "The risk or severity of hypokalemia can be increased when {b} is combined with Salbutamol."
+ },
+ {
+  "rang": 404,
+  "occurrences": 2,
+  "couverture": 0.99942,
+  "en": "The risk or severity of QTc prolongation can be increased when {b} is combined with Salbutamol."
+ },
+ {
+  "rang": 405,
+  "occurrences": 2,
+  "couverture": 0.99943,
+  "en": "{b} may increase the cardiodepressant activities of {a}."
+ },
+ {
+  "rang": 406,
+  "occurrences": 2,
+  "couverture": 0.99944,
+  "en": "The risk or severity of QTc prolongation and hypotension can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 407,
+  "occurrences": 2,
+  "couverture": 0.99944,
+  "en": "The risk or severity of lactic acidosis can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 408,
+  "occurrences": 2,
+  "couverture": 0.99945,
+  "en": "{a} may increase the hypotensive and Electrolyte Disturbance activities of {b}."
+ },
+ {
+  "rang": 409,
+  "occurrences": 2,
+  "couverture": 0.99946,
+  "en": "{b} may increase the Pseudotumor Cerebri activities of {a}."
+ },
+ {
+  "rang": 410,
+  "occurrences": 2,
+  "couverture": 0.99947,
+  "en": "{a} may increase the photosensitizing activities of {b}."
+ },
+ {
+  "rang": 411,
+  "occurrences": 2,
+  "couverture": 0.99947,
+  "en": "{b} may increase the atrioventricular blocking (AV block) activities of {a}."
+ },
+ {
+  "rang": 412,
+  "occurrences": 2,
+  "couverture": 0.99948,
+  "en": "The risk or severity of metabolic acidosis can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 413,
+  "occurrences": 2,
+  "couverture": 0.99949,
+  "en": "The risk or severity of ulceration can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 414,
+  "occurrences": 2,
+  "couverture": 0.99949,
+  "en": "{a} may increase the alpha-adrenergic activities of {b}."
+ },
+ {
+  "rang": 415,
+  "occurrences": 2,
+  "couverture": 0.9995,
+  "en": "{a} may decrease the hypotensive activities of {b}."
+ },
+ {
+  "rang": 416,
+  "occurrences": 2,
+  "couverture": 0.99951,
+  "en": "The risk or severity of somnolence and peripheral neuropathy can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 417,
+  "occurrences": 2,
+  "couverture": 0.99952,
+  "en": "The risk or severity of ototoxicity can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 418,
+  "occurrences": 2,
+  "couverture": 0.99952,
+  "en": "The risk or severity of hypertension and Tachycardia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 419,
+  "occurrences": 2,
+  "couverture": 0.99953,
+  "en": "{b} may decrease the diuretic activities of {a}."
+ },
+ {
+  "rang": 420,
+  "occurrences": 2,
+  "couverture": 0.99954,
+  "en": "{a} may increase the ototoxic activities of {b}."
+ },
+ {
+  "rang": 421,
+  "occurrences": 2,
+  "couverture": 0.99955,
+  "en": "The metabolism of {a} can be decreased when combined with Rifampicin."
+ },
+ {
+  "rang": 422,
+  "occurrences": 2,
+  "couverture": 0.99955,
+  "en": "The risk or severity of granulocytopenia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 423,
+  "occurrences": 2,
+  "couverture": 0.99956,
+  "en": "{a} may decrease the stimulatory activities of {b}."
+ },
+ {
+  "rang": 424,
+  "occurrences": 2,
+  "couverture": 0.99957,
+  "en": "The risk or severity of myelosuppression, anemia, and severe leukopenia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 425,
+  "occurrences": 2,
+  "couverture": 0.99958,
+  "en": "The risk or severity of infection and neutropenia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 426,
+  "occurrences": 2,
+  "couverture": 0.99958,
+  "en": "{a} may increase the hypercalcemic activities of {b}."
+ },
+ {
+  "rang": 427,
+  "occurrences": 2,
+  "couverture": 0.99959,
+  "en": "The risk or severity of fluid retention can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 428,
+  "occurrences": 1,
+  "couverture": 0.9996,
+  "en": "{b} may increase the skeletal muscle relaxing activities of {a}."
+ },
+ {
+  "rang": 429,
+  "occurrences": 1,
+  "couverture": 0.9996,
+  "en": "The therapeutic efficacy of {a} can be increased when used in combination with Rifampicin."
+ },
+ {
+  "rang": 430,
+  "occurrences": 1,
+  "couverture": 0.9996,
+  "en": "The risk or severity of jaw osteonecrosis can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 431,
+  "occurrences": 1,
+  "couverture": 0.99961,
+  "en": "The risk or severity of Anticonvulsant Toxicity can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 432,
+  "occurrences": 1,
+  "couverture": 0.99961,
+  "en": "{a} may increase the dermatologic adverse activities of {b}."
+ },
+ {
+  "rang": 433,
+  "occurrences": 1,
+  "couverture": 0.99961,
+  "en": "The risk or severity of generalized seizure can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 434,
+  "occurrences": 1,
+  "couverture": 0.99962,
+  "en": "{a} may increase the cardiotoxic activities of {b}."
+ },
+ {
+  "rang": 435,
+  "occurrences": 1,
+  "couverture": 0.99962,
+  "en": "The risk or severity of hypercoagulability can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 436,
+  "occurrences": 1,
+  "couverture": 0.99962,
+  "en": "{a} may increase the Decreased alertness activities of {b}."
+ },
+ {
+  "rang": 437,
+  "occurrences": 1,
+  "couverture": 0.99963,
+  "en": "{b} may increase the Change in thyroid function activities of {a}."
+ },
+ {
+  "rang": 438,
+  "occurrences": 1,
+  "couverture": 0.99963,
+  "en": "The risk or severity of hypotension and priapism can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 439,
+  "occurrences": 1,
+  "couverture": 0.99964,
+  "en": "The risk or severity of hypothyroidism can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 440,
+  "occurrences": 1,
+  "couverture": 0.99964,
+  "en": "The risk or severity of mucosal ulceration and ischemic colitis can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 441,
+  "occurrences": 1,
+  "couverture": 0.99964,
+  "en": "The excretion of {a} can be increased when combined with Rifampicin."
+ },
+ {
+  "rang": 442,
+  "occurrences": 1,
+  "couverture": 0.99965,
+  "en": "The risk or severity of neuropsychiatric effects can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 443,
+  "occurrences": 1,
+  "couverture": 0.99965,
+  "en": "The serum concentration of {b} can be increased when it is combined with Florbetaben (18F)."
+ },
+ {
+  "rang": 444,
+  "occurrences": 1,
+  "couverture": 0.99965,
+  "en": "Florbetaben (18F) may decrease the excretion rate of Florbetapir (18F) which could result in a higher serum level."
+ },
+ {
+  "rang": 445,
+  "occurrences": 1,
+  "couverture": 0.99966,
+  "en": "{b} may increase the nephrotoxic and ototoxic activities of {a}."
+ },
+ {
+  "rang": 446,
+  "occurrences": 1,
+  "couverture": 0.99966,
+  "en": "{b} may increase the QTc-prolonging activities of Salbutamol."
+ },
+ {
+  "rang": 447,
+  "occurrences": 1,
+  "couverture": 0.99967,
+  "en": "The serum concentration of {b} can be increased when it is combined with Salbutamol."
+ },
+ {
+  "rang": 448,
+  "occurrences": 1,
+  "couverture": 0.99967,
+  "en": "Salbutamol may decrease effectiveness of {b} as a diagnostic agent."
+ },
+ {
+  "rang": 449,
+  "occurrences": 1,
+  "couverture": 0.99967,
+  "en": "Salbutamol may decrease the excretion rate of Florbetaben (18F) which could result in a higher serum level."
+ },
+ {
+  "rang": 450,
+  "occurrences": 1,
+  "couverture": 0.99968,
+  "en": "The risk or severity of hypokalemia can be increased when Salbutamol is combined with {b}."
+ },
+ {
+  "rang": 451,
+  "occurrences": 1,
+  "couverture": 0.99968,
+  "en": "The risk or severity of bradycardia can be increased when {b} is combined with Salbutamol."
+ },
+ {
+  "rang": 452,
+  "occurrences": 1,
+  "couverture": 0.99968,
+  "en": "{b} may increase the tachycardic activities of Salbutamol."
+ },
+ {
+  "rang": 453,
+  "occurrences": 1,
+  "couverture": 0.99969,
+  "en": "The risk or severity of adverse effects can be increased when {b} is combined with Salbutamol."
+ },
+ {
+  "rang": 454,
+  "occurrences": 1,
+  "couverture": 0.99969,
+  "en": "The serum concentration of {b} can be decreased when it is combined with Salbutamol."
+ },
+ {
+  "rang": 455,
+  "occurrences": 1,
+  "couverture": 0.9997,
+  "en": "Salbutamol may decrease the excretion rate of Florbetapir (18F) which could result in a higher serum level."
+ },
+ {
+  "rang": 456,
+  "occurrences": 1,
+  "couverture": 0.9997,
+  "en": "The serum concentration of 14-OH-{b}, an active metabolite of {a}, can be increased when used in combination with {b}."
+ },
+ {
+  "rang": 457,
+  "occurrences": 1,
+  "couverture": 0.9997,
+  "en": "{b} may increase the bradycardic, atrioventricular blocking (AV block), and arrhythmogenic activities of {a}."
+ },
+ {
+  "rang": 458,
+  "occurrences": 1,
+  "couverture": 0.99971,
+  "en": "The risk or severity of sinus node depression can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 459,
+  "occurrences": 1,
+  "couverture": 0.99971,
+  "en": "The risk or severity of electrolyte abnormality can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 460,
+  "occurrences": 1,
+  "couverture": 0.99971,
+  "en": "Salbutamol may increase the sympathomimetic activities of {a}."
+ },
+ {
+  "rang": 461,
+  "occurrences": 1,
+  "couverture": 0.99972,
+  "en": "The serum concentration of 5-amino-imidazole-4-carboxamide (AIC), an active metabolite of {b}, can be increased when used in combination with {a}."
+ },
+ {
+  "rang": 462,
+  "occurrences": 1,
+  "couverture": 0.99972,
+  "en": "The risk or severity of death can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 463,
+  "occurrences": 1,
+  "couverture": 0.99973,
+  "en": "The risk or severity of hyperkinetic symptoms can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 464,
+  "occurrences": 1,
+  "couverture": 0.99973,
+  "en": "The risk or severity of hypotension, hyperkalemia, and reduced intravascular volume can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 465,
+  "occurrences": 1,
+  "couverture": 0.99973,
+  "en": "The risk or severity of anemia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 466,
+  "occurrences": 1,
+  "couverture": 0.99974,
+  "en": "The risk or severity of rash, hypersensitivity reaction, Stevens-Johnson syndrome, and Cutaneous drug reaction can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 467,
+  "occurrences": 1,
+  "couverture": 0.99974,
+  "en": "The risk or severity of Stevens-Johnson syndrome can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 468,
+  "occurrences": 1,
+  "couverture": 0.99974,
+  "en": "The risk or severity of torsade de pointes can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 469,
+  "occurrences": 1,
+  "couverture": 0.99975,
+  "en": "{b} may increase the teratogenic activities of {a}."
+ },
+ {
+  "rang": 470,
+  "occurrences": 1,
+  "couverture": 0.99975,
+  "en": "The risk or severity of intraocular pressure can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 471,
+  "occurrences": 1,
+  "couverture": 0.99975,
+  "en": "Rifampicin may increase the hypotensive activities of {a}."
+ },
+ {
+  "rang": 472,
+  "occurrences": 1,
+  "couverture": 0.99976,
+  "en": "{b} may increase the hypolipidaemic activities of {a}."
+ },
+ {
+  "rang": 473,
+  "occurrences": 1,
+  "couverture": 0.99976,
+  "en": "The risk or severity of increased glucose can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 474,
+  "occurrences": 1,
+  "couverture": 0.99977,
+  "en": "The risk or severity of granulocytopenia can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 475,
+  "occurrences": 1,
+  "couverture": 0.99977,
+  "en": "The risk or severity of weight gain and edema formation can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 476,
+  "occurrences": 1,
+  "couverture": 0.99977,
+  "en": "The risk or severity of rhabdomyolysis can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 477,
+  "occurrences": 1,
+  "couverture": 0.99978,
+  "en": "The risk or severity of progressive multifocal leukoencephalopathy and immunosuppression can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 478,
+  "occurrences": 1,
+  "couverture": 0.99978,
+  "en": "{a} may increase the myopathic rhabdomyolysis activities of {b}."
+ },
+ {
+  "rang": 479,
+  "occurrences": 1,
+  "couverture": 0.99978,
+  "en": "{a} may increase the arrhythmogenic and cardiotoxic activities of {b}."
+ },
+ {
+  "rang": 480,
+  "occurrences": 1,
+  "couverture": 0.99979,
+  "en": "The risk or severity of torsade de pointes and Cardiac Arrhythmia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 481,
+  "occurrences": 1,
+  "couverture": 0.99979,
+  "en": "The risk or severity of serotonin syndrome and opioid toxicity can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 482,
+  "occurrences": 1,
+  "couverture": 0.9998,
+  "en": "The risk or severity of psychotic reaction can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 483,
+  "occurrences": 1,
+  "couverture": 0.9998,
+  "en": "The risk or severity of generalized seizure can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 484,
+  "occurrences": 1,
+  "couverture": 0.9998,
+  "en": "The risk or severity of cytopenia can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 485,
+  "occurrences": 1,
+  "couverture": 0.99981,
+  "en": "{b} may decrease the vasoconstricting activities of {a}."
+ },
+ {
+  "rang": 486,
+  "occurrences": 1,
+  "couverture": 0.99981,
+  "en": "The risk or severity of cardiac arrest can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 487,
+  "occurrences": 1,
+  "couverture": 0.99981,
+  "en": "The serum concentration of 25-O-Desacetyl{a}, an active metabolite of {a}, can be increased when used in combination with {b}."
+ },
+ {
+  "rang": 488,
+  "occurrences": 1,
+  "couverture": 0.99982,
+  "en": "The risk or severity of Anticonvulsant Toxicity can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 489,
+  "occurrences": 1,
+  "couverture": 0.99982,
+  "en": "{a} may decrease the diuretic activities of {b}."
+ },
+ {
+  "rang": 490,
+  "occurrences": 1,
+  "couverture": 0.99983,
+  "en": "The risk or severity of osteomalacia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 491,
+  "occurrences": 1,
+  "couverture": 0.99983,
+  "en": "The serum concentration of {b} can be increased when it is combined with Rifampicin."
+ },
+ {
+  "rang": 492,
+  "occurrences": 1,
+  "couverture": 0.99983,
+  "en": "The serum concentration of teriflunomide (A77 1726), an active metabolite of {b}, can be increased when used in combination with Rifampicin."
+ },
+ {
+  "rang": 493,
+  "occurrences": 1,
+  "couverture": 0.99984,
+  "en": "The risk or severity of liver damage can be increased when Rifampicin is combined with {b}."
+ },
+ {
+  "rang": 494,
+  "occurrences": 1,
+  "couverture": 0.99984,
+  "en": "The excretion of {b} can be decreased when combined with Rifampicin."
+ },
+ {
+  "rang": 495,
+  "occurrences": 1,
+  "couverture": 0.99984,
+  "en": "The risk or severity of adverse effects can be decreased when Rifampicin is combined with {b}."
+ },
+ {
+  "rang": 496,
+  "occurrences": 1,
+  "couverture": 0.99985,
+  "en": "{a} may increase the atrioventricular blocking (AV block) and tachycardic activities of {b}."
+ },
+ {
+  "rang": 497,
+  "occurrences": 1,
+  "couverture": 0.99985,
+  "en": "The risk or severity of anemia can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 498,
+  "occurrences": 1,
+  "couverture": 0.99986,
+  "en": "The risk or severity of Hypertrichosis can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 499,
+  "occurrences": 1,
+  "couverture": 0.99986,
+  "en": "The risk or severity of gouty arthritis can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 500,
+  "occurrences": 1,
+  "couverture": 0.99986,
+  "en": "The risk or severity of increased serum creatinine can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 501,
+  "occurrences": 1,
+  "couverture": 0.99987,
+  "en": "The risk or severity of Cardiovascular Impairment can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 502,
+  "occurrences": 1,
+  "couverture": 0.99987,
+  "en": "The risk or severity of drowsiness and CNS depression can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 503,
+  "occurrences": 1,
+  "couverture": 0.99987,
+  "en": "The risk or severity of hypokalemia can be increased when {a} is combined with Salbutamol."
+ },
+ {
+  "rang": 504,
+  "occurrences": 1,
+  "couverture": 0.99988,
+  "en": "The risk or severity of hemorrhage, gastrointestinal bleeding, and gastrointestinal ulceration can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 505,
+  "occurrences": 1,
+  "couverture": 0.99988,
+  "en": "{b} may increase the cardiotoxic activities of {a}."
+ },
+ {
+  "rang": 506,
+  "occurrences": 1,
+  "couverture": 0.99988,
+  "en": "The risk or severity of leukopenia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 507,
+  "occurrences": 1,
+  "couverture": 0.99989,
+  "en": "The risk or severity of fluid retention can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 508,
+  "occurrences": 1,
+  "couverture": 0.99989,
+  "en": "The risk or severity of serotonin syndrome and neuroleptic malignant syndrome can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 509,
+  "occurrences": 1,
+  "couverture": 0.9999,
+  "en": "The risk or severity of hypotension, hyperkalemia, and nephrotoxicity can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 510,
+  "occurrences": 1,
+  "couverture": 0.9999,
+  "en": "Rifampicin may increase the neuromuscular blocking activities of {a}."
+ },
+ {
+  "rang": 511,
+  "occurrences": 1,
+  "couverture": 0.9999,
+  "en": "{a} may increase the analgesic activities of {b}."
+ },
+ {
+  "rang": 512,
+  "occurrences": 1,
+  "couverture": 0.99991,
+  "en": "The risk or severity of elevated intracranial pressure can be increased when Salbutamol is combined with {a}."
+ },
+ {
+  "rang": 513,
+  "occurrences": 1,
+  "couverture": 0.99991,
+  "en": "The serum concentration of {b}-10,11­ epoxide (CBZ-E), an active metabolite of {b}, can be increased when used in combination with {a}."
+ },
+ {
+  "rang": 514,
+  "occurrences": 1,
+  "couverture": 0.99991,
+  "en": "The serum concentration of Phenobarbital, an active metabolite of {b}, can be increased when used in combination with {a}."
+ },
+ {
+  "rang": 515,
+  "occurrences": 1,
+  "couverture": 0.99992,
+  "en": "The risk or severity of hemorrhagic cystitis can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 516,
+  "occurrences": 1,
+  "couverture": 0.99992,
+  "en": "{a} may increase the nephrotoxic and neuromuscular blocking activities of {b}."
+ },
+ {
+  "rang": 517,
+  "occurrences": 1,
+  "couverture": 0.99993,
+  "en": "The risk or severity of QTc prolongation and serotonin syndrome can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 518,
+  "occurrences": 1,
+  "couverture": 0.99993,
+  "en": "Rifampicin may increase the excretion rate of {a} which could result in a lower serum level and potentially a reduction in efficacy."
+ },
+ {
+  "rang": 519,
+  "occurrences": 1,
+  "couverture": 0.99993,
+  "en": "The serum concentration of E3174, an active metabolite of {b}, can be decreased when used in combination with {a}."
+ },
+ {
+  "rang": 520,
+  "occurrences": 1,
+  "couverture": 0.99994,
+  "en": "{a} may increase the QTc-prolonging and arrhythmogenic activities of {b}."
+ },
+ {
+  "rang": 521,
+  "occurrences": 1,
+  "couverture": 0.99994,
+  "en": "The risk or severity of Cardiac Arrhythmia and CNS stimulation can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 522,
+  "occurrences": 1,
+  "couverture": 0.99994,
+  "en": "The serum concentration of Phenobarbital, an active metabolite of {a}, can be increased when used in combination with {b}."
+ },
+ {
+  "rang": 523,
+  "occurrences": 1,
+  "couverture": 0.99995,
+  "en": "The risk or severity of QTc prolongation and ventricular arrhythmias can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 524,
+  "occurrences": 1,
+  "couverture": 0.99995,
+  "en": "The risk or severity of osteomalacia can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 525,
+  "occurrences": 1,
+  "couverture": 0.99996,
+  "en": "The risk or severity of generalized seizure and bradycardia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 526,
+  "occurrences": 1,
+  "couverture": 0.99996,
+  "en": "{b} may increase the hypotensive and hyperkalemic activities of {a}."
+ },
+ {
+  "rang": 527,
+  "occurrences": 1,
+  "couverture": 0.99996,
+  "en": "The risk or severity of ventricular arrhythmias and torsade de pointes can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 528,
+  "occurrences": 1,
+  "couverture": 0.99997,
+  "en": "The serum concentration of {a} can be increased when it is combined with Rifampicin."
+ },
+ {
+  "rang": 529,
+  "occurrences": 1,
+  "couverture": 0.99997,
+  "en": "{a} may increase the hepatotoxic and myelosuppressive activities of {b}."
+ },
+ {
+  "rang": 530,
+  "occurrences": 1,
+  "couverture": 0.99997,
+  "en": "The risk or severity of ventricular arrhythmias and Cardiac Arrhythmia can be increased when {b} is combined with {a}."
+ },
+ {
+  "rang": 531,
+  "occurrences": 1,
+  "couverture": 0.99998,
+  "en": "The serum concentration of {a} can be decreased when it is combined with Salbutamol."
+ },
+ {
+  "rang": 532,
+  "occurrences": 1,
+  "couverture": 0.99998,
+  "en": "{b} may increase the arrhythmogenic and cardiotoxic activities of {a}."
+ },
+ {
+  "rang": 533,
+  "occurrences": 1,
+  "couverture": 0.99999,
+  "en": "The risk or severity of tumor lysis syndrome can be increased when {a} is combined with {b}."
+ },
+ {
+  "rang": 534,
+  "occurrences": 1,
+  "couverture": 0.99999,
+  "en": "{a} may increase the neutropenic activities of {b}."
+ },
+ {
+  "rang": 535,
+  "occurrences": 1,
+  "couverture": 0.99999,
+  "en": "The serum concentration of {b} can be increased when it is combined with Florbetapir (18F)."
+ },
+ {
+  "rang": 536,
+  "occurrences": 1,
+  "couverture": 1.0,
+  "en": "The serum concentration of monomethyl auristatin E (MMAE), an active metabolite of {b}, can be increased when used in combination with {a}."
+ },
+ {
+  "rang": 537,
+  "occurrences": 1,
+  "couverture": 1.0,
+  "en": "{b} may decrease the arrhythmogenic activities of {a}."
+ }
+]

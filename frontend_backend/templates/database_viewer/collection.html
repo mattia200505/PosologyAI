@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Collection {{ name }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f1923; color: #e0e0e0; min-height: 100vh;
+        }
+        .header {
+            background: #1a2634; padding: 1rem 2rem;
+            display: flex; align-items: center; gap: 1rem;
+            border-bottom: 1px solid #2a3a4a; flex-wrap: wrap;
+        }
+        .header h1 { font-size: 1.15rem; }
+        .header a { color: #4a9eff; text-decoration: none; font-size: .9rem; }
+        .header a:hover { text-decoration: underline; }
+        .header .meta { color: #999; font-size: .85rem; margin-left: auto; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 1.5rem 2rem; }
+        .search-bar { margin-bottom: 1.5rem; display: flex; gap: .5rem; }
+        .search-bar input {
+            flex: 1; padding: .6rem 1rem; background: #1a2634;
+            border: 1px solid #2a3a4a; color: #e0e0e0; border-radius: 6px;
+            font-size: .9rem; outline: none;
+        }
+        .search-bar input:focus { border-color: #4a9eff; }
+        .search-bar button {
+            padding: .6rem 1.2rem; background: #4a9eff; color: #fff;
+            border: none; border-radius: 6px; cursor: pointer;
+        }
+        .search-bar button:hover { background: #3a8eef; }
+        .search-results { display: none; margin-bottom: 1.5rem; }
+        .search-results.active { display: block; }
+        .search-results h3 { margin-bottom: .75rem; color: #4a9eff; font-size: .95rem; }
+        table {
+            width: 100%; border-collapse: collapse; font-size: .85rem;
+        }
+        th {
+            background: #1a2634; text-align: left; padding: .6rem .75rem;
+            border-bottom: 2px solid #2a3a4a; color: #999; font-weight: 600;
+            position: sticky; top: 0;
+        }
+        td {
+            padding: .5rem .75rem; border-bottom: 1px solid #1e2a36;
+            max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        tr:hover td { background: #1e2a36; }
+        .payload-field { margin: .15rem 0; }
+        .payload-key { color: #4a9eff; }
+        .payload-value { color: #e0e0e0; }
+        .point-id { color: #4a9eff; text-decoration: none; font-family: monospace; }
+        .point-id:hover { text-decoration: underline; }
+        .score-badge {
+            display: inline-block; padding: .15rem .5rem; border-radius: 4px;
+            font-size: .8rem; font-weight: 500;
+        }
+        .score-high { background: #1a3a2a; color: #4aeF9e; }
+        .score-mid { background: #3a3a1a; color: #efef4a; }
+        .score-low { background: #3a1a1a; color: #ef6b6b; }
+        .pagination {
+            display: flex; align-items: center; justify-content: center;
+            gap: 1rem; margin-top: 1.5rem; padding-bottom: 2rem;
+        }
+        .pagination a, .pagination span {
+            padding: .5rem 1rem; border-radius: 6px; font-size: .9rem;
+        }
+        .pagination a { background: #1a2634; color: #4a9eff; text-decoration: none; }
+        .pagination a:hover { background: #2a3a4a; }
+        .pagination .current { color: #999; }
+        .error { background: #2a1a1a; border: 1px solid #6b2a2a; padding: 1rem; border-radius: 8px; }
+        .mono { font-family: 'Consolas', 'Courier New', monospace; font-size: .8rem; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="{{ url_for('database_viewer.index') }}">&larr; Collections</a>
+        <h1>{{ name }}</h1>
+        <span class="meta">{{ total }} points &middot; dim {{ dim }} &middot; {{ distance }}</span>
+    </div>
+    <div class="container">
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% else %}
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Recherche sémantique..." value="{{ search }}">
+            <button onclick="searchCollection()">Rechercher</button>
+        </div>
+
+        <div class="search-results" id="search-results">
+            <h3>Résultats de recherche sémantique</h3>
+            <div id="search-results-content"></div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Payload</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for point in points %}
+                <tr>
+                    <td><a class="point-id" href="{{ url_for('database_viewer.view_point', name=name, point_id=point.id) }}">{{ point.id }}</a></td>
+                    <td>
+                        {% if point.payload %}
+                        {% for key, value in point.payload.items() %}
+                        <div class="payload-field">
+                            <span class="payload-key">{{ key }}:</span>
+                            <span class="payload-value mono">
+                                {% if value is mapping %}
+                                {{ value | tojson(ensure_ascii=False)[:150] }}
+                                {% elif value is sequence and value is not string %}
+                                [{{ value | join(', ') }}]
+                                {% else %}
+                                {{ value }}
+                                {% endif %}
+                            </span>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <span style="color:#666">(aucun payload)</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="pagination">
+            {% if page > 1 %}
+            <a href="{{ url_for('database_viewer.view_collection', name=name, page=page-1, per_page=per_page) }}">Précédent</a>
+            {% else %}
+            <span style="color:#444">Précédent</span>
+            {% endif %}
+            <span class="current">Page {{ page }}</span>
+            {% if next_offset is not none and next_offset > 0 %}
+            <a href="{{ url_for('database_viewer.view_collection', name=name, page=page+1, per_page=per_page) }}">Suivant</a>
+            {% else %}
+            <span style="color:#444">Suivant</span>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        let searchDebounce = null;
+        document.getElementById('search-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') searchCollection();
+        });
+
+        function searchCollection() {
+            const q = document.getElementById('search-input').value.trim();
+            const container = document.getElementById('search-results');
+            const content = document.getElementById('search-results-content');
+
+            if (!q) { container.classList.remove('active'); return; }
+
+            fetch('{{ url_for("database_viewer.api_search_collection", name=name) }}?q=' + encodeURIComponent(q) + '&limit=10')
+                .then(r => r.json())
+                .then(data => {
+                    if (data.error) {
+                        content.innerHTML = '<div class="error">' + data.error + '</div>';
+                    } else if (data.results.length === 0) {
+                        content.innerHTML = '<p style="color:#666">Aucun résultat</p>';
+                    } else {
+                        let html = '<table><thead><tr><th>Score</th><th>ID</th><th>Payload</th></tr></thead><tbody>';
+                        data.results.forEach(r => {
+                            const scoreClass = r.score >= 0.3 ? 'score-high' : r.score >= 0.15 ? 'score-mid' : 'score-low';
+                            let payloadHtml = '';
+                            if (r.payload) {
+                                for (const [k, v] of Object.entries(r.payload)) {
+                                    const val = Array.isArray(v) ? v.join(', ') : (typeof v === 'object' ? JSON.stringify(v).slice(0,150) : v);
+                                    payloadHtml += '<div class="payload-field"><span class="payload-key">' + k + ':</span> <span class="payload-value mono">' + val + '</span></div>';
+                                }
+                            }
+                            html += '<tr><td><span class="score-badge ' + scoreClass + '">' + r.score.toFixed(4) + '</span></td>';
+                            html += '<td><a class="point-id" href="{{ url_for("database_viewer.view_point", name=name, point_id=0) }}'.replace('/0', '/'+r.id) + '">' + r.id + '</a></td>';
+                            html += '<td>' + payloadHtml + '</td></tr>';
+                        });
+                        html += '</tbody></table>';
+                        content.innerHTML = html;
+                    }
+                    container.classList.add('active');
+                })
+                .catch(err => {
+                    content.innerHTML = '<div class="error">Erreur: ' + err.message + '</div>';
+                    container.classList.add('active');
+                });
+        }
+    </script>
+</body>
+</html>

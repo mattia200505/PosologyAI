@@ -1,0 +1,4 @@
+drug_id_1,drug_id_2,severity,mechanism,recommendation,description,risk_score
+EX002,EX001,Modérée,Additif,Éviter association,Risque de surdosage en antalgique,50
+EX002,EX003,Mineure,Pharmacocinétique,Surveillance standard,Association fréquente sans risque,15
+EX001,EX004,Mineure,Aucun connu,Association possible,Aucune interaction documentée,5

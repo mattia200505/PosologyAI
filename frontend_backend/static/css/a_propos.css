@@ -1,0 +1,794 @@
+/* ─── Page « Architecture » ────────────────────────────────────────────
+   Réglages du skill : VARIANCE 7, MOTION 4, DENSITY 6. La page décrit le
+   montage interne du projet ; c'est de la documentation technique, et une
+   documentation trop aérée oblige à faire défiler pour comparer deux
+   chiffres qui devraient tenir côte à côte.
+
+   La palette n'est pas inventée. C'est celle du site, reprise de theme.css :
+   fond #f5f5f7, surfaces blanches, encre #1d1d1f, accent indigo #4f46e5, et
+   le dégradé nuit #1e1b4b → #312e81 → #3730a3 déjà en service dans la
+   section « Intelligence artificielle » de l'accueil.
+
+   Un seul accent (§4.2), un seul rayon de coin (§4.4). Aucune couleur ne
+   code un niveau de gravité : c'est la contrainte du projet, elle vaut
+   aussi ici, y compris sur le graphique à barres où la ligne « aucune
+   correspondance » est grise et non rouge.
+
+   Le pied de page du site est presque noir. Les fonds alternent donc de
+   façon à ne pas empiler deux bandes sombres avant lui : la clôture est
+   claire, et c'est le pied qui ferme. */
+
+.page-apropos {
+  --ap-fond: var(--bg, #f5f5f7);
+  --ap-surface: var(--surface, #ffffff);
+  --ap-encre: var(--text-primary, #1d1d1f);
+  --ap-douce: var(--text-secondary, #6e6e73);
+  --ap-filet: rgba(0, 0, 0, 0.09);
+  --ap-filet-fort: rgba(0, 0, 0, 0.18);
+  --ap-accent: var(--primary, #4f46e5);
+  --ap-nuit: #1e1b4b;
+  --ap-nuit-2: #312e81;
+  --ap-nuit-3: #3730a3;
+  /* Sur fond nuit, l'indigo du site tombe à 2,4:1. Il est éclairci pour
+     tenir son rôle d'accent sans devenir une deuxième couleur. Deux crans
+     ont été essayés : #a5b4fc ne donne que 3,5:1 sur le bandeau, tout
+     juste bon pour du grand corps ; #c7d2fe tient 4,7:1. */
+  --ap-accent-sur-sombre: #c7d2fe;
+  --ap-rayon: 16px;
+
+  background: var(--ap-fond);
+  color: var(--ap-encre);
+  overflow-x: hidden;
+}
+
+.ap-large { position: relative; max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+
+/* Le libellé du champ de recherche existe pour les lecteurs d'écran. Sans
+   cette règle il s'affichait en clair au-dessus du champ : elle n'était
+   déclarée nulle part dans les feuilles du site. */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+.ap-sur {
+  margin: 0 0 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ap-douce);
+}
+
+.ap-titre-section {
+  margin: 0 0 14px;
+  font-size: clamp(1.5rem, 2.9vw, 2.15rem);
+  font-weight: 740;
+  line-height: 1.14;
+  letter-spacing: -0.03em;
+}
+
+.ap-intro-section { max-width: 62ch; margin: 0 0 44px; font-size: 1rem; line-height: 1.74; color: var(--ap-douce); }
+.ap-absent { margin: 0; font-size: 0.98rem; color: var(--ap-douce); }
+
+
+/* ══ 1. Bandeau d'ouverture ═════════════════════════════════════════
+   Aligné à gauche, pas centré : au-delà de VARIANCE 4 le skill écarte le
+   hero centré (§4.3). Les quatre chiffres tiennent dans le bandeau plutôt
+   que dans une section à part. */
+
+.ap-hero { position: relative; padding: 122px 0 0; overflow: hidden; color: #fff; }
+
+.ap-hero-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.4);
+}
+
+/* Le voile est assez dense pour que le contraste ne dépende pas de la
+   photographie : le calcul se fait sur un pixel blanc, au point où le
+   dégradé est le plus transparent et où la lueur éclaircit le plus. Une
+   première version laissait passer 0,86 d'opacité et une lueur à 0,18 :
+   le titre en italique tombait à 2,9:1 et l'intitulé des chiffres à 4,0:1.
+   Densifié, le fond le plus clair est rgb(79, 75, 181), et tout tient. */
+.ap-hero-voile {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(118deg, rgba(30, 27, 75, 0.96) 0%, rgba(49, 46, 129, 0.93) 52%, rgba(55, 48, 163, 0.92) 100%),
+    radial-gradient(ellipse 70% 120% at 88% 8%, rgba(129, 140, 248, 0.14), transparent 68%);
+}
+
+.ap-hero-inner { z-index: 1; }
+.ap-hero .ap-sur { color: rgba(255, 255, 255, 0.82); }
+
+/* Couleur declaree et non heritee : theme.css applique
+   `color: var(--text-primary)` a h1..h6, et une regle directe l emporte
+   toujours sur l heritage. Le `color: #fff` pose sur la section ne
+   descendait donc pas jusqu au titre, qui restait en encre presque noire
+   sur fond sombre. */
+.ap-hero-titre {
+  max-width: 17ch;
+  margin: 0 0 26px;
+  font-size: clamp(2.05rem, 5.2vw, 3.85rem);
+  font-weight: 780;
+  line-height: 1.06;
+  letter-spacing: -0.036em;
+  color: #fff;
+}
+
+/* Réserve autour de l'italique : la pente déborde à droite et le point
+   suit. Sans elle, un interlignage à 1,06 rogne les deux. */
+.ap-hero-titre em {
+  display: inline-block;
+  padding: 0 4px 6px 0;
+  line-height: 1.14;
+  font-style: italic;
+  color: var(--ap-accent-sur-sombre);
+}
+
+.ap-hero-chapeau {
+  max-width: 63ch;
+  margin: 0 0 60px;
+  font-size: clamp(1rem, 1.3vw, 1.1rem);
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.ap-hero-chiffres {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.24);
+}
+
+.ap-hero-chiffres > div { padding: 24px 24px 32px; }
+.ap-hero-chiffres > div + div { border-left: 1px solid rgba(255, 255, 255, 0.18); }
+.ap-hero-chiffres > div:first-child { padding-left: 0; }
+
+.ap-hero-chiffres dt {
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.ap-hero-chiffres dd {
+  margin: 10px 0 0;
+  font-size: clamp(1.4rem, 2.6vw, 2.1rem);
+  font-weight: 720;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* ══ Schémas ════════════════════════════════════════════════════════
+   Dessinés à la main en SVG, sans bibliothèque : la page est servie par
+   Flask et doit rester autonome. Les couleurs viennent d'ici et non du
+   tracé, donc un schéma suit la palette au lieu de la figer.
+
+   Le dessin ne se comprime pas en dessous de 720 px : il défile dans son
+   propre cadre. Un schéma réduit à la largeur d'un téléphone rendrait ses
+   étiquettes illisibles, ce qui revient à ne rien montrer. */
+
+.ap-schema {
+  margin: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.ap-schema svg { display: block; width: 100%; min-width: 720px; height: auto; font-family: inherit; }
+
+.ap-schema figcaption {
+  max-width: 68ch;
+  margin: 22px 0 0;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--ap-douce);
+}
+
+.sc-bande { font-size: 13px; font-weight: 700; letter-spacing: 0.12em; fill: var(--ap-encre); }
+.sc-bande-vive { fill: var(--ap-accent); }
+.sc-duree { font-size: 11px; fill: var(--ap-douce); }
+
+.sc-chip rect { fill: var(--ap-surface); stroke: var(--ap-filet-fort); stroke-width: 1; }
+.sc-chip text { font-size: 12px; text-anchor: middle; fill: var(--ap-encre); }
+
+.sc-magasin rect { fill: rgba(79, 70, 229, 0.08); stroke: var(--ap-accent); stroke-width: 1.4; }
+.sc-magasin text { font-size: 11.5px; text-anchor: middle; fill: var(--ap-douce); }
+.sc-magasin .sc-nom { font-size: 14.5px; font-weight: 700; fill: var(--ap-encre); }
+
+.sc-requete rect { fill: var(--ap-accent); }
+.sc-requete text { font-size: 12px; text-anchor: middle; fill: rgba(255, 255, 255, 0.9); }
+.sc-requete .sc-nom { font-size: 15px; font-weight: 700; fill: #fff; }
+
+.sc-lien line, .sc-lien path { stroke: var(--ap-filet-fort); stroke-width: 1.4; }
+.sc-pointe { fill: var(--ap-filet-fort); }
+
+/* Variante sombre : mêmes formes, autres valeurs. Le pivot du schéma
+   prend le bleu pâle, qui tient 4,7:1 sur ce fond. */
+.ap-schema-sombre .sc-noeud rect { fill: rgba(255, 255, 255, 0.08); stroke: rgba(255, 255, 255, 0.34); stroke-width: 1.2; }
+.ap-schema-sombre .sc-noeud text { font-size: 11.5px; text-anchor: middle; fill: rgba(255, 255, 255, 0.82); }
+.ap-schema-sombre .sc-noeud .sc-nom { font-size: 13.5px; font-weight: 700; fill: #fff; }
+.ap-schema-sombre .sc-noeud-pivot rect { fill: rgba(199, 210, 254, 0.18); stroke: var(--ap-accent-sur-sombre); stroke-width: 1.6; }
+.ap-schema-sombre .sc-lien line, .ap-schema-sombre .sc-lien path { stroke: rgba(255, 255, 255, 0.46); }
+.ap-schema-sombre .sc-pointe { fill: rgba(255, 255, 255, 0.46); }
+.ap-schema-sombre figcaption { color: rgba(255, 255, 255, 0.78); }
+
+/* Pas de `text-anchor` en CSS ici : les étiquettes d'arête portent leur
+   ancrage en attribut, et une déclaration de feuille l'emporterait sur
+   l'attribut de présentation. */
+.sc-arete-nom text { font-size: 10.5px; letter-spacing: 0.04em; fill: rgba(255, 255, 255, 0.74); }
+.sc-arete-nom .sc-arete-n { font-weight: 600; fill: var(--ap-accent-sur-sombre); }
+
+
+/* ══ 2. Trois régimes de temps ══════════════════════════════════════ */
+
+.ap-regimes { padding: 100px 0; background: var(--ap-fond); }
+
+.ap-regimes-tete {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: 48px;
+  align-items: end;
+  margin-bottom: 52px;
+}
+
+.ap-regimes-tete h2 {
+  margin: 0;
+  font-size: clamp(1.5rem, 2.9vw, 2.15rem);
+  font-weight: 740;
+  line-height: 1.14;
+  letter-spacing: -0.03em;
+}
+
+.ap-regimes-tete p { margin: 0; font-size: 1rem; line-height: 1.74; color: var(--ap-douce); }
+.ap-regimes-tete p em { font-style: italic; color: var(--ap-encre); }
+
+/* La note tient le rôle d'un aparté : décalée, plus étroite, tenue par un
+   filet d'accent. Ce n'est pas une carte, l'élévation ne dirait rien. */
+.ap-note {
+  width: min(100%, 720px);
+  margin: 52px 0 0 auto;
+  padding: 4px 0 4px 30px;
+  border-left: 3px solid var(--ap-accent);
+}
+
+.ap-note h3 { margin: 0 0 12px; font-size: 1.04rem; font-weight: 700; letter-spacing: -0.018em; }
+.ap-note p { margin: 0; font-size: 0.97rem; line-height: 1.76; color: var(--ap-douce); }
+
+.ap-note-sombre { border-left-color: var(--ap-accent-sur-sombre); }
+.ap-note-sombre h3 { color: #fff; }
+.ap-note-sombre p { color: rgba(255, 255, 255, 0.82); }
+.ap-note-sombre p em { font-style: italic; color: var(--ap-accent-sur-sombre); }
+
+
+/* ══ 3. Les quatre magasins ═════════════════════════════════════════
+   Registre à trois colonnes séparé par des filets. Ni cartes ni tuiles
+   égales : ce sont des entrées comparables, elles se lisent en descendant
+   et le regard doit pouvoir sauter d'un chiffre à l'autre. */
+
+.ap-magasins { padding: 100px 0; background: var(--ap-surface); border-block: 1px solid var(--ap-filet); }
+
+.ap-registre { margin: 0; padding: 0; list-style: none; }
+
+.ap-registre > li {
+  display: grid;
+  grid-template-columns: 68px minmax(0, 0.8fr) minmax(0, 1.45fr);
+  gap: 28px;
+  padding: 36px 0;
+  border-top: 1px solid var(--ap-filet);
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ap-registre > li:last-child { border-bottom: 1px solid var(--ap-filet); }
+.ap-registre > li.ap-vu { opacity: 1; transform: none; }
+
+.ap-registre-rang {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ap-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.ap-registre-titre h3 {
+  margin: 0 0 10px;
+  font-size: clamp(1.12rem, 1.9vw, 1.45rem);
+  font-weight: 700;
+  line-height: 1.24;
+  letter-spacing: -0.024em;
+}
+
+.ap-registre-mesure {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.6;
+  color: var(--ap-douce);
+  font-variant-numeric: tabular-nums;
+}
+
+.ap-registre-texte p { margin: 0; max-width: 64ch; font-size: 0.99rem; line-height: 1.76; color: var(--ap-douce); }
+
+/* Bordure et non ombre portée : la figure est blanche sur une section
+   blanche, une ombre ne ferait que salir le fond. */
+.ap-molecule-figure {
+  max-width: 320px;
+  margin: 24px 0 0;
+  padding: 18px 18px 12px;
+  background: var(--ap-surface);
+  border: 1px solid var(--ap-filet);
+  border-radius: var(--ap-rayon);
+}
+
+.ap-molecule-figure img { display: block; width: 100%; height: auto; max-height: 220px; object-fit: contain; }
+
+.ap-molecule-figure figcaption {
+  margin-top: 12px;
+  padding-top: 10px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--ap-douce);
+  border-top: 1px solid var(--ap-filet);
+}
+
+
+/* ══ 4. Le graphe, et 7. les agents ═════════════════════════════════
+   Deux sections sur fond nuit, séparées par quatre sections claires : le
+   rappel est un rythme, pas une répétition de mise en page. Le schéma du
+   graphe est un réseau, celui des agents une boucle. */
+
+.ap-graphe, .ap-agents {
+  padding: 100px 0;
+  color: #fff;
+  background: linear-gradient(142deg, var(--ap-nuit) 0%, var(--ap-nuit-2) 56%, var(--ap-nuit-3) 100%);
+}
+
+.ap-graphe-tete { max-width: 70ch; margin-bottom: 44px; }
+
+.ap-graphe-tete h2 {
+  margin: 0 0 14px;
+  font-size: clamp(1.5rem, 2.9vw, 2.15rem);
+  font-weight: 740;
+  line-height: 1.14;
+  letter-spacing: -0.03em;
+  color: #fff;
+}
+
+.ap-graphe-tete p { margin: 0; font-size: 1rem; line-height: 1.74; color: rgba(255, 255, 255, 0.85); }
+.ap-agents .ap-sur { color: rgba(255, 255, 255, 0.82); }
+
+
+/* ══ 5. L'appariement ═══════════════════════════════════════════════
+   Un graphique à barres, pas un tableau : neuf règles dont la première
+   couvre plus de la moitié des fiches, et c'est la proportion qui est
+   l'information. Les longueurs sont calculées à l'affichage à partir des
+   effectifs réels, jamais dessinées à la main. */
+
+.ap-appariement { padding: 100px 0; background: var(--ap-fond); }
+
+.ap-appariement-tete { margin-bottom: 46px; }
+
+.ap-appariement-tete h2 {
+  margin: 0 0 18px;
+  font-size: clamp(1.5rem, 3vw, 2.3rem);
+  font-weight: 740;
+  line-height: 1.14;
+  letter-spacing: -0.03em;
+}
+
+.ap-appariement-tete p {
+  max-width: 66ch;
+  margin: 0 0 0 auto;
+  font-size: 1rem;
+  line-height: 1.74;
+  color: var(--ap-douce);
+}
+
+.ap-barres { margin: 0; padding: 0; list-style: none; }
+
+.ap-barres > li {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr) 92px;
+  gap: 24px;
+  align-items: center;
+  padding: 14px 0;
+  border-top: 1px solid var(--ap-filet);
+}
+
+.ap-barres > li:last-child { border-bottom: 1px solid var(--ap-filet); }
+.ap-barre-nom { font-size: 0.93rem; font-weight: 600; }
+
+.ap-barre-piste {
+  height: 12px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.ap-barre-trait {
+  display: block;
+  height: 100%;
+  background: var(--ap-accent);
+  border-radius: 999px;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ap-vu .ap-barre-trait { transform: scaleX(1); }
+
+/* Gris, et non rouge. Aucune couleur de cette page ne code un niveau de
+   gravité, et un échec d'appariement n'est pas un danger : c'est une
+   information sur nous. */
+.ap-barre-echec .ap-barre-trait { background: var(--ap-douce); }
+.ap-barre-echec .ap-barre-nom { color: var(--ap-douce); }
+
+.ap-barre-n { text-align: right; font-size: 0.93rem; font-weight: 650; font-variant-numeric: tabular-nums; }
+
+.ap-bilan {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 40px;
+  margin-top: 52px;
+}
+
+.ap-bilan > div {
+  padding-top: 26px;
+  border-top: 2px solid var(--ap-accent);
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ap-bilan > div:last-child { border-top-color: var(--ap-filet-fort); }
+.ap-bilan > div.ap-vu { opacity: 1; transform: none; }
+
+.ap-bilan-n {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 760;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+}
+
+.ap-bilan-t { margin: 6px 0 12px; font-size: 0.98rem; font-weight: 650; }
+.ap-bilan-d { max-width: 46ch; margin: 0; font-size: 0.94rem; line-height: 1.72; color: var(--ap-douce); }
+
+
+/* ══ 6. Le trajet d'une requête ═════════════════════════════════════
+   Frise verticale numérotée. Le titre reste collé pendant que les six
+   étapes défilent, ce qui garde la question sous les yeux. */
+
+.ap-trajet { padding: 100px 0; background: var(--ap-surface); border-block: 1px solid var(--ap-filet); }
+
+.ap-trajet-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
+  gap: 62px;
+}
+
+.ap-trajet-titre { position: sticky; top: 104px; align-self: start; }
+
+.ap-trajet-titre h2 {
+  margin: 0 0 18px;
+  font-size: clamp(1.5rem, 2.9vw, 2.15rem);
+  font-weight: 740;
+  line-height: 1.14;
+  letter-spacing: -0.03em;
+}
+
+.ap-trajet-titre p { margin: 0; max-width: 34ch; font-size: 0.98rem; line-height: 1.72; color: var(--ap-douce); }
+
+.ap-frise { margin: 0; padding: 0; list-style: none; counter-reset: etape; }
+
+.ap-frise > li {
+  position: relative;
+  padding: 0 0 34px 60px;
+  border-left: 1px solid var(--ap-filet);
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ap-frise > li:last-child { padding-bottom: 0; border-left-color: transparent; }
+.ap-frise > li.ap-vu { opacity: 1; transform: none; }
+
+.ap-frise > li::before {
+  counter-increment: etape;
+  content: counter(etape, decimal-leading-zero);
+  position: absolute;
+  top: -4px;
+  left: -18px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--ap-accent);
+  background: var(--ap-surface);
+  border: 1px solid var(--ap-accent);
+  border-radius: 50%;
+  font-variant-numeric: tabular-nums;
+}
+
+.ap-frise h3 { margin: 4px 0 10px; font-size: 1.04rem; font-weight: 680; letter-spacing: -0.018em; }
+.ap-frise p { margin: 0; max-width: 60ch; font-size: 0.97rem; line-height: 1.76; color: var(--ap-douce); }
+
+
+/* ══ 8. Ce que ce montage ne fait pas ═══════════════════════════════
+   Grille posée sur une photographie. Le voile est plus sombre et plus plat
+   que celui du bandeau d'ouverture : même matière, autre disposition. */
+
+.ap-limites { position: relative; padding: 100px 0; overflow: hidden; color: #fff; }
+
+.ap-limites-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.5);
+}
+
+.ap-limites-voile {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(16, 14, 42, 0.95) 0%, rgba(30, 27, 75, 0.93) 100%);
+}
+
+.ap-limites-inner { z-index: 1; }
+
+.ap-limites h2 {
+  margin: 0 0 40px;
+  max-width: 20ch;
+  font-size: clamp(1.5rem, 2.9vw, 2.15rem);
+  font-weight: 740;
+  line-height: 1.14;
+  letter-spacing: -0.03em;
+  color: #fff;
+}
+
+.ap-limites-grille { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.ap-limites-grille > div {
+  padding: 30px 34px 30px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ap-limites-grille > div:nth-child(even) {
+  padding-right: 0;
+  padding-left: 34px;
+  border-left: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.ap-limites-grille > div.ap-vu { opacity: 1; transform: none; }
+.ap-limites-grille h3 { margin: 0 0 12px; font-size: 1.04rem; font-weight: 680; letter-spacing: -0.016em;
+  color: #fff; }
+.ap-limites-grille p { margin: 0; max-width: 46ch; font-size: 0.95rem; line-height: 1.72; color: rgba(255, 255, 255, 0.84); }
+
+
+/* ══ 9. Sources ═════════════════════════════════════════════════════
+   Index de liens : le nom occupe la colonne de gauche, la description
+   suit, la flèche part au survol. Trois lignes, pas trois cartes. */
+
+.ap-sources { padding: 96px 0; background: var(--ap-fond); }
+
+.ap-sources-titre {
+  margin: 0 0 34px;
+  font-size: clamp(1.5rem, 2.9vw, 2.15rem);
+  font-weight: 740;
+  line-height: 1.14;
+  letter-spacing: -0.03em;
+}
+
+.ap-sources-index { margin: 0; padding: 0; list-style: none; }
+
+.ap-sources-index > li {
+  border-top: 1px solid var(--ap-filet);
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ap-sources-index > li:last-child { border-bottom: 1px solid var(--ap-filet); }
+.ap-sources-index > li.ap-vu { opacity: 1; transform: none; }
+
+.ap-sources-index a {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr) 26px;
+  gap: 26px;
+  align-items: center;
+  padding: 28px 18px 28px 14px;
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--ap-rayon);
+  transition: background 0.24s ease;
+}
+
+.ap-sources-index a:hover { background: rgba(79, 70, 229, 0.06); }
+.ap-sources-index a:focus-visible { outline: 2px solid var(--ap-accent); outline-offset: 3px; }
+
+.ap-source-nom { font-size: clamp(1.25rem, 2.3vw, 1.7rem); font-weight: 720; letter-spacing: -0.028em; }
+.ap-source-desc { font-size: 0.95rem; line-height: 1.68; color: var(--ap-douce); }
+
+.ap-source-fleche { font-size: 0.9rem; color: var(--ap-accent); transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1); }
+.ap-sources-index a:hover .ap-source-fleche { transform: translate(3px, -3px); }
+
+
+/* ══ 10. Clôture ════════════════════════════════════════════════════
+   Claire, et non sombre : le pied de page du site est presque noir, deux
+   bandes sombres empilées se seraient confondues. */
+
+.ap-cloture { padding: 92px 0 100px; background: var(--ap-surface); border-top: 1px solid var(--ap-filet); }
+
+.ap-cloture-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: 52px;
+  align-items: center;
+}
+
+.ap-cloture-texte h2 {
+  margin: 0 0 14px;
+  font-size: clamp(1.45rem, 2.7vw, 2rem);
+  font-weight: 740;
+  line-height: 1.16;
+  letter-spacing: -0.03em;
+}
+
+.ap-cloture-texte p { margin: 0; max-width: 44ch; font-size: 0.98rem; line-height: 1.74; color: var(--ap-douce); }
+
+.ap-recherche {
+  display: flex;
+  gap: 8px;
+  padding: 7px;
+  background: var(--ap-fond);
+  border: 1px solid var(--ap-filet);
+  border-radius: calc(var(--ap-rayon) + 7px);
+}
+
+.ap-recherche input {
+  flex: 1;
+  min-width: 0;
+  padding: 15px 17px;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--ap-encre);
+  background: transparent;
+  border: none;
+}
+
+.ap-recherche input::placeholder { color: var(--ap-douce); }
+.ap-recherche input:focus { outline: none; }
+.ap-recherche:focus-within { border-color: var(--ap-accent); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.16); }
+
+.ap-recherche button {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 15px 28px;
+  font: inherit;
+  font-weight: 650;
+  color: #fff;
+  white-space: nowrap;
+  background: var(--ap-accent);
+  border: none;
+  border-radius: var(--ap-rayon);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.18s ease;
+}
+
+.ap-recherche button:hover { background: var(--ap-nuit-3); transform: translateY(-1px); }
+.ap-recherche button:active { transform: scale(0.985); }
+.ap-recherche button i { transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1); }
+.ap-recherche button:hover i { transform: translateX(4px); }
+
+.ap-cloture-liens { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+
+.ap-cloture-liens a {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 18px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ap-encre);
+  text-decoration: none;
+  background: var(--ap-surface);
+  border: 1px solid var(--ap-filet-fort);
+  border-radius: 999px;
+  transition: border-color 0.22s ease, transform 0.18s ease;
+}
+
+.ap-cloture-liens a:hover { border-color: var(--ap-accent); transform: translateY(-1px); }
+.ap-cloture-liens i { font-size: 0.85rem; color: var(--ap-accent); }
+
+
+/* ══ Repli mobile, déclaré section par section ══════════════════════ */
+
+@media (max-width: 1000px) {
+  .ap-regimes-tete,
+  .ap-trajet-inner,
+  .ap-cloture-inner { grid-template-columns: minmax(0, 1fr); gap: 26px; }
+
+  .ap-trajet-inner { gap: 40px; }
+  .ap-trajet-titre { position: static; }
+  .ap-appariement-tete p { margin-left: 0; }
+
+  .ap-registre > li { grid-template-columns: 52px minmax(0, 1fr); gap: 16px 22px; }
+  .ap-registre-texte { grid-column: 2; }
+
+  .ap-barres > li { grid-template-columns: minmax(0, 1fr) 88px; gap: 6px 18px; }
+  .ap-barre-nom { grid-column: 1; grid-row: 1; }
+  .ap-barre-n { grid-column: 2; grid-row: 1; }
+  .ap-barre-piste { grid-column: 1 / span 2; grid-row: 2; }
+
+  .ap-sources-index a { grid-template-columns: minmax(0, 1fr) 26px; gap: 8px 20px; }
+  .ap-source-nom { grid-column: 1; grid-row: 1; }
+  .ap-source-desc { grid-column: 1; grid-row: 2; }
+  .ap-source-fleche { grid-column: 2; grid-row: 1 / span 2; }
+}
+
+@media (max-width: 760px) {
+  .ap-hero { padding-top: 84px; }
+  .ap-hero-chapeau { margin-bottom: 42px; }
+  .ap-hero-chiffres { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ap-hero-chiffres > div { padding: 22px 18px 26px; }
+  .ap-hero-chiffres > div:nth-child(odd) { padding-left: 0; border-left: none; }
+  .ap-hero-chiffres > div:nth-child(n + 3) { border-top: 1px solid rgba(255, 255, 255, 0.18); }
+
+  .ap-regimes, .ap-magasins, .ap-graphe, .ap-appariement,
+  .ap-trajet, .ap-agents, .ap-limites, .ap-sources { padding: 72px 0; }
+  .ap-cloture { padding: 72px 0 80px; }
+
+  .ap-note { padding-left: 20px; }
+  .ap-bilan { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+
+  .ap-limites-grille { grid-template-columns: minmax(0, 1fr); }
+  .ap-limites-grille > div,
+  .ap-limites-grille > div:nth-child(even) { padding: 26px 0; border-left: none; }
+
+  .ap-recherche { flex-direction: column; }
+  .ap-recherche button { justify-content: center; }
+  .ap-cloture-liens a { flex: 1 1 auto; justify-content: center; }
+}
+
+
+/* ══ Mouvement réduit : tout s'arrête, rien ne disparaît ════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  .ap-registre > li,
+  .ap-frise > li,
+  .ap-limites-grille > div,
+  .ap-sources-index > li,
+  .ap-bilan > div {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  /* La barre garde sa longueur, elle ne la joue pas. */
+  .ap-barre-trait { transform: scaleX(1); transition: none; }
+
+  .ap-trajet-titre { position: static; }
+
+  .ap-sources-index a,
+  .ap-source-fleche,
+  .ap-recherche button,
+  .ap-recherche button i,
+  .ap-cloture-liens a { transition: none; }
+}

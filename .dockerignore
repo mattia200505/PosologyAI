@@ -1,0 +1,37 @@
+# Le docker-compose.yml a la racine construit avec ce dossier (MEDICSEARCH/)
+# comme contexte de build. Sans ce fichier ICI (celui dans configuration/ ne
+# compte pas -- Docker ne lit que le .dockerignore du contexte), tout ce qui
+# suit partirait vers le demon Docker a chaque build : plusieurs
+# environnements virtuels, un dump DrugBank complet, les exports de bases,
+# les journaux de collecte -- plusieurs gigaoctets, pour un Dockerfile qui
+# ne copie au final que frontend_backend/.
+
+.venv/
+.venv_new/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.git
+.gitignore
+.DS_Store
+
+# Donnees et exports volumineux, non necessaires a l'image (l'app les lit
+# depuis MongoDB/Neo4j/Qdrant a l'execution, pas depuis le disque local)
+drugbank_all_full_database.xml/
+export_base_données/
+data/
+logs/
+archive/
+neo4j_kg/
+models/
+*.out
+*.log
+.lots_journal.jsonl
+
+# Artefacts de developpement sans rapport avec l'app Flask
+docs/
+scripts/__pycache__/
+.vscode/
+graphify-out/
+frontend_backend/qdrant_storage/

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Database Viewer</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f1923; color: #e0e0e0; min-height: 100vh;
+        }
+        .header {
+            background: #1a2634; padding: 1rem 2rem;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid #2a3a4a;
+        }
+        .header h1 { font-size: 1.25rem; }
+        .header a { color: #999; text-decoration: none; font-size: .9rem; }
+        .header a:hover { color: #fff; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .collections { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+        .card {
+            background: #1a2634; border-radius: 10px; padding: 1.5rem;
+            border: 1px solid #2a3a4a; transition: border .2s;
+        }
+        .card:hover { border-color: #4a9eff; }
+        .card h2 { font-size: 1.1rem; margin-bottom: .75rem; }
+        .card h2 a { color: #4a9eff; text-decoration: none; }
+        .card h2 a:hover { text-decoration: underline; }
+        .stat { display: flex; justify-content: space-between; padding: .3rem 0; font-size: .9rem; }
+        .stat .label { color: #999; }
+        .stat .value { color: #e0e0e0; font-weight: 500; }
+        .error { background: #2a1a1a; border: 1px solid #6b2a2a; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
+        .no-data { text-align: center; padding: 3rem; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Database Viewer</h1>
+        <a href="{{ url_for('database_viewer.logout') }}">Déconnexion</a>
+    </div>
+    <div class="container">
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+
+        {% if collections %}
+        <p style="margin-bottom:1rem;color:#999;">{{ collections|length }} collection(s) trouvée(s)</p>
+        <div class="collections">
+            {% for col in collections %}
+            <div class="card">
+                <h2><a href="{{ url_for('database_viewer.view_collection', name=col.name) }}">{{ col.name }}</a></h2>
+                <div class="stat"><span class="label">Points</span><span class="value">{{ col.points }}</span></div>
+                <div class="stat"><span class="label">Dimension</span><span class="value">{{ col.dim }}</span></div>
+                <div class="stat"><span class="label">Distance</span><span class="value">{{ col.distance }}</span></div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-data">
+            <p>Aucune collection trouvée ou serveur Qdrant indisponible.</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
