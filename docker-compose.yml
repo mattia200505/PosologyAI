@@ -35,7 +35,7 @@ services:
       retries: 5
 
   neo4j:
-    image: neo4j:5   # tag sans suffixe = edition Community, sans licence a accepter
+    image: neo4j:2025.10.1   # tag sans suffixe = edition Community, sans licence a accepter
     container_name: posologyai-neo4j
     restart: unless-stopped
     ports:
@@ -46,7 +46,7 @@ services:
       # L'edition Community ne gere qu'une seule base de donnees a la fois ;
       # on la nomme "medicament" pour matcher NEO4J_DATABASE (config.py),
       # plutot que d'en creer une seconde -- impossible sans Enterprise.
-      NEO4J_dbms_default__database: medicament
+      NEO4J_initial_dbms_default__database: medicament
       NEO4J_server_memory_pagecache_size: 512M
       NEO4J_server_memory_heap_max__size: 1G
     volumes:

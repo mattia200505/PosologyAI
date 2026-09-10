@@ -56,7 +56,7 @@ Docker Compose crée MongoDB, Neo4j et Qdrant vides — le catalogue de médicam
    docker run --rm \
      -v <nom_du_volume_neo4j_data>:/data \
      -v "<chemin_absolu_vers_le_dossier_backup>:/backups" \
-     neo4j:5 neo4j-admin database load medicament --from-path=/backups --overwrite-destination=true
+     neo4j:2025.10.1 neo4j-admin database load medicament --from-path=/backups --overwrite-destination=true
    docker compose up -d neo4j
 
    # Qdrant — attention, la collection doit s'appeler "medicines" et non
